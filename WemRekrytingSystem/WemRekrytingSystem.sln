@@ -1,27 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35728.132 d17.12
+VisualStudioVersion = 17.12.35728.132
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebRekrytingSystem", "WebRekrytingSystem.csproj", "{B9CEFC6E-79CA-4C79-9B3D-A321BC37228A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WemRekrytingSystem.Tests", "..\WemRekrytingSystem.Tests\WemRekrytingSystem.Tests.csproj", "{5B5A8CE9-C8A4-4C4E-88D5-20454568F0D8}"
-EndProject
 Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B9CEFC6E-79CA-4C79-9B3D-A321BC37228A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B9CEFC6E-79CA-4C79-9B3D-A321BC37228A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B9CEFC6E-79CA-4C79-9B3D-A321BC37228A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B9CEFC6E-79CA-4C79-9B3D-A321BC37228A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5B5A8CE9-C8A4-4C4E-88D5-20454568F0D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5B5A8CE9-C8A4-4C4E-88D5-20454568F0D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5B5A8CE9-C8A4-4C4E-88D5-20454568F0D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5B5A8CE9-C8A4-4C4E-88D5-20454568F0D8}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
