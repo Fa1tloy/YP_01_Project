@@ -18,9 +18,10 @@ namespace WebReckrytingSystem.Model
         [StringLength(50, ErrorMessage = "Фамилия не должна превышать 50 символов.")]
         public required string LastName { get; set; }
 
-        public enum Role {job_seeker , employer }
-
         
+        public UserRole Role { get; set; }
+
+
 
 
     }
