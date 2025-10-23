@@ -1,0 +1,85 @@
+﻿@page
+@model WebReckrytingSystem.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Регистрация";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="text-center mb-4">Регистрация</h2>
+
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="alert alert-success">
+                    @Model.SuccessMessage
+                </div>
+            }
+
+            <form method="post">
+                <div class="mb-3">
+                    <label asp-for="RegisterData.Email" class="form-label">Email</label>
+                    <input asp-for="RegisterData.Email" class="form-control" />
+                    <span asp-validation-for="RegisterData.Email" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="RegisterData.Password" class="form-label">Пароль</label>
+                    <input asp-for="RegisterData.Password" type="password" class="form-control" />
+                    <span asp-validation-for="RegisterData.Password" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="RegisterData.ConfirmPassword" class="form-label">Подтвердите пароль</label>
+                    <input asp-for="RegisterData.ConfirmPassword" type="password" class="form-control" />
+                    <span asp-validation-for="RegisterData.ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="RegisterData.FirstName" class="form-label">Имя</label>
+                    <input asp-for="RegisterData.FirstName" class="form-control" />
+                    <span asp-validation-for="RegisterData.FirstName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="RegisterData.LastName" class="form-label">Фамилия</label>
+                    <input asp-for="RegisterData.LastName" class="form-control" />
+                    <span asp-validation-for="RegisterData.LastName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="RegisterData.Role" class="form-label">Роль</label>
+                    <select asp-for="RegisterData.Role" class="form-control" id="roleSelect">
+                        <option value="">Выберите роль</option>
+                        <option value="job_seeker">Соискатель</option>
+                        <option value="employer">Работодатель</option>
+                    </select>
+                    <span asp-validation-for="RegisterData.Role" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3" id="companyField" style="display: none;">
+                    <label asp-for="RegisterData.CompanyName" class="form-label">Название компании</label>
+                    <input asp-for="RegisterData.CompanyName" class="form-control" />
+                    <span asp-validation-for="RegisterData.CompanyName" class="text-danger"></span>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Создать аккаунт</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('roleSelect').addEventListener('change', function() {
+            var companyField = document.getElementById('companyField');
+            if (this.value === 'employer') {
+                companyField.style.display = 'block';
+            } else {
+                companyField.style.display = 'none';
+            }
+        });
+    </script>
+}

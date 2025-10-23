@@ -14,7 +14,6 @@ namespace WebReckrytingSystem.Pages
 
         public void OnGet()
         {
-
         }
     }
 }
