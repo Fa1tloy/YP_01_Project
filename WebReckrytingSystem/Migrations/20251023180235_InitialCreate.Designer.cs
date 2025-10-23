@@ -11,8 +11,8 @@ using WebReckrytingSystem.Models;
 namespace WebReckrytingSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251023072010_InitialSchema")]
-    partial class InitialSchema
+    [Migration("20251023180235_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
