@@ -77,5 +77,19 @@ namespace WebReckrytingSystem.Services
             string pattern = @"^[^\s@]+@[^\s@]+\.[^\s@]+$";
             return Regex.IsMatch(email, pattern);
         }
+
+        public ServiceResult AuthenticateUser(string email, string password)
+        {
+            // Найти пользователя по email
+            var user = _userRepository.FindByEmail(email);
+            if (user == null)
+                return ServiceResult.Error("Пользователь с таким email не найден");
+
+            // Проверить пароль
+            if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+                return ServiceResult.Error("Неверный пароль");
+
+            return ServiceResult.Success("Успешный вход", user);
+        }
     }
 }
