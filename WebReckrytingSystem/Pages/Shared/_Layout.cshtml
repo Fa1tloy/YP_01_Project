@@ -48,15 +48,14 @@
                 <div class="col-md-3">
                     <h6>Соискателям</h6>
                     <ul class="list-unstyled">
-                        
-                        <a href="/Account/Register?role=job_seeker" class="text-white-50">Найти работу</a>
+                        <li><a asp-page="/Account/Register" asp-route-role="job_seeker" class="text-white-50">Найти работу</a></li>
                         <li><a href="#" class="text-white-50">Создать резюме</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">
                     <h6>Работодателям</h6>
                     <ul class="list-unstyled">
-                        <a href="/Account/Register?role=employer" class="text-white-50">Разместить вакансию</a>
+                        <li><a asp-page="/Account/Register" asp-route-role="employer" class="text-white-50">Разместить вакансию</a></li>
                         <li><a href="#" class="text-white-50">Найти сотрудников</a></li>
                     </ul>
                 </div>
