@@ -1,4 +1,4 @@
-﻿namespace WebReckrytingSystem.Model
+﻿namespace WebReckrytingSystem.Models
 {
     public enum UserRole
     {

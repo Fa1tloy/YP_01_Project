@@ -1,0 +1,70 @@
+﻿@page
+@model WebReckrytingSystem.Pages.Account.EmployerDashboardModel
+@{
+    ViewData["Title"] = "Личный кабинет работодателя";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Добро пожаловать, @Model.UserFirstName!</h5>
+                    <p class="text-muted">Личный кабинет работодателя</p>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6>Управление</h6>
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-primary">Создать вакансию</a>
+                        <a href="#" class="btn btn-outline-primary">Мои вакансии</a>
+                        <a href="#" class="btn btn-outline-primary">Отклики соискателей</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Статистика компании</h5>
+                    <div class="row text-center">
+                        <div class="col-3">
+                            <div class="border rounded p-3">
+                                <h4 class="text-primary">0</h4>
+                                <small>Активных вакансий</small>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="border rounded p-3">
+                                <h4 class="text-success">0</h4>
+                                <small>Новых откликов</small>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="border rounded p-3">
+                                <h4 class="text-info">0</h4>
+                                <small>Всего откликов</small>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="border rounded p-3">
+                                <h4 class="text-warning">0</h4>
+                                <small>Найденных сотрудников</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">Последние отклики</h5>
+                    <p class="text-muted">Создайте вакансию, чтобы получать отклики от соискателей</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
