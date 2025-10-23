@@ -14,32 +14,35 @@ namespace WebReckrytingSystem.Services
         }
 
         public ServiceResult RegisterUser(
-            string email,
-            string password,
-            string firstName,
-            string lastName,
-            string role)
+    string email,
+    string password,
+    string firstName,
+    string lastName,
+    string role)
         {
+            // Проверка обязательных полей
+            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
+                return ServiceResult.Error("Имя и фамилия обязательны для заполнения");
+
             // Валидация email формата
             if (!IsValidEmail(email))
                 return ServiceResult.Error("Неверный формат email");
-
-            // Валидация обязательных полей
-            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
-                return ServiceResult.Error("Имя и фамилия обязательны для заполнения");
 
             // Валидация пароля
             if (string.IsNullOrWhiteSpace(password) || password.Length < 8)
                 return ServiceResult.Error("Пароль должен содержать минимум 8 символов");
 
-            // Валидация роли (теперь проверяем строки)
+            // Валидация роли
             if (role != "job_seeker" && role != "employer")
                 return ServiceResult.Error("Неверно указана роль. Допустимые значения: job_seeker, employer");
 
-            // Проверка уникальности email
+            // Проверка уникальности email (более детальная)
             var existingUser = _userRepository.FindByEmail(email);
             if (existingUser != null)
-                return ServiceResult.Error("Email уже зарегистрирован");
+            {
+                return ServiceResult.Error($"Пользователь с email '{email}' уже зарегистрирован. " +
+                                         "Если это ваш аккаунт, перейдите на страницу входа.");
+            }
 
             try
             {
@@ -50,7 +53,7 @@ namespace WebReckrytingSystem.Services
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
                     FirstName = firstName.Trim(),
                     LastName = lastName.Trim(),
-                    Role = role // Теперь просто string
+                    Role = role
                 };
 
                 // Сохранение в БД
@@ -60,7 +63,9 @@ namespace WebReckrytingSystem.Services
             }
             catch (Exception ex)
             {
-                return ServiceResult.Error($"Ошибка при сохранении пользователя: {ex.Message}");
+                // Логируем ошибку для разработчика
+                Console.WriteLine($"Ошибка при регистрации пользователя: {ex.Message}");
+                return ServiceResult.Error("Произошла ошибка при регистрации. Пожалуйста, попробуйте позже.");
             }
         }
 

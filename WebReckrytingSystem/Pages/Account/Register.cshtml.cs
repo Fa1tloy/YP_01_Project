@@ -34,6 +34,7 @@ namespace WebReckrytingSystem.Pages.Account
         {
             if (!ModelState.IsValid)
             {
+                // Показываем ошибки валидации модели
                 return Page();
             }
 
@@ -49,13 +50,19 @@ namespace WebReckrytingSystem.Pages.Account
             {
                 // Автоматический вход после регистрации
                 await SignInUser(result.Data!);
-                
+
                 // Редирект в соответствующий кабинет
                 return RedirectToDashboard(RegisterData.Role);
             }
             else
             {
+                // Добавляем понятное сообщение об ошибке
                 ModelState.AddModelError("", result.Message);
+
+                // Сохраняем введенные данные (кроме пароля) для удобства пользователя
+                RegisterData.Password = string.Empty;
+                RegisterData.ConfirmPassword = string.Empty;
+
                 return Page();
             }
         }

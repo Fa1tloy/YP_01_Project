@@ -9,10 +9,22 @@
         <div class="col-md-6">
             <h2 class="text-center mb-4">Регистрация</h2>
 
+            @* Блок для успешных сообщений *@
             @if (!string.IsNullOrEmpty(Model.SuccessMessage))
             {
                 <div class="alert alert-success">
                     @Model.SuccessMessage
+                </div>
+            }
+
+            @* Блок для общих ошибок *@
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors.Count > 0)
+            {
+                <div class="alert alert-danger">
+                    @foreach (var error in ViewData.ModelState[string.Empty]?.Errors)
+                    {
+                        <div>@error.ErrorMessage</div>
+                    }
                 </div>
             }
 
@@ -66,12 +78,19 @@
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary">Создать аккаунт</button>
                 </div>
+
+                @* Ссылка на вход для существующих пользователей *@
+                <div class="text-center mt-3">
+                    <p>Уже есть аккаунт? <a href="/Account/Login">Войдите здесь</a></p>
+                </div>
             </form>
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
     <script>
         document.getElementById('roleSelect').addEventListener('change', function() {
             var companyField = document.getElementById('companyField');
@@ -79,6 +98,15 @@
                 companyField.style.display = 'block';
             } else {
                 companyField.style.display = 'none';
+            }
+        });
+
+        // Автоматически показать поле компании если роль employer при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            var roleSelect = document.getElementById('roleSelect');
+            var companyField = document.getElementById('companyField');
+            if (roleSelect.value === 'employer') {
+                companyField.style.display = 'block';
             }
         });
     </script>
