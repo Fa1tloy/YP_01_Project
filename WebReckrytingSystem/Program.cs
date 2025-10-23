@@ -13,7 +13,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Account/Register";
+        options.LoginPath = "/Account/Login"; 
         options.AccessDeniedPath = "/AccessDenied";
     });
 
