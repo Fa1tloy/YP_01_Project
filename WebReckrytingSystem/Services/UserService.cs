@@ -80,16 +80,29 @@ namespace WebReckrytingSystem.Services
 
         public ServiceResult AuthenticateUser(string email, string password)
         {
-            // Найти пользователя по email
+            // Проверка на пустые данные
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+                return ServiceResult.Error("Email и пароль обязательны для заполнения");
+
+            // Поиск пользователя
             var user = _userRepository.FindByEmail(email);
             if (user == null)
-                return ServiceResult.Error("Пользователь с таким email не найден");
+                return ServiceResult.Error("Неверный email или пароль");
 
-            // Проверить пароль
-            if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
-                return ServiceResult.Error("Неверный пароль");
+            try
+            {
+                // Проверка пароля
+                if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+                    return ServiceResult.Error("Неверный email или пароль");
 
-            return ServiceResult.Success("Успешный вход", user);
+                return ServiceResult.Success("Успешный вход", user);
+            }
+            catch (Exception ex)
+            {
+                // Логируем ошибку для разработчика
+                Console.WriteLine($"Ошибка при проверке пароля: {ex.Message}");
+                return ServiceResult.Error("Произошла ошибка при аутентификации");
+            }
         }
     }
 }

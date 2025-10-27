@@ -33,39 +33,60 @@ namespace WebReckrytingSystem.Pages.Account
                 return Page();
             }
 
-            var result = _userService.AuthenticateUser(LoginData.Email, LoginData.Password);
-
-            if (result.IsSuccess && result.Data != null)
+            try
             {
-                // Создаем claims для аутентификации
-                var claims = new List<Claim>
+                var result = _userService.AuthenticateUser(
+                    LoginData.Email,
+                    LoginData.Password
+                );
+
+                if (result.IsSuccess && result.Data != null)
                 {
-                    new Claim(ClaimTypes.Email, result.Data.Email),
-                    new Claim(ClaimTypes.GivenName, result.Data.FirstName),
-                    new Claim(ClaimTypes.Surname, result.Data.LastName),
-                    new Claim(ClaimTypes.Role, result.Data.Role)
-                };
+                    // Создаем claims для аутентификации
+                    var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Email, result.Data.Email),
+                new Claim(ClaimTypes.GivenName, result.Data.FirstName),
+                new Claim(ClaimTypes.Surname, result.Data.LastName),
+                new Claim(ClaimTypes.Role, result.Data.Role)
+            };
 
-                var claimsIdentity = new ClaimsIdentity(
-                    claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var claimsIdentity = new ClaimsIdentity(
+                        claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-                var authProperties = new AuthenticationProperties
+                    var authProperties = new AuthenticationProperties
+                    {
+                        IsPersistent = LoginData.RememberMe
+                    };
+
+                    await HttpContext.SignInAsync(
+                        CookieAuthenticationDefaults.AuthenticationScheme,
+                        new ClaimsPrincipal(claimsIdentity),
+                        authProperties);
+
+                    return RedirectToDashboard(result.Data.Role);
+                }
+                else
                 {
-                    IsPersistent = LoginData.RememberMe
-                };
+                    // Устанавливаем сообщение об ошибке
+                    ErrorMessage = result.Message;
 
-                // Выполняем вход
-                await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity),
-                    authProperties);
+                    // Сохраняем email для удобства пользователя
+                    // Очищаем только пароль
+                    LoginData.Password = string.Empty;
 
-                // Редирект в соответствующий кабинет
-                return RedirectToDashboard(result.Data.Role);
+                    return Page();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                ErrorMessage = result.Message;
+                // Обработка непредвиденных ошибок
+                ErrorMessage = "Произошла ошибка при входе. Пожалуйста, попробуйте позже.";
+
+                // Логируем для разработчика
+                Console.WriteLine($"Ошибка в Login: {ex.Message}");
+
+                LoginData.Password = string.Empty;
                 return Page();
             }
         }

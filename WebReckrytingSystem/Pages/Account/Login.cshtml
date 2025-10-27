@@ -9,12 +9,16 @@
         <div class="col-md-6">
             <h2 class="text-center mb-4">Вход в систему</h2>
 
+            <!-- Блок для отображения ошибок -->
             @if (!string.IsNullOrEmpty(Model.ErrorMessage))
             {
                 <div class="alert alert-danger">
                     @Model.ErrorMessage
                 </div>
             }
+
+            <!-- Валидационные ошибки -->
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <form method="post">
                 <div class="mb-3">
