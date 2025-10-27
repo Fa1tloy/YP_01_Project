@@ -1,3 +1,4 @@
+// Program.cs
 using Microsoft.EntityFrameworkCore;
 using WebReckrytingSystem.Data;
 using WebReckrytingSystem.Models;
@@ -13,7 +14,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Account/Login"; 
+        options.LoginPath = "/Account/Login";
         options.AccessDeniedPath = "/AccessDenied";
     });
 
@@ -28,6 +29,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<UserService>();
 
+// ДОБАВЬТЕ ЭТИ СТРОЧКИ:
+builder.Services.AddScoped<IResumeRepository, ResumeRepository>();
+builder.Services.AddScoped<IResumeService, ResumeService>();
+
 var app = builder.Build();
 
 // Конфигурация HTTP pipeline
@@ -41,7 +46,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
 
 app.UseAuthentication();
 app.UseAuthorization();

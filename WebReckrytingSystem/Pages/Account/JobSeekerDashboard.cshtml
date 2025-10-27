@@ -1,4 +1,5 @@
-﻿@page
+﻿@* Pages/Account/JobSeekerDashboard.cshtml *@
+@page
 @model WebReckrytingSystem.Pages.Account.JobSeekerDashboardModel
 @{
     ViewData["Title"] = "Личный кабинет соискателя";
@@ -18,7 +19,15 @@
                 <div class="card-body">
                     <h6>Быстрые действия</h6>
                     <div class="d-grid gap-2">
-                        <a href="#" class="btn btn-outline-primary">Создать резюме</a>
+                        @if (Model.HasResume)
+                        {
+                            <a asp-page="/Account/ViewResume" class="btn btn-outline-primary">Мое резюме</a>
+                            <a asp-page="/Account/EditResume" class="btn btn-outline-primary">Редактировать резюме</a>
+                        }
+                        else
+                        {
+                            <a asp-page="/Account/CreateResume" class="btn btn-outline-primary">Создать резюме</a>
+                        }
                         <a href="#" class="btn btn-outline-primary">Найти вакансии</a>
                         <a href="#" class="btn btn-outline-primary">Мои отклики</a>
                     </div>
@@ -45,8 +54,8 @@
                         </div>
                         <div class="col-4">
                             <div class="border rounded p-3">
-                                <h4 class="text-info">0</h4>
-                                <small>Просмотров резюме</small>
+                                <h4 class="text-info">@(Model.HasResume ? "1" : "0")</h4>
+                                <small>Резюме</small>
                             </div>
                         </div>
                     </div>
@@ -55,8 +64,17 @@
 
             <div class="card mt-3">
                 <div class="card-body">
-                    <h5 class="card-title">Рекомендуемые вакансии</h5>
-                    <p class="text-muted">Создайте резюме, чтобы увидеть подходящие вакансии</p>
+                    <h5 class="card-title">@(Model.HasResume ? "Ваше резюме" : "Создайте резюме")</h5>
+                    @if (Model.HasResume)
+                    {
+                        <p class="text-success">✓ У вас есть опубликованное резюме</p>
+                        <a asp-page="/Account/ViewResume" class="btn btn-primary">Просмотреть резюме</a>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Создайте резюме, чтобы начать поиск работы</p>
+                        <a asp-page="/Account/CreateResume" class="btn btn-primary">Создать резюме</a>
+                    }
                 </div>
             </div>
         </div>
