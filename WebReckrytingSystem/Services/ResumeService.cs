@@ -37,11 +37,11 @@ namespace WebReckrytingSystem.Services
                     ExperienceDescription = FormatExperienceDescription(model),
                     EducationDescription = FormatEducationDescription(model),
                     Skills = FormatSkills(model.Skills),
-                    IsPublished = model.IsPublished
+                    IsPublished = true // Гарантируем публикацию при создании
                 };
 
                 var savedResume = _resumeRepository.Save(resume);
-                return ServiceResult<Resume>.Success("Резюме успешно создано!", savedResume);
+                return ServiceResult<Resume>.Success("Резюме успешно создано и опубликовано!", savedResume);
             }
             catch (Exception ex)
             {

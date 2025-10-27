@@ -51,7 +51,8 @@ namespace WebReckrytingSystem.Pages.Account
 
             if (result.IsSuccess)
             {
-                SuccessMessage = result.Message;
+                // Успешное создание - редирект на просмотр резюме
+                TempData["SuccessMessage"] = "Резюме успешно создано и опубликовано!";
                 return RedirectToPage("/Account/ViewResume");
             }
             else

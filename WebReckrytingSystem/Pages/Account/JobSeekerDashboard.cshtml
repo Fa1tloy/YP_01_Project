@@ -21,12 +21,34 @@
                     <div class="d-grid gap-2">
                         @if (Model.HasResume)
                         {
-                            <a asp-page="/Account/ViewResume" class="btn btn-outline-primary">Мое резюме</a>
-                            <a asp-page="/Account/EditResume" class="btn btn-outline-primary">Редактировать резюме</a>
+                            <div class="card mt-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Ваше резюме</h5>
+                                    <p class="text-success">
+                                        <i class="fas fa-check-circle me-2"></i>У вас есть опубликованное резюме
+                                    </p>
+                                    <div class="d-grid gap-2 d-md-flex">
+                                        <a href="/Account/ViewResume" class="btn btn-primary me-md-2">
+                                            <i class="fas fa-eye me-2"></i>Просмотреть резюме
+                                        </a>
+                                        <a href="/Account/EditResume" class="btn btn-outline-primary">
+                                            <i class="fas fa-edit me-2"></i>Редактировать
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         }
                         else
                         {
-                            <a asp-page="/Account/CreateResume" class="btn btn-outline-primary">Создать резюме</a>
+                            <div class="card mt-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Создайте резюме</h5>
+                                    <p class="text-muted">Создайте резюме, чтобы начать поиск работы</p>
+                                    <a href="/Account/CreateResume" class="btn btn-primary">
+                                        <i class="fas fa-plus me-2"></i>Создать резюме
+                                    </a>
+                                </div>
+                            </div>
                         }
                         <a href="#" class="btn btn-outline-primary">Найти вакансии</a>
                         <a href="#" class="btn btn-outline-primary">Мои отклики</a>
