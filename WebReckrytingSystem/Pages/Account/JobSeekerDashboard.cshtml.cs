@@ -1,4 +1,4 @@
-// Pages/Account/JobSeekerDashboard.cshtml.cs
+using Microsoft.AspNetCore.Authorization;  // ? ДОБАВИТЬ ЭТУ СТРОЧКУ
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
@@ -6,6 +6,7 @@ using WebReckrytingSystem.Services;
 
 namespace WebReckrytingSystem.Pages.Account
 {
+    [Authorize(Roles = "job_seeker")]  
     public class JobSeekerDashboardModel : PageModel
     {
         private readonly IResumeService _resumeService;
@@ -18,17 +19,24 @@ namespace WebReckrytingSystem.Pages.Account
         public string UserFirstName { get; set; } = string.Empty;
         public bool HasResume { get; set; }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
+            // Дополнительная проверка (на всякий случай)
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToPage("/Account/Login");
+            }
+
             UserFirstName = User.FindFirst(ClaimTypes.GivenName)?.Value ?? "Пользователь";
 
-            // Проверяем наличие резюме
             var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
             if (!string.IsNullOrEmpty(userEmail))
             {
                 var resume = _resumeService.GetUserResume(userEmail);
                 HasResume = resume != null;
             }
+
+            return Page();
         }
     }
 }
