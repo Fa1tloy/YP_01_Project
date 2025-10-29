@@ -59,6 +59,18 @@ namespace WebReckrytingSystem.Pages.Account
                         IsPersistent = LoginData.RememberMe
                     };
 
+                    if (LoginData.RememberMe)
+                    {
+                        // Кука на 30 дней при "Запомнить меня"
+                        authProperties.ExpiresUtc = DateTimeOffset.UtcNow.AddDays(30);
+                        authProperties.IsPersistent = true;
+                    }
+                    else
+                    {
+                        // Обычная сессионная кука (истекает при закрытии браузера)
+                        authProperties.IsPersistent  = false;
+                    }
+
                     await HttpContext.SignInAsync(
                         CookieAuthenticationDefaults.AuthenticationScheme,
                         new ClaimsPrincipal(claimsIdentity),
