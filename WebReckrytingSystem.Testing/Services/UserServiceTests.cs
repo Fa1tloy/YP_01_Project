@@ -100,6 +100,30 @@ namespace WebReckrytingSystem.Tests.Services
             Assert.AreEqual("employer", result.Data.Role);
         }
 
+        [TestMethod]
+        public void AuthenticateUser_InvalidEmail_ReturnsError()
+        {
+            // Act
+            var result = _userService.AuthenticateUser("nonexistent@example.com", "AnyPassword123");
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Неверный email или пароль", result.Message);
+            Assert.IsNull(result.Data);
+        }
+
+        [TestMethod]
+        public void AuthenticateUser_InvalidPassword_ReturnsError()
+        {
+            // Act
+            var result = _userService.AuthenticateUser("petrov.ivan@example.com", "WrongPassword123");
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Неверный email или пароль", result.Message);
+            Assert.IsNull(result.Data);
+        }
+
         
     }
 }
