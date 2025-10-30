@@ -5,7 +5,7 @@ VisualStudioVersion = 17.14.36408.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebReckrytingSystem", "WebReckrytingSystem.csproj", "{A99ECA60-78B2-4A12-BE92-C8A79430440D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebReckrytingSystem.Tests", "..\WebReckrytingSystem.Tests\WebReckrytingSystem.Tests.csproj", "{35BB958D-C76E-45E0-B8D2-F33B0CDC3580}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebReckrytingSystem.Testing", "..\WebReckrytingSystem.Testing\WebReckrytingSystem.Testing.csproj", "{B366E5CE-F09A-4CEC-9DC4-FCF3DEF9BE8C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{A99ECA60-78B2-4A12-BE92-C8A79430440D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A99ECA60-78B2-4A12-BE92-C8A79430440D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A99ECA60-78B2-4A12-BE92-C8A79430440D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{35BB958D-C76E-45E0-B8D2-F33B0CDC3580}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{35BB958D-C76E-45E0-B8D2-F33B0CDC3580}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{35BB958D-C76E-45E0-B8D2-F33B0CDC3580}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{35BB958D-C76E-45E0-B8D2-F33B0CDC3580}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B366E5CE-F09A-4CEC-9DC4-FCF3DEF9BE8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B366E5CE-F09A-4CEC-9DC4-FCF3DEF9BE8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B366E5CE-F09A-4CEC-9DC4-FCF3DEF9BE8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B366E5CE-F09A-4CEC-9DC4-FCF3DEF9BE8C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
