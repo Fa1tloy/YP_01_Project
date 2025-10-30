@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Http;
+Ôªøusing Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -6,7 +6,7 @@ using Moq;
 using System.Security.Claims;
 using WebReckrytingSystem.Pages.Account;
 
-namespace WebReckrytingSystem.Testing.Pages.Account
+namespace WebReckrytingSystem.Tests.Pages.Account
 {
     [TestClass]
     public class AccessControlTests
@@ -15,7 +15,7 @@ namespace WebReckrytingSystem.Testing.Pages.Account
         public void JobSeekerDashboard_UnauthenticatedUser_RedirectsToLogin()
         {
             // Arrange
-            var pageModel = new JobSeekerDashboardModel(Mock.Of<Services.IResumeService>())
+            var pageModel = new JobSeekerDashboardModel(Mock.Of<WebReckrytingSystem.Services.IResumeService>())
             {
                 PageContext = new PageContext
                 {
@@ -48,7 +48,7 @@ namespace WebReckrytingSystem.Testing.Pages.Account
             pageModel.OnGet();
 
             // Assert
-            Assert.AreEqual("œÓÎ¸ÁÓ‚‡ÚÂÎ¸", pageModel.UserFirstName);
+            Assert.AreEqual("–ü–æ–ª—å–∑–æ–≤–∞—Ç–µ–ª—å", pageModel.UserFirstName);
         }
 
         [TestMethod]
@@ -59,13 +59,14 @@ namespace WebReckrytingSystem.Testing.Pages.Account
             var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
             {
                 new Claim(ClaimTypes.Email, "seeker@test.com"),
-                new Claim(ClaimTypes.GivenName, "»‚‡Ì"),
+                new Claim(ClaimTypes.GivenName, "–ò–≤–∞–Ω"),
                 new Claim(ClaimTypes.Role, "job_seeker")
             }, "TestAuth"));
 
             httpContext.User = user;
 
-            var pageModel = new JobSeekerDashboardModel(Mock.Of<Services.IResumeService>())
+            var pageModel = new JobSeekerDashboardModel(
+                Mock.Of<WebReckrytingSystem.Services.IResumeService>())
             {
                 PageContext = new PageContext
                 {
@@ -78,7 +79,7 @@ namespace WebReckrytingSystem.Testing.Pages.Account
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(PageResult));
-            Assert.AreEqual("»‚‡Ì", pageModel.UserFirstName);
+            Assert.AreEqual("–ò–≤–∞–Ω", pageModel.UserFirstName);
         }
 
         [TestMethod]
@@ -89,7 +90,7 @@ namespace WebReckrytingSystem.Testing.Pages.Account
             var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
             {
                 new Claim(ClaimTypes.Email, "employer@test.com"),
-                new Claim(ClaimTypes.GivenName, "ŒÎ¸„‡"),
+                new Claim(ClaimTypes.GivenName, "–û–ª—å–≥–∞"),
                 new Claim(ClaimTypes.Role, "employer")
             }, "TestAuth"));
 
@@ -107,7 +108,7 @@ namespace WebReckrytingSystem.Testing.Pages.Account
             pageModel.OnGet();
 
             // Assert
-            Assert.AreEqual("ŒÎ¸„‡", pageModel.UserFirstName);
+            Assert.AreEqual("–û–ª—å–≥–∞", pageModel.UserFirstName);
         }
     }
 }
