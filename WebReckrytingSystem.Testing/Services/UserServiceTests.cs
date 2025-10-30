@@ -58,5 +58,48 @@ namespace WebReckrytingSystem.Tests.Services
             _userService = new UserService(_mockUserRepository.Object);
         }
 
+        [TestMethod]
+        public void AuthenticateUser_ValidCredentialsSeeker1_ReturnsSuccess()
+        {
+            // Act
+            var result = _userService.AuthenticateUser("petrov.ivan@example.com", "S1234567");
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual("Успешный вход", result.Message);
+            Assert.IsNotNull(result.Data);
+            Assert.AreEqual("petrov.ivan@example.com", result.Data.Email);
+            Assert.AreEqual("job_seeker", result.Data.Role);
+        }
+
+        [TestMethod]
+        public void AuthenticateUser_ValidCredentialsSeeker2_ReturnsSuccess()
+        {
+            // Act
+            var result = _userService.AuthenticateUser("sidorova.maria@example.com", "M7654321");
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual("Успешный вход", result.Message);
+            Assert.IsNotNull(result.Data);
+            Assert.AreEqual("sidorova.maria@example.com", result.Data.Email);
+            Assert.AreEqual("job_seeker", result.Data.Role);
+        }
+
+        [TestMethod]
+        public void AuthenticateUser_ValidCredentialsEmployer_ReturnsSuccess()
+        {
+            // Act
+            var result = _userService.AuthenticateUser("hr@techcompany.ru", "Hr20241234");
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual("Успешный вход", result.Message);
+            Assert.IsNotNull(result.Data);
+            Assert.AreEqual("hr@techcompany.ru", result.Data.Email);
+            Assert.AreEqual("employer", result.Data.Role);
+        }
+
+        
     }
 }
