@@ -124,6 +124,28 @@ namespace WebReckrytingSystem.Tests.Services
             Assert.IsNull(result.Data);
         }
 
-        
+        [TestMethod]
+        public void AuthenticateUser_EmptyEmail_ReturnsError()
+        {
+            // Act
+            var result = _userService.AuthenticateUser("", "S1234567");
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Email и пароль обязательны для заполнения", result.Message);
+            Assert.IsNull(result.Data);
+        }
+
+        [TestMethod]
+        public void AuthenticateUser_EmptyPassword_ReturnsError()
+        {
+            // Act
+            var result = _userService.AuthenticateUser("petrov.ivan@example.com", "");
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Email и пароль обязательны для заполнения", result.Message);
+            Assert.IsNull(result.Data);
+        }
     }
 }
