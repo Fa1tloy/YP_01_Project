@@ -2,7 +2,7 @@
 
 namespace WebReckrytingSystem.Models
 {
-    public class CreateResumeViewModel
+    public class EditResumeViewModel
     {
         [Required(ErrorMessage = "Желаемая должность обязательна для заполнения")]
         [StringLength(255, ErrorMessage = "Желаемая должность не должна превышать 255 символов")]

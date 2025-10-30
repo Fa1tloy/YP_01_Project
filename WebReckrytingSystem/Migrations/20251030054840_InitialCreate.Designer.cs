@@ -11,7 +11,7 @@ using WebReckrytingSystem.Models;
 namespace WebReckrytingSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251027192319_InitialCreate")]
+    [Migration("20251030054840_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -23,49 +23,6 @@ namespace WebReckrytingSystem.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
-
-            modelBuilder.Entity("WebReckrytingSystem.Models.Resume", b =>
-                {
-                    b.Property<string>("UserEmail")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)")
-                        .HasColumnName("user_email");
-
-                    b.Property<string>("DesiredPosition")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)")
-                        .HasColumnName("desired_position");
-
-                    b.Property<string>("EducationDescription")
-                        .HasColumnType("longtext")
-                        .HasColumnName("education_description");
-
-                    b.Property<string>("ExperienceDescription")
-                        .HasColumnType("longtext")
-                        .HasColumnName("experience_description");
-
-                    b.Property<bool>("IsPublished")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_published");
-
-                    b.Property<int?>("SalaryExpectations")
-                        .HasColumnType("int")
-                        .HasColumnName("salary_expectations");
-
-                    b.Property<string>("Skills")
-                        .HasColumnType("longtext")
-                        .HasColumnName("skills");
-
-                    b.HasKey("UserEmail");
-
-                    b.ToTable("resumes", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
-                });
 
             modelBuilder.Entity("WebReckrytingSystem.Models.User", b =>
                 {
@@ -104,17 +61,6 @@ namespace WebReckrytingSystem.Migrations
                         {
                             t.ExcludeFromMigrations();
                         });
-                });
-
-            modelBuilder.Entity("WebReckrytingSystem.Models.Resume", b =>
-                {
-                    b.HasOne("WebReckrytingSystem.Models.User", "User")
-                        .WithOne()
-                        .HasForeignKey("WebReckrytingSystem.Models.Resume", "UserEmail")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }
