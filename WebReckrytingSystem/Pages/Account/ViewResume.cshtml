@@ -1,0 +1,159 @@
+﻿@page
+@model WebReckrytingSystem.Pages.Account.ViewResumeModel
+@{
+    ViewData["Title"] = "Мое резюме";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Заголовок -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Мое резюме</h2>
+                <div>
+                    <a href="/Account/EditResume" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-edit"></i> Редактировать
+                    </a>
+                    <a href="/Account/JobSeekerDashboard" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> В кабинет
+                    </a>
+                </div>
+            </div>
+            <!-- Добавить после заголовка -->
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    @Model.SuccessMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (Model.Resume != null)
+            {
+                <!-- Статус публикации -->
+                <div class="alert @(Model.Resume.IsPublished ? "alert-success" : "alert-warning") mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>
+                                <i class="fas @(Model.Resume.IsPublished ? "fa-eye" : "fa-eye-slash") me-2"></i>
+                                @(Model.Resume.IsPublished ? "Резюме опубликовано и видно работодателям" : "Резюме не опубликовано")
+                            </strong>
+                        </div>
+                        <span class="badge bg-@(Model.Resume.IsPublished ? "success" : "warning")">
+                            @(Model.Resume.IsPublished ? "ОПУБЛИКОВАНО" : "ЧЕРНОВИК")
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Основная информация -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Основная информация</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Желаемая должность</h6>
+                                <p class="fs-5 fw-bold text-primary">@Model.Resume.DesiredPosition</p>
+                            </div>
+                            @if (Model.Resume.SalaryExpectations.HasValue)
+                            {
+                                <div class="col-md-6">
+                                    <h6 class="text-muted">Зарплатные ожидания</h6>
+                                    <p class="fs-5 fw-bold text-success">@Model.Resume.SalaryExpectations.Value.ToString("N0") ₽</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Опыт работы -->
+                @if (!string.IsNullOrEmpty(Model.Resume.ExperienceDescription))
+                {
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Опыт работы</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-0" style="white-space: pre-line">@Model.Resume.ExperienceDescription</p>
+                        </div>
+                    </div>
+                }
+
+                <!-- Образование -->
+                @if (!string.IsNullOrEmpty(Model.Resume.EducationDescription))
+                {
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Образование</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-0" style="white-space: pre-line">@Model.Resume.EducationDescription</p>
+                        </div>
+                    </div>
+                }
+
+                <!-- Навыки -->
+                @if (!string.IsNullOrEmpty(Model.Resume.Skills))
+                {
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Ключевые навыки</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach (var skill in Model.Resume.Skills.Split(',').Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)))
+                                {
+                                    <span class="badge bg-primary fs-6 py-2 px-3">@skill</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Информация для работодателей -->
+                @if (Model.Resume.IsPublished)
+                {
+                    <div class="card border-success">
+                        <div class="card-body text-center">
+                            <h5 class="text-success">
+                                <i class="fas fa-check-circle me-2"></i>Готово к работе!
+                            </h5>
+                            <p class="text-muted mb-0">
+                                Ваше резюме теперь видно работодателям в системе.
+                                Ожидайте приглашений на собеседования!
+                            </p>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <!-- Если резюме нет -->
+                <div class="text-center py-5">
+                    <i class="fas fa-file-alt fa-4x text-muted mb-3"></i>
+                    <h3>Резюме не найдено</h3>
+                    <p class="text-muted mb-4">Создайте ваше первое резюме, чтобы начать поиск работы</p>
+                    <a href="/Account/CreateResume" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus me-2"></i>Создать резюме
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border: 1px solid rgba(0, 0, 0, 0.125);
+    }
+
+    .card-header {
+        font-weight: 600;
+    }
+
+    .badge {
+        font-weight: 500;
+    }
+</style>

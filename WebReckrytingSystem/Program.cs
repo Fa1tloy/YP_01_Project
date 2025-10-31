@@ -1,3 +1,4 @@
+// Program.cs
 using Microsoft.EntityFrameworkCore;
 using WebReckrytingSystem.Data;
 using WebReckrytingSystem.Models;
@@ -13,8 +14,10 @@ builder.Services.AddRazorPages();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Account/Register";
+        options.LoginPath = "/Account/Login";
         options.AccessDeniedPath = "/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromDays(30);
+        options.SlidingExpiration = true;
     });
 
 // Регистрация контекста базы данных
@@ -27,6 +30,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Регистрация репозиториев и сервисов
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<UserService>();
+
+// ДОБАВЬТЕ ЭТИ СТРОЧКИ:
+builder.Services.AddScoped<IResumeRepository, ResumeRepository>();
+builder.Services.AddScoped<IResumeService, ResumeService>();
 
 var app = builder.Build();
 
@@ -41,7 +48,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
 
 app.UseAuthentication();
 app.UseAuthorization();

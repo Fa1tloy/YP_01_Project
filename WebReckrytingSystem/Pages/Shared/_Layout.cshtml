@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="utf-8" />
@@ -22,12 +23,35 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/">Главная</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Account/Register">Регистрация</a>
-                        </li>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Account/@(User.IsInRole("employer") ? "Employer" : "JobSeeker")Dashboard">
+                                    Личный кабинет
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Account/Register">Регистрация</a>
+                            </li>
+                        }
                     </ul>
                     <div class="navbar-nav">
-                        <a href="/Account/Register" class="btn btn-outline-light btn-sm">Войти</a>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <span class="nav-item nav-link text-light">
+                                Привет, @User.FindFirst(ClaimTypes.GivenName)?.Value!
+                            </span>
+                            <form method="post" asp-page="/Account/Logout" class="nav-item">
+                                <button type="submit" class="btn btn-outline-light btn-sm">Выйти</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a href="/Account/Login" class="btn btn-outline-light btn-sm">Войти</a>
+                        }
                     </div>
                 </div>
             </div>
