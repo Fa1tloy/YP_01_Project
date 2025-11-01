@@ -15,8 +15,8 @@ namespace WebReckrytingSystem.Tests.Pages.Account
     [TestClass]
     public class LoginModelTests
     {
-        private Mock<UserService> _mockUserService;
-        private LoginModel _loginModel;
+        private Mock<UserService> mockUserService_;
+        private LoginModel loginModel_;
 
         private readonly User _seeker = new User
         {
@@ -37,8 +37,8 @@ namespace WebReckrytingSystem.Tests.Pages.Account
         [TestInitialize]
         public void Setup()
         {
-            _mockUserService = new Mock<UserService>(Mock.Of<IUserRepository>());
-            _loginModel = new LoginModel(_mockUserService.Object)
+            mockUserService_ = new Mock<UserService>(Mock.Of<IUserRepository>());
+            loginModel_ = new LoginModel(mockUserService_.Object)
             {
                 PageContext = new PageContext
                 {
@@ -51,10 +51,10 @@ namespace WebReckrytingSystem.Tests.Pages.Account
         public async Task OnPostAsync_ValidCredentialsSeeker_RedirectsToJobSeekerDashboard()
         {
             // Arrange
-            _mockUserService.Setup(service => service.AuthenticateUser("petrov.ivan@example.com", "S1234567"))
+            mockUserService_.Setup(service => service.AuthenticateUser("petrov.ivan@example.com", "S1234567"))
                 .Returns(ServiceResult.Success("Успешный вход", _seeker));
 
-            _loginModel.LoginData = new LoginViewModel
+            loginModel_.LoginData = new LoginViewModel
             {
                 Email = "petrov.ivan@example.com",
                 Password = "S1234567",
@@ -64,7 +64,7 @@ namespace WebReckrytingSystem.Tests.Pages.Account
             var authServiceMock = SetupAuthenticationService();
 
             // Act
-            var result = await _loginModel.OnPostAsync();
+            var result = await loginModel_.OnPostAsync();
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(RedirectToPageResult));
@@ -78,10 +78,10 @@ namespace WebReckrytingSystem.Tests.Pages.Account
         public async Task OnPostAsync_ValidCredentialsEmployer_RedirectsToEmployerDashboard()
         {
             // Arrange
-            _mockUserService.Setup(service => service.AuthenticateUser("hr@techcompany.ru", "Hr20241234"))
+            mockUserService_.Setup(service => service.AuthenticateUser("hr@techcompany.ru", "Hr20241234"))
                 .Returns(ServiceResult.Success("Успешный вход", _employer));
 
-            _loginModel.LoginData = new LoginViewModel
+            loginModel_.LoginData = new LoginViewModel
             {
                 Email = "hr@techcompany.ru",
                 Password = "Hr20241234",
@@ -91,7 +91,7 @@ namespace WebReckrytingSystem.Tests.Pages.Account
             var authServiceMock = SetupAuthenticationService();
 
             // Act
-            var result = await _loginModel.OnPostAsync();
+            var result = await loginModel_.OnPostAsync();
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(RedirectToPageResult));
@@ -105,10 +105,10 @@ namespace WebReckrytingSystem.Tests.Pages.Account
         public async Task OnPostAsync_InvalidCredentials_ReturnsPageWithErrorMessage()
         {
             // Arrange
-            _mockUserService.Setup(service => service.AuthenticateUser("test@example.com", "WrongPassword"))
+            mockUserService_.Setup(service => service.AuthenticateUser("test@example.com", "WrongPassword"))
                 .Returns(ServiceResult.Error("Неверный email или пароль"));
 
-            _loginModel.LoginData = new LoginViewModel
+            loginModel_.LoginData = new LoginViewModel
             {
                 Email = "test@example.com",
                 Password = "WrongPassword",
@@ -118,13 +118,13 @@ namespace WebReckrytingSystem.Tests.Pages.Account
             var authServiceMock = SetupAuthenticationService();
 
             // Act
-            var result = await _loginModel.OnPostAsync();
+            var result = await loginModel_.OnPostAsync();
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(PageResult));
-            Assert.AreEqual("Неверный email или пароль", _loginModel.ErrorMessage);
-            Assert.AreEqual("test@example.com", _loginModel.LoginData.Email);
-            Assert.AreEqual("", _loginModel.LoginData.Password);
+            Assert.AreEqual("Неверный email или пароль", loginModel_.ErrorMessage);
+            Assert.AreEqual("test@example.com", loginModel_.LoginData.Email);
+            Assert.AreEqual("", loginModel_.LoginData.Password);
 
             authServiceMock.Verify(auth => auth.SignInAsync(
                 It.IsAny<HttpContext>(),
@@ -138,19 +138,19 @@ namespace WebReckrytingSystem.Tests.Pages.Account
         public async Task OnPostAsync_InvalidModelState_ReturnsPageWithValidationErrors()
         {
             // Arrange
-            _loginModel.ModelState.AddModelError("Email", "Email обязателен");
-            _loginModel.LoginData = new LoginViewModel
+            loginModel_.ModelState.AddModelError("Email", "Email обязателен");
+            loginModel_.LoginData = new LoginViewModel
             {
                 Email = "",
                 Password = "password"
             };
 
             // Act
-            var result = await _loginModel.OnPostAsync();
+            var result = await loginModel_.OnPostAsync();
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(PageResult));
-            _mockUserService.Verify(service => service.AuthenticateUser(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            mockUserService_.Verify(service => service.AuthenticateUser(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
         private Mock<IAuthenticationService> SetupAuthenticationService()
@@ -168,7 +168,7 @@ namespace WebReckrytingSystem.Tests.Pages.Account
                 .Setup(provider => provider.GetService(typeof(IAuthenticationService)))
                 .Returns(authServiceMock.Object);
 
-            _loginModel.PageContext.HttpContext.RequestServices = serviceProviderMock.Object;
+            loginModel_.PageContext.HttpContext.RequestServices = serviceProviderMock.Object;
             return authServiceMock;
         }
 

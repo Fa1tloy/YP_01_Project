@@ -16,8 +16,8 @@ namespace WebReckrytingSystem.Tests.Pages.Account
     [TestClass]
     public class CookieTests
     {
-        private Mock<UserService> _mockUserService;
-        private LoginModel _loginModel;
+        private Mock<UserService> mockUserService_;
+        private LoginModel loginModel_;
 
         private readonly User _seeker = new User
         {
@@ -30,8 +30,8 @@ namespace WebReckrytingSystem.Tests.Pages.Account
         [TestInitialize]
         public void Setup()
         {
-            _mockUserService = new Mock<UserService>(Mock.Of<IUserRepository>());
-            _loginModel = new LoginModel(_mockUserService.Object)
+            mockUserService_ = new Mock<UserService>(Mock.Of<IUserRepository>());
+            loginModel_ = new LoginModel(mockUserService_.Object)
             {
                 PageContext = new PageContext
                 {
@@ -44,10 +44,10 @@ namespace WebReckrytingSystem.Tests.Pages.Account
         public async Task OnPostAsync_RememberMeFalse_CreatesSessionCookie()
         {
             // Arrange
-            _mockUserService.Setup(service => service.AuthenticateUser("petrov.ivan@example.com", "S1234567"))
+            mockUserService_.Setup(service => service.AuthenticateUser("petrov.ivan@example.com", "S1234567"))
                 .Returns(ServiceResult.Success("Óñïåøíûé âõîä", _seeker));
 
-            _loginModel.LoginData = new LoginViewModel
+            loginModel_.LoginData = new LoginViewModel
             {
                 Email = "petrov.ivan@example.com",
                 Password = "S1234567",
@@ -57,7 +57,7 @@ namespace WebReckrytingSystem.Tests.Pages.Account
             var authServiceMock = SetupAuthenticationService();
 
             // Act
-            await _loginModel.OnPostAsync();
+            await loginModel_.OnPostAsync();
 
             // Assert
             authServiceMock.Verify(auth => auth.SignInAsync(
@@ -73,10 +73,10 @@ namespace WebReckrytingSystem.Tests.Pages.Account
         public async Task OnPostAsync_RememberMeTrue_CreatesPersistentCookie()
         {
             // Arrange
-            _mockUserService.Setup(service => service.AuthenticateUser("petrov.ivan@example.com", "S1234567"))
+            mockUserService_.Setup(service => service.AuthenticateUser("petrov.ivan@example.com", "S1234567"))
                 .Returns(ServiceResult.Success("Óñïåøíûé âõîä", _seeker));
 
-            _loginModel.LoginData = new LoginViewModel
+            loginModel_.LoginData = new LoginViewModel
             {
                 Email = "petrov.ivan@example.com",
                 Password = "S1234567",
@@ -86,7 +86,7 @@ namespace WebReckrytingSystem.Tests.Pages.Account
             var authServiceMock = SetupAuthenticationService();
 
             // Act
-            await _loginModel.OnPostAsync();
+            await loginModel_.OnPostAsync();
 
             // Assert
             authServiceMock.Verify(auth => auth.SignInAsync(
@@ -156,7 +156,7 @@ namespace WebReckrytingSystem.Tests.Pages.Account
                 .Setup(provider => provider.GetService(typeof(IAuthenticationService)))
                 .Returns(authServiceMock.Object);
 
-            _loginModel.PageContext.HttpContext.RequestServices = serviceProviderMock.Object;
+            loginModel_.PageContext.HttpContext.RequestServices = serviceProviderMock.Object;
             return authServiceMock;
         }
     }
