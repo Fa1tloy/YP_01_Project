@@ -62,7 +62,7 @@ namespace WebReckrytingSystem.Tests.Services
         public void AuthenticateUser_ValidCredentialsSeeker1_ReturnsSuccess()
         {
             // Act
-            var result = userService_.AuthenticateUser("petrov.ivan@example.com", "S1234567");
+            ServiceResult result = userService_.AuthenticateUser("petrov.ivan@example.com", "S1234567");
 
             // Assert
             Assert.IsTrue(result.IsSuccess);
@@ -76,7 +76,7 @@ namespace WebReckrytingSystem.Tests.Services
         public void AuthenticateUser_ValidCredentialsSeeker2_ReturnsSuccess()
         {
             // Act
-            var result = userService_.AuthenticateUser("sidorova.maria@example.com", "M7654321");
+            ServiceResult result = userService_.AuthenticateUser("sidorova.maria@example.com", "M7654321");
 
             // Assert
             Assert.IsTrue(result.IsSuccess);
@@ -90,7 +90,7 @@ namespace WebReckrytingSystem.Tests.Services
         public void AuthenticateUser_ValidCredentialsEmployer_ReturnsSuccess()
         {
             // Act
-            var result = userService_.AuthenticateUser("hr@techcompany.ru", "Hr20241234");
+            ServiceResult result = userService_.AuthenticateUser("hr@techcompany.ru", "Hr20241234");
 
             // Assert
             Assert.IsTrue(result.IsSuccess);
@@ -104,7 +104,7 @@ namespace WebReckrytingSystem.Tests.Services
         public void AuthenticateUser_InvalidEmail_ReturnsError()
         {
             // Act
-            var result = userService_.AuthenticateUser("nonexistent@example.com", "AnyPassword123");
+            ServiceResult result = userService_.AuthenticateUser("nonexistent@example.com", "AnyPassword123");
 
             // Assert
             Assert.IsFalse(result.IsSuccess);
@@ -116,7 +116,7 @@ namespace WebReckrytingSystem.Tests.Services
         public void AuthenticateUser_InvalidPassword_ReturnsError()
         {
             // Act
-            var result = userService_.AuthenticateUser("petrov.ivan@example.com", "WrongPassword123");
+            ServiceResult result = userService_.AuthenticateUser("petrov.ivan@example.com", "WrongPassword123");
 
             // Assert
             Assert.IsFalse(result.IsSuccess);
@@ -128,7 +128,7 @@ namespace WebReckrytingSystem.Tests.Services
         public void AuthenticateUser_EmptyEmail_ReturnsError()
         {
             // Act
-            var result = userService_.AuthenticateUser("", "S1234567");
+            ServiceResult result = userService_.AuthenticateUser("", "S1234567");
 
             // Assert
             Assert.IsFalse(result.IsSuccess);
@@ -140,7 +140,7 @@ namespace WebReckrytingSystem.Tests.Services
         public void AuthenticateUser_EmptyPassword_ReturnsError()
         {
             // Act
-            var result = userService_.AuthenticateUser("petrov.ivan@example.com", "");
+            ServiceResult result = userService_.AuthenticateUser("petrov.ivan@example.com", "");
 
             // Assert
             Assert.IsFalse(result.IsSuccess);
