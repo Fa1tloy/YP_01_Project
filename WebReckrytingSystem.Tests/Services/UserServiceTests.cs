@@ -9,8 +9,8 @@ namespace WebReckrytingSystem.Tests.Services
     [TestClass]
     public class UserServiceTests
     {
-        private Mock<IUserRepository> _mockUserRepository;
-        private UserService userService_;
+        public Mock<IUserRepository> _mockUserRepository;
+        public UserService userService_;
 
         // Тестовые данные
         private readonly User _seeker1 = new User

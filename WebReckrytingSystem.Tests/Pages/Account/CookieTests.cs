@@ -16,8 +16,8 @@ namespace WebReckrytingSystem.Tests.Pages.Account
     [TestClass]
     public class CookieTests
     {
-        private Mock<UserService> mockUserService_;
-        private LoginModel loginModel_;
+         public Mock<UserService> mockUserService_;
+        public LoginModel loginModel_;
 
         private readonly User _seeker = new User
         {
