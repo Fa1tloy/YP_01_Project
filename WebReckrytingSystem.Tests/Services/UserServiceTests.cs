@@ -13,7 +13,7 @@ namespace WebReckrytingSystem.Tests.Services
         public UserService userService_;
 
         // Тестовые данные
-        private readonly User _seeker1 = new User
+        public readonly User _seeker1 = new User
         {
             Email = "petrov.ivan@example.com",
             PasswordHash = BCrypt.Net.BCrypt.HashPassword("S1234567"),
@@ -22,7 +22,7 @@ namespace WebReckrytingSystem.Tests.Services
             Role = "job_seeker"
         };
 
-        private readonly User _seeker2 = new User
+        public readonly User _seeker2 = new User
         {
             Email = "sidorova.maria@example.com",
             PasswordHash = BCrypt.Net.BCrypt.HashPassword("M7654321"),
@@ -31,7 +31,7 @@ namespace WebReckrytingSystem.Tests.Services
             Role = "job_seeker"
         };
 
-        private readonly User _employer1 = new User
+        public readonly User _employer1 = new User
         {
             Email = "hr@techcompany.ru",
             PasswordHash = BCrypt.Net.BCrypt.HashPassword("Hr20241234"),

@@ -18,7 +18,7 @@ namespace WebReckrytingSystem.Tests.Pages.Account
         public Mock<UserService> mockUserService_;
         public LoginModel loginModel_;
 
-        private readonly User _seeker = new User
+        public readonly User _seeker = new User
         {
             Email = "petrov.ivan@example.com",
             FirstName = "Иван",
@@ -26,7 +26,7 @@ namespace WebReckrytingSystem.Tests.Pages.Account
             Role = "job_seeker"
         };
 
-        private readonly User _employer = new User
+        public readonly User _employer = new User
         {
             Email = "hr@techcompany.ru",
             FirstName = "Ольга",

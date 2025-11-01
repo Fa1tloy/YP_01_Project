@@ -19,11 +19,11 @@ namespace WebReckrytingSystem.Tests.Pages.Account
          public Mock<UserService> mockUserService_;
         public LoginModel loginModel_;
 
-        private readonly User _seeker = new User
+        public readonly User _seeker = new User
         {
             Email = "petrov.ivan@example.com",
-            FirstName = "Èâàí",
-            LastName = "Ïåòðîâ",
+            FirstName = "Иван",
+            LastName = "Петров",
             Role = "job_seeker"
         };
 
