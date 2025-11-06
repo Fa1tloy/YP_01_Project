@@ -1,1 +1,21 @@
-﻿
+﻿@* Pages/Account/Login.cshtml *@
+<form method="post">
+    <div class="mb-3">
+        <label asp-for="LoginData.Email" class="form-label">Email</label>
+        <input asp-for="LoginData.Email" class="form-control" />
+        <span asp-validation-for="LoginData.Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="LoginData.Password" class="form-label">Пароль</label>
+        <input asp-for="LoginData.Password" type="password" class="form-control" />
+        <span asp-validation-for="LoginData.Password" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3 form-check">
+        <input asp-for="LoginData.RememberMe" class="form-check-input" />
+        <label asp-for="LoginData.RememberMe" class="form-check-label">Запомнить меня</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Войти</button>
+</form>
