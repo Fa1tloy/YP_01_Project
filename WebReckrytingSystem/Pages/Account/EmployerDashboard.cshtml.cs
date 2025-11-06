@@ -5,7 +5,7 @@ using System.Security.Claims;
 
 namespace WebReckrytingSystem.Pages.Account
 {
-     
+    [Authorize(Roles = "employer")]    // Только для работодателей
     public class EmployerDashboardModel : PageModel
     {
         public string UserFirstName { get; set; } = string.Empty;
