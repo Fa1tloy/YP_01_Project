@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;  // ? днаюбхрэ щрс ярпнвйс
+using Microsoft.AspNetCore.Authorization;  
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
@@ -6,7 +6,7 @@ using WebReckrytingSystem.Services;
 
 namespace WebReckrytingSystem.Pages.Account
 {
-    [Authorize(Roles = "job_seeker")]  
+    
     public class JobSeekerDashboardModel : PageModel
     {
         private readonly IResumeService _resumeService;
