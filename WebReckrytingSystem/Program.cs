@@ -11,7 +11,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 
 // Добавляем аутентификацию
-
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";          // Путь к странице входа
+        options.AccessDeniedPath = "/AccessDenied";    // Путь при отказе в доступе
+        options.ExpireTimeSpan = TimeSpan.FromDays(30); // Максимальный срок жизни куки
+        options.SlidingExpiration = true;              // Обновление срока при активности
+    });
 
 // Регистрация контекста базы данных
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
