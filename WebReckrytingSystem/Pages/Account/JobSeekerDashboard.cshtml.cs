@@ -6,7 +6,7 @@ using WebReckrytingSystem.Services;
 
 namespace WebReckrytingSystem.Pages.Account
 {
-    [Authorize(Roles = "job_seeker")]  
+    
     public class JobSeekerDashboardModel : PageModel
     {
         private readonly IResumeService _resumeService;
