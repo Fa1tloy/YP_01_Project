@@ -35,6 +35,11 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IResumeRepository, ResumeRepository>();
 builder.Services.AddScoped<IResumeService, ResumeService>();
 
+// Регистрация репозиториев и сервисов для вакансий
+builder.Services.AddScoped<IVacancyRepository, VacancyRepository>();
+builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+builder.Services.AddScoped<IVacancyService, VacancyService>();
+
 var app = builder.Build();
 
 // Конфигурация HTTP pipeline
