@@ -34,7 +34,7 @@ namespace WebReckrytingSystem.Models
         public string AuthorEmail { get; set; } = string.Empty;
 
         // Навигационные свойства
-        
+        public Company Company { get; set; } = null!;
         public User Author { get; set; } = null!;
     }
 }
