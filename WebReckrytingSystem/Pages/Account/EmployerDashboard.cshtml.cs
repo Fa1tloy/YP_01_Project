@@ -1,25 +1,25 @@
-using Microsoft.AspNetCore.Authorization;  
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
 
 namespace WebReckrytingSystem.Pages.Account
 {
-    [Authorize(Roles = "employer")]  
+    [Authorize(Roles = "employer")]
     public class EmployerDashboardModel : PageModel
     {
         public string UserFirstName { get; set; } = string.Empty;
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
-            // Дополнительная проверка
+            // Проверка аутентификации
             if (!User.Identity.IsAuthenticated)
             {
-                RedirectToPage("/Account/Login");
-                return;
+                return RedirectToPage("/Account/Login");
             }
 
             UserFirstName = User.FindFirst(ClaimTypes.GivenName)?.Value ?? "Пользователь";
+            return Page();
         }
     }
 }
