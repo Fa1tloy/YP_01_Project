@@ -1,4 +1,5 @@
-﻿using WebReckrytingSystem.Data;
+﻿using Microsoft.Extensions.Logging;
+using WebReckrytingSystem.Data;
 using WebReckrytingSystem.Models;
 
 namespace WebReckrytingSystem.Services
@@ -9,41 +10,60 @@ namespace WebReckrytingSystem.Services
         private readonly ICompanyRepository _companyRepository;
         private readonly IUserRepository _userRepository;
         private readonly ICompanyService _companyService;
+        private readonly ILogger<VacancyService> _logger;
 
         public VacancyService(IVacancyRepository vacancyRepository,
                             ICompanyRepository companyRepository,
                             IUserRepository userRepository,
-                            ICompanyService companyService)
+                            ICompanyService companyService,
+                            ILogger<VacancyService> logger)
         {
             _vacancyRepository = vacancyRepository;
             _companyRepository = companyRepository;
             _userRepository = userRepository;
             _companyService = companyService;
+            _logger = logger;
+      
         }
 
         public ServiceResult<Vacancy> CreateVacancy(string authorEmail, CreateVacancyViewModel model)
         {
+            _logger.LogInformation($"Создание вакансии для пользователя: {authorEmail}");
+            _logger.LogInformation($"Данные вакансии: Company={model.CompanyName}, Title={model.Title}");
+
             // 1. Проверка прав доступа
             var user = _userRepository.FindByEmail(authorEmail);
             if (user == null || user.Role != "employer")
+            {
+                _logger.LogWarning($"Попытка создания вакансии не-работодателем: {authorEmail}");
                 return ServiceResult<Vacancy>.Error("Только работодатели могут создавать вакансии");
+            }
 
             // 2. Валидация данных вакансии
             var validationResult = ValidateVacancyData(model);
             if (!validationResult.IsSuccess)
+            {
+                _logger.LogWarning($"Ошибка валидации: {validationResult.Message}");
                 return ServiceResult<Vacancy>.Error(validationResult.Message);
+            }
 
             // 3. Проверка компании
             var company = _companyRepository.FindByName(model.CompanyName.Trim());
             if (company == null)
             {
+                _logger.LogWarning($"Компания не найдена: {model.CompanyName}");
                 return ServiceResult<Vacancy>.Error("Компания не найдена. Сначала создайте компанию.");
             }
+
+            _logger.LogInformation($"Найдена компания: {company.Name}");
 
             // 4. Проверка дубликатов
             var existingVacancy = _vacancyRepository.GetByCompanyAndTitle(model.CompanyName, model.Title);
             if (existingVacancy != null)
+            {
+                _logger.LogWarning($"Дубликат вакансии: {model.CompanyName} - {model.Title}");
                 return ServiceResult<Vacancy>.Error("Вакансия с таким названием уже существует в этой компании");
+            }
 
             try
             {
@@ -61,11 +81,15 @@ namespace WebReckrytingSystem.Services
                     AuthorEmail = authorEmail
                 };
 
+                _logger.LogInformation("Сохранение вакансии в репозиторий");
                 var savedVacancy = _vacancyRepository.Save(vacancy);
+                _logger.LogInformation("Вакансия успешно сохранена");
+
                 return ServiceResult<Vacancy>.Success("Вакансия успешно опубликована!", savedVacancy);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Ошибка при сохранении вакансии");
                 return ServiceResult<Vacancy>.Error($"Ошибка при создании вакансии: {ex.Message}");
             }
         }
