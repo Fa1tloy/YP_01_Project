@@ -31,6 +31,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<UserService>();
 
+//  регистрацию сервиса компаний
+builder.Services.AddScoped<ICompanyService, CompanyService>();
+
 // ДОБАВЬТЕ ЭТИ СТРОЧКИ:
 builder.Services.AddScoped<IResumeRepository, ResumeRepository>();
 builder.Services.AddScoped<IResumeService, ResumeService>();
