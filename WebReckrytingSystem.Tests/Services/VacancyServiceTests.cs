@@ -238,5 +238,46 @@ namespace WebReckrytingSystem.Tests.Services
             Assert.IsFalse(result.IsSuccess);
             Assert.AreEqual("Требования к кандидату обязательны", result.Message);
         }
+        [TestMethod]
+        public void CreateVacancy_WithSalaryFromGreaterThanSalaryTo_ReturnsError()
+        {
+            // Arrange
+            var model = CreateValidVacancyModel();
+            model.SalaryFrom = 300000;
+            model.SalaryTo = 200000;
+
+            _mockUserRepository.Setup(x => x.FindByEmail(_employerUser.Email))
+                .Returns(_employerUser);
+            _mockCompanyRepository.Setup(x => x.FindByName(model.CompanyName))
+                .Returns(_testCompany);
+
+            // Act
+            var result = _vacancyService.CreateVacancy(_employerUser.Email, model);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Зарплата 'от' не может быть больше зарплаты 'до'", result.Message);
+        }
+
+        [TestMethod]
+        public void CreateVacancy_WithNegativeSalary_ReturnsError()
+        {
+            // Arrange
+            var model = CreateValidVacancyModel();
+            model.SalaryFrom = -50000;
+            model.SalaryTo = 100000;
+
+            _mockUserRepository.Setup(x => x.FindByEmail(_employerUser.Email))
+                .Returns(_employerUser);
+            _mockCompanyRepository.Setup(x => x.FindByName(model.CompanyName))
+                .Returns(_testCompany);
+
+            // Act
+            var result = _vacancyService.CreateVacancy(_employerUser.Email, model);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Зарплата не может быть отрицательной", result.Message);
+        }
     }
 }
