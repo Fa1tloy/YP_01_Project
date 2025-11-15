@@ -71,5 +71,64 @@ namespace WebReckrytingSystem.Tests.Services
                 WorkSchedule = "remote"
             };
         }
+        [TestMethod]
+        public void CreateVacancy_WithValidData_ReturnsSuccess()
+        {
+            // Arrange
+            var model = CreateValidVacancyModel();
+            _mockUserRepository.Setup(x => x.FindByEmail(_employerUser.Email))
+                .Returns(_employerUser);
+            _mockCompanyRepository.Setup(x => x.FindByName(model.CompanyName))
+                .Returns(_testCompany);
+            _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle(model.CompanyName, model.Title))
+                .Returns((Vacancy)null);
+            _mockVacancyRepository.Setup(x => x.Save(It.IsAny<Vacancy>()))
+                .Returns((Vacancy v) => v);
+
+            // Act
+            var result = _vacancyService.CreateVacancy(_employerUser.Email, model);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual("Вакансия успешно опубликована!", result.Message);
+            Assert.IsNotNull(result.Data);
+            Assert.AreEqual(model.Title, result.Data.Title);
+            Assert.AreEqual(model.CompanyName, result.Data.CompanyName);
+            _mockVacancyRepository.Verify(x => x.Save(It.IsAny<Vacancy>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void CreateVacancy_WithMinimumRequiredData_ReturnsSuccess()
+        {
+            // Arrange
+            var model = new CreateVacancyViewModel
+            {
+                CompanyName = "StartupInnovations",
+                Title = "Frontend Developer",
+                Description = "Разработка UI",
+                Requirements = "JavaScript, React",
+                EmploymentType = "full",
+                WorkSchedule = "full_day"
+            };
+
+            var company = new Company { Name = "StartupInnovations", Verified = false };
+
+            _mockUserRepository.Setup(x => x.FindByEmail(_employerUser.Email))
+                .Returns(_employerUser);
+            _mockCompanyRepository.Setup(x => x.FindByName(model.CompanyName))
+                .Returns(company);
+            _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle(model.CompanyName, model.Title))
+                .Returns((Vacancy)null);
+            _mockVacancyRepository.Setup(x => x.Save(It.IsAny<Vacancy>()))
+                .Returns((Vacancy v) => v);
+
+            // Act
+            var result = _vacancyService.CreateVacancy(_employerUser.Email, model);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.IsNull(result.Data.SalaryFrom);
+            Assert.IsNull(result.Data.SalaryTo);
+        }
     }
 }
