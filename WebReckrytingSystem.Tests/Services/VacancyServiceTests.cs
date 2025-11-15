@@ -394,6 +394,63 @@ namespace WebReckrytingSystem.Tests.Services
             Assert.IsFalse(result.IsSuccess);
             Assert.IsTrue(result.Message.Contains("Ошибка при создании вакансии"));
         }
+        [TestMethod]
+        public void GetUserVacancies_ReturnsUserVacancies()
+        {
+            // Arrange
+            var userVacancies = new List<Vacancy>
+            {
+                new Vacancy { CompanyName = "TechCorp", Title = "Developer 1", AuthorEmail = _employerUser.Email },
+                new Vacancy { CompanyName = "TechCorp", Title = "Developer 2", AuthorEmail = _employerUser.Email }
+            };
+
+            _mockVacancyRepository.Setup(x => x.GetByAuthor(_employerUser.Email))
+                .Returns(userVacancies);
+
+            // Act
+            var result = _vacancyService.GetUserVacancies(_employerUser.Email);
+
+            // Assert
+            Assert.AreEqual(2, result.Count);
+            Assert.IsTrue(result.All(v => v.AuthorEmail == _employerUser.Email));
+        }
+
+        [TestMethod]
+        public void GetVacancy_WithExistingVacancy_ReturnsVacancy()
+        {
+            // Arrange
+            var expectedVacancy = new Vacancy
+            {
+                CompanyName = "TechCorp",
+                Title = "Senior .NET Developer",
+                AuthorEmail = _employerUser.Email
+            };
+
+            _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle("TechCorp", "Senior .NET Developer"))
+                .Returns(expectedVacancy);
+
+            // Act
+            var result = _vacancyService.GetVacancy("TechCorp", "Senior .NET Developer");
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(expectedVacancy.Title, result.Title);
+            Assert.AreEqual(expectedVacancy.CompanyName, result.CompanyName);
+        }
+
+        [TestMethod]
+        public void GetVacancy_WithNonExistingVacancy_ReturnsNull()
+        {
+            // Arrange
+            _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle("Unknown", "Vacancy"))
+                .Returns((Vacancy)null);
+
+            // Act
+            var result = _vacancyService.GetVacancy("Unknown", "Vacancy");
+
+            // Assert
+            Assert.IsNull(result);
+        }
     }
 }
 
