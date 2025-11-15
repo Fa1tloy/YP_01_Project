@@ -306,5 +306,72 @@ namespace WebReckrytingSystem.Tests.Services
             Assert.AreEqual("Вакансия с таким названием уже существует в этой компании", result.Message);
             _mockVacancyRepository.Verify(x => x.Save(It.IsAny<Vacancy>()), Times.Never);
         }
+        [TestMethod]
+        public void CreateVacancy_WithInvalidEmploymentType_ReturnsError()
+        {
+            // Arrange
+            var model = CreateValidVacancyModel();
+            model.EmploymentType = "invalid_type";
+
+            _mockUserRepository.Setup(x => x.FindByEmail(_employerUser.Email))
+                .Returns(_employerUser);
+            _mockCompanyRepository.Setup(x => x.FindByName(model.CompanyName))
+                .Returns(_testCompany);
+
+            // Act
+            var result = _vacancyService.CreateVacancy(_employerUser.Email, model);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Недопустимый тип занятости", result.Message);
+        }
+
+        [TestMethod]
+        public void CreateVacancy_WithInvalidWorkSchedule_ReturnsError()
+        {
+            // Arrange
+            var model = CreateValidVacancyModel();
+            model.WorkSchedule = "invalid_schedule";
+
+            _mockUserRepository.Setup(x => x.FindByEmail(_employerUser.Email))
+                .Returns(_employerUser);
+            _mockCompanyRepository.Setup(x => x.FindByName(model.CompanyName))
+                .Returns(_testCompany);
+
+            // Act
+            var result = _vacancyService.CreateVacancy(_employerUser.Email, model);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Недопустимый график работы", result.Message);
+        }
+
+        [TestMethod]
+        public void CreateVacancy_WithValidEmploymentTypes_ReturnsSuccess()
+        {
+            // Arrange
+            var validTypes = new[] { "full", "part", "project", "internship", "volunteer" };
+
+            foreach (var employmentType in validTypes)
+            {
+                var model = CreateValidVacancyModel();
+                model.EmploymentType = employmentType;
+
+                _mockUserRepository.Setup(x => x.FindByEmail(_employerUser.Email))
+                    .Returns(_employerUser);
+                _mockCompanyRepository.Setup(x => x.FindByName(model.CompanyName))
+                    .Returns(_testCompany);
+                _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle(model.CompanyName, model.Title))
+                    .Returns((Vacancy)null);
+                _mockVacancyRepository.Setup(x => x.Save(It.IsAny<Vacancy>()))
+                    .Returns((Vacancy v) => v);
+
+                // Act
+                var result = _vacancyService.CreateVacancy(_employerUser.Email, model);
+
+                // Assert
+                Assert.IsTrue(result.IsSuccess, $"Должен принимать тип занятости: {employmentType}");
+            }
+        }
     }
 }
