@@ -373,5 +373,27 @@ namespace WebReckrytingSystem.Tests.Services
                 Assert.IsTrue(result.IsSuccess, $"Должен принимать тип занятости: {employmentType}");
             }
         }
+        [TestMethod]
+        public void CreateVacancy_WhenRepositoryThrowsException_ReturnsError()
+        {
+            // Arrange
+            var model = CreateValidVacancyModel();
+            _mockUserRepository.Setup(x => x.FindByEmail(_employerUser.Email))
+                .Returns(_employerUser);
+            _mockCompanyRepository.Setup(x => x.FindByName(model.CompanyName))
+                .Returns(_testCompany);
+            _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle(model.CompanyName, model.Title))
+                .Returns((Vacancy)null);
+            _mockVacancyRepository.Setup(x => x.Save(It.IsAny<Vacancy>()))
+                .Throws(new Exception("Database connection failed"));
+
+            // Act
+            var result = _vacancyService.CreateVacancy(_employerUser.Email, model);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.IsTrue(result.Message.Contains("Ошибка при создании вакансии"));
+        }
     }
 }
+
