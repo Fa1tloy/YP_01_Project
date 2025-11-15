@@ -8,14 +8,17 @@ namespace WebReckrytingSystem.Services
         private readonly IVacancyRepository _vacancyRepository;
         private readonly ICompanyRepository _companyRepository;
         private readonly IUserRepository _userRepository;
+        private readonly ICompanyService _companyService;
 
         public VacancyService(IVacancyRepository vacancyRepository,
                             ICompanyRepository companyRepository,
-                            IUserRepository userRepository)
+                            IUserRepository userRepository,
+                            ICompanyService companyService)
         {
             _vacancyRepository = vacancyRepository;
             _companyRepository = companyRepository;
             _userRepository = userRepository;
+            _companyService = companyService;
         }
 
         public ServiceResult<Vacancy> CreateVacancy(string authorEmail, CreateVacancyViewModel model)
@@ -25,15 +28,17 @@ namespace WebReckrytingSystem.Services
             if (user == null || user.Role != "employer")
                 return ServiceResult<Vacancy>.Error("Только работодатели могут создавать вакансии");
 
-            // 2. Валидация компании
-            var company = _companyRepository.FindByName(model.CompanyName);
-            if (company == null)
-                return ServiceResult<Vacancy>.Error("Компания не найдена");
-
-            // 3. Валидация данных вакансии
+            // 2. Валидация данных вакансии
             var validationResult = ValidateVacancyData(model);
             if (!validationResult.IsSuccess)
                 return ServiceResult<Vacancy>.Error(validationResult.Message);
+
+            // 3. Проверка компании
+            var company = _companyRepository.FindByName(model.CompanyName.Trim());
+            if (company == null)
+            {
+                return ServiceResult<Vacancy>.Error("Компания не найдена. Сначала создайте компанию.");
+            }
 
             // 4. Проверка дубликатов
             var existingVacancy = _vacancyRepository.GetByCompanyAndTitle(model.CompanyName, model.Title);
