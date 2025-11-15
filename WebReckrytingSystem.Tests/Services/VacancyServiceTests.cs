@@ -130,5 +130,37 @@ namespace WebReckrytingSystem.Tests.Services
             Assert.IsNull(result.Data.SalaryFrom);
             Assert.IsNull(result.Data.SalaryTo);
         }
+        [TestMethod]
+        public void CreateVacancy_ByJobSeeker_ReturnsError()
+        {
+            // Arrange
+            var model = CreateValidVacancyModel();
+            _mockUserRepository.Setup(x => x.FindByEmail(_jobSeekerUser.Email))
+                .Returns(_jobSeekerUser);
+
+            // Act
+            var result = _vacancyService.CreateVacancy(_jobSeekerUser.Email, model);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Только работодатели могут создавать вакансии", result.Message);
+            _mockVacancyRepository.Verify(x => x.Save(It.IsAny<Vacancy>()), Times.Never);
+        }
+
+        [TestMethod]
+        public void CreateVacancy_WithNonExistentUser_ReturnsError()
+        {
+            // Arrange
+            var model = CreateValidVacancyModel();
+            _mockUserRepository.Setup(x => x.FindByEmail("nonexistent@example.com"))
+                .Returns((User)null);
+
+            // Act
+            var result = _vacancyService.CreateVacancy("nonexistent@example.com", model);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Только работодатели могут создавать вакансии", result.Message);
+        }
     }
 }
