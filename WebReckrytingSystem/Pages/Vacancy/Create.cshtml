@@ -44,7 +44,7 @@
                                         </select>
                                         <span asp-validation-for="VacancyData.CompanyName" class="text-danger"></span>
                                         <small class="form-text text-muted">
-                                            Нет подходящей компании? <a href="/Companies/Create">Создать новую</a>
+                                            Нет подходящей компании? <a href="/Company/Create">Создать новую</a>
                                         </small>
                                     </div>
 
@@ -134,31 +134,3 @@
     </div>
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-
-    <script>
-        console.log("Страница создания вакансии загружена");
-        console.log("Количество компаний: @Model.Companies.Count");
-
-        // Включить отладочную информацию
-        document.getElementById('debugInfo').style.display = 'block';
-        document.getElementById('debugContent').innerHTML =
-            'Компаний загружено: @Model.Companies.Count<br>' +
-            'Компании: @string.Join(", ", Model.Companies.Select(c => c.Name))';
-
-        document.getElementById('vacancyForm').addEventListener('submit', function(e) {
-            console.log('Форма отправляется...');
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Создание...';
-        });
-
-        // Проверить валидацию при изменении полей
-        document.querySelectorAll('input, select, textarea').forEach(element => {
-            element.addEventListener('change', function() {
-                console.log('Изменено поле:', this.name, '=', this.value);
-            });
-        });
-    </script>
-}

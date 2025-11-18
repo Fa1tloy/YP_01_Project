@@ -140,7 +140,16 @@ namespace WebReckrytingSystem.Services
 
         public ICollection<Vacancy> GetUserVacancies(string authorEmail)
         {
-            return _vacancyRepository.GetByAuthor(authorEmail);
+            _logger.LogInformation($"Получение вакансий для пользователя: {authorEmail}");
+            var vacancies = _vacancyRepository.GetByAuthor(authorEmail);
+            _logger.LogInformation($"Найдено вакансий: {vacancies.Count}");
+
+            foreach (var vacancy in vacancies)
+            {
+                _logger.LogInformation($"Вакансия: {vacancy.CompanyName} - {vacancy.Title}");
+            }
+
+            return vacancies;
         }
 
         public ICollection<Vacancy> GetAllVacancies()

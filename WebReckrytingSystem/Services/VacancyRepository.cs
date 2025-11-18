@@ -26,6 +26,7 @@ namespace WebReckrytingSystem.Services
             return _context.Vacancies
                 .Include(v => v.Company)
                 .Where(v => v.AuthorEmail == authorEmail)
+                .OrderByDescending(v => v.CompanyName) // Сортируем по названию компании
                 .ToList();
         }
 
@@ -34,6 +35,7 @@ namespace WebReckrytingSystem.Services
             return _context.Vacancies
                 .Include(v => v.Company)
                 .Include(v => v.Author)
+                .OrderByDescending(v => v.CompanyName)
                 .ToList();
         }
 
