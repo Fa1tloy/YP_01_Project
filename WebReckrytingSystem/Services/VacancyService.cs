@@ -115,14 +115,6 @@ namespace WebReckrytingSystem.Services
                 if (model.SalaryFrom.Value < 0 || model.SalaryTo.Value < 0)
                     return ServiceResult.Error("Зарплата не может быть отрицательной");
             }
-            else if (model.SalaryFrom.HasValue && model.SalaryFrom.Value < 0)
-            {
-                return ServiceResult.Error("Зарплата не может быть отрицательной");
-            }
-            else if (model.SalaryTo.HasValue && model.SalaryTo.Value < 0)
-            {
-                return ServiceResult.Error("Зарплата не может быть отрицательной");
-            }
 
             // Валидация типов
             var validEmploymentTypes = new[] { "full", "part", "project", "internship", "volunteer" };

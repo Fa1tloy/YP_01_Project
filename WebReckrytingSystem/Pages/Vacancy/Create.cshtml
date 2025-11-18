@@ -51,7 +51,7 @@
                                         </select>
                                         <span asp-validation-for="VacancyData.CompanyName" class="text-danger"></span>
                                         <small class="form-text text-muted">
-                                            Нет подходящей компании? <a href="/Companies/Create">Создать новую</a>
+                                            Нет подходящей компании? <a href="/Company/Create">Создать новую</a>
                                         </small>
                                     </div>
 
@@ -141,71 +141,3 @@
     </div>
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-
-    <script>
-        console.log("Страница создания вакансии загружена");
-        console.log("Количество компаний: @Model.Companies.Count");
-
-        // Добавим валидацию зарплаты на клиенте
-        document.getElementById('vacancyForm').addEventListener('submit', function(e) {
-            const salaryFrom = document.querySelector('[name="VacancyData.SalaryFrom"]');
-            const salaryTo = document.querySelector('[name="VacancyData.SalaryTo"]');
-
-            if (salaryFrom.value && salaryTo.value) {
-                const from = parseInt(salaryFrom.value);
-                const to = parseInt(salaryTo.value);
-
-                if (from > to) {
-                    e.preventDefault();
-                    alert('Ошибка: Зарплата "от" не может быть больше зарплаты "до"');
-                    salaryFrom.focus();
-                    return false;
-                }
-            }
-
-            console.log('Форма отправляется...');
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Создание...';
-        });
-
-        // Валидация зарплаты в реальном времени
-        document.querySelector('[name="VacancyData.SalaryFrom"]')?.addEventListener('change', validateSalary);
-        document.querySelector('[name="VacancyData.SalaryTo"]')?.addEventListener('change', validateSalary);
-
-        function validateSalary() {
-            const salaryFrom = document.querySelector('[name="VacancyData.SalaryFrom"]');
-            const salaryTo = document.querySelector('[name="VacancyData.SalaryTo"]');
-            const errorDiv = document.getElementById('salaryError');
-
-            if (salaryFrom.value && salaryTo.value) {
-                const from = parseInt(salaryFrom.value);
-                const to = parseInt(salaryTo.value);
-
-                if (from > to) {
-                    salaryFrom.classList.add('is-invalid');
-                    salaryTo.classList.add('is-invalid');
-
-                    // Создаем или обновляем сообщение об ошибке
-                    let errorMessage = document.getElementById('salaryRangeError');
-                    if (!errorMessage) {
-                        errorMessage = document.createElement('div');
-                        errorMessage.id = 'salaryRangeError';
-                        errorMessage.className = 'invalid-feedback d-block';
-                        errorMessage.textContent = 'Зарплата "от" не может быть больше зарплаты "до"';
-                        salaryFrom.parentNode.appendChild(errorMessage);
-                    }
-                } else {
-                    salaryFrom.classList.remove('is-invalid');
-                    salaryTo.classList.remove('is-invalid');
-                    const errorMessage = document.getElementById('salaryRangeError');
-                    if (errorMessage) {
-                        errorMessage.remove();
-                    }
-                }
-            }
-        }
-    </script>
-}
