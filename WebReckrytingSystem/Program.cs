@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Добавление сервисов в контейнер
+// Добавление сервисов в контейнер 
 builder.Services.AddRazorPages();
 
 // Добавляем аутентификацию
