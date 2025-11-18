@@ -5,6 +5,16 @@
 }
 
 <div class="container mt-5">
+    <!-- Сообщение об успешном создании -->
+    @if (ViewData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            @ViewData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
     <div class="row">
         <div class="col-md-4">
             <div class="card">
@@ -18,22 +28,23 @@
                 <div class="card-body">
                     <h6>Управление</h6>
                     <div class="d-grid gap-2">
-                        <a href="#" class="btn btn-outline-primary">Создать вакансию</a>
+                        <a href="/Company/Create" class="btn btn-outline-primary">Создать компанию</a>
+                        <a href="/Vacancy/Create" class="btn btn-outline-primary">Создать вакансию</a>
                         <a href="#" class="btn btn-outline-primary">Мои вакансии</a>
-                        <a href="#" class="btn btn-outline-primary">Отклики соискателей</a>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="col-md-8">
+            <!-- Статистика -->
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Статистика компании</h5>
                     <div class="row text-center">
                         <div class="col-3">
                             <div class="border rounded p-3">
-                                <h4 class="text-primary">0</h4>
+                                <h4 class="text-primary">@Model.ActiveVacanciesCount</h4>
                                 <small>Активных вакансий</small>
                             </div>
                         </div>
@@ -59,12 +70,103 @@
                 </div>
             </div>
 
+            <!-- Список вакансий -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Мои вакансии</h5>
+                        <span class="badge bg-primary">@Model.Vacancies.Count</span>
+                    </div>
+
+                    @if (Model.Vacancies.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var vacancy in Model.Vacancies)
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">@vacancy.Title</h6>
+                                        <small class="text-muted">@vacancy.CompanyName</small>
+                                    </div>
+                                    <p class="mb-1">@vacancy.Description</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            @if (vacancy.SalaryFrom.HasValue && vacancy.SalaryTo.HasValue)
+                                            {
+                                                <text>@vacancy.SalaryFrom.Value.ToString("N0") - @vacancy.SalaryTo.Value.ToString("N0") руб.</text>
+                                            }
+                                            else if (vacancy.SalaryFrom.HasValue)
+                                            {
+                                                <text>от @vacancy.SalaryFrom.Value.ToString("N0") руб.</text>
+                                            }
+                                            else
+                                            {
+                                                <text>Зарплата не указана</text>
+                                            }
+                                        </small>
+                                        <div>
+                                            <span class="badge bg-info me-1">@GetEmploymentTypeDisplay(vacancy.EmploymentType)</span>
+                                            <span class="badge bg-secondary">@GetWorkScheduleDisplay(vacancy.WorkSchedule)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-briefcase fa-3x text-muted mb-3"></i>
+                            <h6>У вас пока нет вакансий</h6>
+                            <p class="text-muted">Создайте первую вакансию, чтобы начать поиск сотрудников</p>
+                            <a href="/Vacancy/Create" class="btn btn-primary">Создать вакансию</a>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Последние отклики -->
             <div class="card mt-3">
                 <div class="card-body">
                     <h5 class="card-title">Последние отклики</h5>
-                    <p class="text-muted">Создайте вакансию, чтобы получать отклики от соискателей</p>
+                    @if (Model.Vacancies.Any())
+                    {
+                        <p class="text-muted">Отклики появятся здесь, когда соискатели начнут откликаться на ваши вакансии</p>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Создайте вакансию, чтобы получать отклики от соискателей</p>
+                    }
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@functions {
+    private string GetEmploymentTypeDisplay(string employmentType)
+    {
+        return employmentType switch
+        {
+            "full" => "Полная занятость",
+            "part" => "Частичная занятость",
+            "project" => "Проектная работа",
+            "internship" => "Стажировка",
+            "volunteer" => "Волонтерство",
+            _ => employmentType
+        };
+    }
+
+    private string GetWorkScheduleDisplay(string workSchedule)
+    {
+        return workSchedule switch
+        {
+            "full_day" => "Полный день",
+            "shifts" => "Сменный график",
+            "flexible" => "Гибкий график",
+            "remote" => "Удаленная работа",
+            "shift_work" => "Вахтовый метод",
+            _ => workSchedule
+        };
+    }
+}
