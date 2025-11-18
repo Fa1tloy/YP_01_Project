@@ -47,9 +47,12 @@ namespace WebReckrytingSystem.Pages.Vacancy
             if (!ModelState.IsValid)
             {
                 _logger.LogWarning("Модель не валидна. Ошибки:");
-                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                foreach (var error in ModelState)
                 {
-                    _logger.LogWarning($"Ошибка валидации: {error.ErrorMessage}");
+                    foreach (var err in error.Value.Errors)
+                    {
+                        _logger.LogWarning($"Ошибка в поле {error.Key}: {err.ErrorMessage}");
+                    }
                 }
 
                 LoadCompanies();
@@ -81,6 +84,8 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 }
                 else
                 {
+                    // Добавляем ошибку в ModelState для отображения в форме
+                    ModelState.AddModelError("", result.Message);
                     ErrorMessage = result.Message;
                     _logger.LogWarning($"Ошибка создания вакансии: {result.Message}");
                     LoadCompanies();
@@ -95,7 +100,6 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 return Page();
             }
         }
-
         private void LoadCompanies()
         {
             var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;

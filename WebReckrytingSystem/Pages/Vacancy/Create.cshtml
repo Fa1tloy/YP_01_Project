@@ -12,11 +12,18 @@
                     <h4 class="mb-0">Создание вакансии</h4>
                 </div>
                 <div class="card-body">
-                    <!-- Отладочная информация -->
-                    <div id="debugInfo" style="display: none;" class="alert alert-info">
-                        <strong>Отладка:</strong>
-                        <div id="debugContent"></div>
-                    </div>
+                    <!-- Общие ошибки (не привязанные к конкретным полям) -->
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            @Model.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <!-- Сообщения об ошибках валидации модели -->
+                    <div asp-validation-summary="All" class="alert alert-danger"></div>
 
                     @if (!Model.Companies.Any())
                     {
@@ -35,7 +42,7 @@
 
                                     <div class="mb-3">
                                         <label asp-for="VacancyData.CompanyName" class="form-label">Компания *</label>
-                                        <select asp-for="VacancyData.CompanyName" class="form-control" id="companySelect" required>
+                                        <select asp-for="VacancyData.CompanyName" class="form-control @(ViewData.ModelState["VacancyData.CompanyName"]?.Errors.Any() == true ? "is-invalid" : "")" required>
                                             <option value="">Выберите компанию</option>
                                             @foreach (var company in Model.Companies)
                                             {
@@ -44,25 +51,25 @@
                                         </select>
                                         <span asp-validation-for="VacancyData.CompanyName" class="text-danger"></span>
                                         <small class="form-text text-muted">
-                                            Нет подходящей компании? <a href="/Company/Create">Создать новую</a>
+                                            Нет подходящей компании? <a href="/Companies/Create">Создать новую</a>
                                         </small>
                                     </div>
 
                                     <div class="mb-3">
                                         <label asp-for="VacancyData.Title" class="form-label">Должность *</label>
-                                        <input asp-for="VacancyData.Title" class="form-control" placeholder="Например, Senior .NET Developer" required />
+                                        <input asp-for="VacancyData.Title" class="form-control @(ViewData.ModelState["VacancyData.Title"]?.Errors.Any() == true ? "is-invalid" : "")" placeholder="Например, Senior .NET Developer" required />
                                         <span asp-validation-for="VacancyData.Title" class="text-danger"></span>
                                     </div>
 
                                     <div class="mb-3">
                                         <label asp-for="VacancyData.SalaryFrom" class="form-label">Зарплата от (руб.)</label>
-                                        <input asp-for="VacancyData.SalaryFrom" type="number" class="form-control" placeholder="Например, 100000" min="0" max="9999999" />
+                                        <input asp-for="VacancyData.SalaryFrom" type="number" class="form-control @(ViewData.ModelState["VacancyData.SalaryFrom"]?.Errors.Any() == true ? "is-invalid" : "")" placeholder="Например, 100000" min="0" max="9999999" />
                                         <span asp-validation-for="VacancyData.SalaryFrom" class="text-danger"></span>
                                     </div>
 
                                     <div class="mb-3">
                                         <label asp-for="VacancyData.SalaryTo" class="form-label">Зарплата до (руб.)</label>
-                                        <input asp-for="VacancyData.SalaryTo" type="number" class="form-control" placeholder="Например, 200000" min="0" max="9999999" />
+                                        <input asp-for="VacancyData.SalaryTo" type="number" class="form-control @(ViewData.ModelState["VacancyData.SalaryTo"]?.Errors.Any() == true ? "is-invalid" : "")" placeholder="Например, 200000" min="0" max="9999999" />
                                         <span asp-validation-for="VacancyData.SalaryTo" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -72,10 +79,10 @@
 
                                     <div class="mb-3">
                                         <label asp-for="VacancyData.EmploymentType" class="form-label">Тип занятости *</label>
-                                        <select asp-for="VacancyData.EmploymentType" class="form-control" required>
+                                        <select asp-for="VacancyData.EmploymentType" class="form-control @(ViewData.ModelState["VacancyData.EmploymentType"]?.Errors.Any() == true ? "is-invalid" : "")" required>
                                             <option value="">Выберите тип занятости</option>
                                             <option value="full">Полная занятость</option>
-                                            <option value="part">Частичная занятости</option>
+                                            <option value="part">Частичная занятость</option>
                                             <option value="project">Проектная работа</option>
                                             <option value="internship">Стажировка</option>
                                             <option value="volunteer">Волонтерство</option>
@@ -85,7 +92,7 @@
 
                                     <div class="mb-3">
                                         <label asp-for="VacancyData.WorkSchedule" class="form-label">График работы *</label>
-                                        <select asp-for="VacancyData.WorkSchedule" class="form-control" required>
+                                        <select asp-for="VacancyData.WorkSchedule" class="form-control @(ViewData.ModelState["VacancyData.WorkSchedule"]?.Errors.Any() == true ? "is-invalid" : "")" required>
                                             <option value="">Выберите график работы</option>
                                             <option value="full_day">Полный день</option>
                                             <option value="shifts">Сменный график</option>
@@ -104,13 +111,13 @@
 
                                     <div class="mb-3">
                                         <label asp-for="VacancyData.Description" class="form-label">Описание вакансии *</label>
-                                        <textarea asp-for="VacancyData.Description" class="form-control" rows="4" placeholder="Опишите вакансию, обязанности, условия работы..." required></textarea>
+                                        <textarea asp-for="VacancyData.Description" class="form-control @(ViewData.ModelState["VacancyData.Description"]?.Errors.Any() == true ? "is-invalid" : "")" rows="4" placeholder="Опишите вакансию, обязанности, условия работы..." required></textarea>
                                         <span asp-validation-for="VacancyData.Description" class="text-danger"></span>
                                     </div>
 
                                     <div class="mb-3">
                                         <label asp-for="VacancyData.Requirements" class="form-label">Требования к кандидату *</label>
-                                        <textarea asp-for="VacancyData.Requirements" class="form-control" rows="4" placeholder="Опишите требования к кандидату (образование, опыт, навыки)..." required></textarea>
+                                        <textarea asp-for="VacancyData.Requirements" class="form-control @(ViewData.ModelState["VacancyData.Requirements"]?.Errors.Any() == true ? "is-invalid" : "")" rows="4" placeholder="Опишите требования к кандидату (образование, опыт, навыки)..." required></textarea>
                                         <span asp-validation-for="VacancyData.Requirements" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -134,3 +141,71 @@
     </div>
 </div>
 
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        console.log("Страница создания вакансии загружена");
+        console.log("Количество компаний: @Model.Companies.Count");
+
+        // Добавим валидацию зарплаты на клиенте
+        document.getElementById('vacancyForm').addEventListener('submit', function(e) {
+            const salaryFrom = document.querySelector('[name="VacancyData.SalaryFrom"]');
+            const salaryTo = document.querySelector('[name="VacancyData.SalaryTo"]');
+
+            if (salaryFrom.value && salaryTo.value) {
+                const from = parseInt(salaryFrom.value);
+                const to = parseInt(salaryTo.value);
+
+                if (from > to) {
+                    e.preventDefault();
+                    alert('Ошибка: Зарплата "от" не может быть больше зарплаты "до"');
+                    salaryFrom.focus();
+                    return false;
+                }
+            }
+
+            console.log('Форма отправляется...');
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Создание...';
+        });
+
+        // Валидация зарплаты в реальном времени
+        document.querySelector('[name="VacancyData.SalaryFrom"]')?.addEventListener('change', validateSalary);
+        document.querySelector('[name="VacancyData.SalaryTo"]')?.addEventListener('change', validateSalary);
+
+        function validateSalary() {
+            const salaryFrom = document.querySelector('[name="VacancyData.SalaryFrom"]');
+            const salaryTo = document.querySelector('[name="VacancyData.SalaryTo"]');
+            const errorDiv = document.getElementById('salaryError');
+
+            if (salaryFrom.value && salaryTo.value) {
+                const from = parseInt(salaryFrom.value);
+                const to = parseInt(salaryTo.value);
+
+                if (from > to) {
+                    salaryFrom.classList.add('is-invalid');
+                    salaryTo.classList.add('is-invalid');
+
+                    // Создаем или обновляем сообщение об ошибке
+                    let errorMessage = document.getElementById('salaryRangeError');
+                    if (!errorMessage) {
+                        errorMessage = document.createElement('div');
+                        errorMessage.id = 'salaryRangeError';
+                        errorMessage.className = 'invalid-feedback d-block';
+                        errorMessage.textContent = 'Зарплата "от" не может быть больше зарплаты "до"';
+                        salaryFrom.parentNode.appendChild(errorMessage);
+                    }
+                } else {
+                    salaryFrom.classList.remove('is-invalid');
+                    salaryTo.classList.remove('is-invalid');
+                    const errorMessage = document.getElementById('salaryRangeError');
+                    if (errorMessage) {
+                        errorMessage.remove();
+                    }
+                }
+            }
+        }
+    </script>
+}

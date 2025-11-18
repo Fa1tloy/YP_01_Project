@@ -2,7 +2,7 @@
 
 namespace WebReckrytingSystem.Models
 {
-    public class CreateVacancyViewModel
+    public class CreateVacancyViewModel : IValidatableObject
     {
         [Required(ErrorMessage = "Название компании обязательно")]
         [StringLength(255, ErrorMessage = "Название компании не должно превышать 255 символов")]
@@ -37,5 +37,30 @@ namespace WebReckrytingSystem.Models
         [Required(ErrorMessage = "График работы обязателен")]
         [Display(Name = "График работы")]
         public string WorkSchedule { get; set; } = string.Empty;
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            // Кастомная валидация зарплаты
+            if (SalaryFrom.HasValue && SalaryTo.HasValue && SalaryFrom > SalaryTo)
+            {
+                yield return new ValidationResult(
+                    "Зарплата 'от' не может быть больше зарплаты 'до'",
+                    new[] { nameof(SalaryFrom), nameof(SalaryTo) });
+            }
+
+            if (SalaryFrom.HasValue && SalaryFrom < 0)
+            {
+                yield return new ValidationResult(
+                    "Зарплата не может быть отрицательной",
+                    new[] { nameof(SalaryFrom) });
+            }
+
+            if (SalaryTo.HasValue && SalaryTo < 0)
+            {
+                yield return new ValidationResult(
+                    "Зарплата не может быть отрицательной",
+                    new[] { nameof(SalaryTo) });
+            }
+        }
     }
 }
