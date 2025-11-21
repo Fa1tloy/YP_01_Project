@@ -19,7 +19,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
         [BindProperty(SupportsGet = true)]
         public SearchVacancyViewModel SearchData { get; set; } = new();
 
-        public SearchResult<Vacancy> SearchResult { get; set; } = new();
+        public SearchResult<WebReckrytingSystem.Models.Vacancy> SearchResult { get; set; } = new();
 
         public string SuccessMessage { get; set; } = string.Empty;
         public string ErrorMessage { get; set; } = string.Empty;
