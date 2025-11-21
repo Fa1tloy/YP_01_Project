@@ -214,5 +214,54 @@ namespace UnitTests.Services
             Assert.IsTrue(result.Data.Items.All(v => v.WorkSchedule == "remote"));
             Assert.AreEqual(3, result.Data.Items.Count); // 3 удаленные вакансии в тестовых данных
         }
+        [TestMethod]
+        public void SearchVacancies_WithMultipleFilters_ReturnsMatchingVacancies()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+            model.Keywords = "Developer";
+            model.SalaryFrom = 150000;
+            model.EmploymentType = "full";
+            model.WorkSchedule = "remote";
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual(1, result.Data.Items.Count);
+            Assert.AreEqual("Senior .NET Developer", result.Data.Items.First().Title);
+        }
+
+        [TestMethod]
+        public void SearchVacancies_WithNoFilters_ReturnsAllVacancies()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual(_testVacancies.Count, result.Data.TotalCount);
+            Assert.AreEqual("Найдено 6 вакансий", result.Message);
+        }
+
+        [TestMethod]
+        public void SearchVacancies_WithNoResults_ReturnsEmptyList()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+            model.Keywords = "Blockchain Angular";
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual(0, result.Data.Items.Count);
+            Assert.AreEqual("По вашему запросу ничего не найдено", result.Message);
+        }
     }
 }
