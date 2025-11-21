@@ -1,0 +1,35 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace WebReckrytingSystem.Models
+{
+    public class SearchVacancyViewModel
+    {
+        [StringLength(100, ErrorMessage = "Ключевые слова не должны превышать 100 символов")]
+        [Display(Name = "Ключевые слова")]
+        public string? Keywords { get; set; }
+
+        [StringLength(255, ErrorMessage = "Название компании не должно превышать 255 символов")]
+        [Display(Name = "Компания")]
+        public string? CompanyName { get; set; }
+
+        [Range(0, 9999999, ErrorMessage = "Зарплата должна быть в диапазоне от 0 до 9 999 999")]
+        [Display(Name = "Зарплата от (руб.)")]
+        public int? SalaryFrom { get; set; }
+
+        [Range(0, 9999999, ErrorMessage = "Зарплата должна быть в диапазоне от 0 до 9 999 999")]
+        [Display(Name = "Зарплата до (руб.)")]
+        public int? SalaryTo { get; set; }
+
+        [Display(Name = "Тип занятости")]
+        public string? EmploymentType { get; set; }
+
+        [Display(Name = "График работы")]
+        public string? WorkSchedule { get; set; }
+
+        [Range(1, 100, ErrorMessage = "Номер страницы должен быть от 1 до 100")]
+        public int Page { get; set; } = 1;
+
+        [Range(1, 50, ErrorMessage = "Размер страницы должен быть от 1 до 50")]
+        public int PageSize { get; set; } = 10;
+    }
+}
