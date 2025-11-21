@@ -354,5 +354,60 @@ namespace UnitTests.Services
             Assert.IsFalse(result.IsSuccess);
             Assert.AreEqual("Некорректный размер страницы", result.Message);
         }
+        [TestMethod]
+        public void SearchVacancies_WithPagination_ReturnsCorrectPage()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+            model.Page = 1;
+            model.PageSize = 3;
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual(3, result.Data.Items.Count);
+            Assert.AreEqual(1, result.Data.Page);
+            Assert.AreEqual(3, result.Data.PageSize);
+            Assert.AreEqual(2, result.Data.TotalPages); // 6 вакансий / 3 на страницу = 2 страницы
+        }
+
+        [TestMethod]
+        public void SearchVacancies_WithSecondPage_ReturnsCorrectResults()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+            model.Page = 2;
+            model.PageSize = 3;
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual(3, result.Data.Items.Count); // Вторая страница тоже имеет 3 элемента
+            Assert.AreEqual(2, result.Data.Page);
+            Assert.IsTrue(result.Data.HasPreviousPage);
+            Assert.IsFalse(result.Data.HasNextPage); // На второй странице из двух
+        }
+
+        [TestMethod]
+        public void SearchVacancies_PaginationProperties_AreCalculatedCorrectly()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+            model.Page = 1;
+            model.PageSize = 4;
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.AreEqual(6, result.Data.TotalCount);
+            Assert.AreEqual(2, result.Data.TotalPages); // 6/4 = 2 страницы
+            Assert.IsFalse(result.Data.HasPreviousPage);
+            Assert.IsTrue(result.Data.HasNextPage);
+        }
     }
 }
