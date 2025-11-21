@@ -118,5 +118,101 @@ namespace UnitTests.Services
                 PageSize = 10
             };
         }
+        [TestMethod]
+        public void SearchVacancies_WithKeywords_ReturnsMatchingVacancies()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+            model.Keywords = ".NET";
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual("Найдено 1 вакансий", result.Message);
+            Assert.AreEqual(1, result.Data.Items.Count);
+            Assert.AreEqual("Senior .NET Developer", result.Data.Items.First().Title);
+        }
+
+        [TestMethod]
+        public void SearchVacancies_WithMultipleKeywords_ReturnsMatchingVacancies()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+            model.Keywords = "Developer React";
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.IsTrue(result.Data.Items.Count >= 2);
+            Assert.IsTrue(result.Data.Items.Any(v => v.Title.Contains("React")));
+            Assert.IsTrue(result.Data.Items.Any(v => v.Title.Contains("Developer")));
+        }
+
+        [TestMethod]
+        public void SearchVacancies_WithCompanyFilter_ReturnsCompanyVacancies()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+            model.CompanyName = "TechCorp";
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual(1, result.Data.Items.Count);
+            Assert.AreEqual("TechCorp", result.Data.Items.First().CompanyName);
+        }
+
+        [TestMethod]
+        public void SearchVacancies_WithSalaryFilter_ReturnsMatchingVacancies()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+            model.SalaryFrom = 150000;
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.IsTrue(result.Data.Items.All(v =>
+                v.SalaryTo >= 150000 || v.SalaryFrom >= 150000));
+        }
+
+        [TestMethod]
+        public void SearchVacancies_WithEmploymentTypeFilter_ReturnsMatchingVacancies()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+            model.EmploymentType = "full";
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.IsTrue(result.Data.Items.All(v => v.EmploymentType == "full"));
+        }
+
+        [TestMethod]
+        public void SearchVacancies_WithWorkScheduleFilter_ReturnsMatchingVacancies()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+            model.WorkSchedule = "remote";
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.IsTrue(result.Data.Items.All(v => v.WorkSchedule == "remote"));
+            Assert.AreEqual(3, result.Data.Items.Count); // 3 удаленные вакансии в тестовых данных
+        }
     }
 }
