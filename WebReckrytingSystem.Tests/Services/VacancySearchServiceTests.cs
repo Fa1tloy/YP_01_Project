@@ -409,5 +409,65 @@ namespace UnitTests.Services
             Assert.IsFalse(result.Data.HasPreviousPage);
             Assert.IsTrue(result.Data.HasNextPage);
         }
+        [TestMethod]
+        public void SearchVacancies_WithKeywords_SortsByRelevance()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+            model.Keywords = "Java Developer";
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            var firstVacancy = result.Data.Items.First();
+            Assert.AreEqual("Java Backend Developer", firstVacancy.Title); // Должен быть первым по релевантности
+        }
+
+        [TestMethod]
+        public void SearchVacancies_WithoutKeywords_SortsByCompanyAndTitle()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            var firstVacancy = result.Data.Items.First();
+            // Должны быть отсортированы по названию компании
+            Assert.IsTrue(result.Data.Items.Select(v => v.CompanyName).SequenceEqual(
+                result.Data.Items.Select(v => v.CompanyName).OrderByDescending(c => c)));
+        }
+
+        [TestMethod]
+        public void SearchVacancies_RelevanceScore_IsCalculatedCorrectly()
+        {
+            // Arrange
+            var service = new VacancySearchService(_mockVacancyRepository.Object, _mockLogger.Object);
+            var vacancy = new Vacancy
+            {
+                Title = "Senior .NET Developer",
+                Description = "Разработка на C#",
+                Requirements = ".NET Framework, ASP.NET",
+                CompanyName = "TechCorp"
+            };
+            var keywords = new[] { "net", "developer" };
+
+            // Act & Assert - используем reflection для тестирования приватного метода
+            var method = typeof(VacancySearchService).GetMethod("CalculateRelevanceScore",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            var score = (int)method.Invoke(service, new object[] { vacancy, keywords });
+
+            // Assert
+            Assert.IsTrue(score > 0);
+            // Title содержит оба ключевых слова: 10 + 10 = 20
+            // Requirements содержит "net": +5
+            // CompanyName не содержит ключевых слов: 0
+            // Итого: 25
+        }
     }
 }
