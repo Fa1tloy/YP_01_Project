@@ -504,5 +504,35 @@ namespace UnitTests.Services
                 v.Description.ToLower().Contains("developer") ||
                 v.Requirements.ToLower().Contains("developer")));
         }
+        [TestMethod]
+        public void GetSimilarVacancies_ReturnsSimilarVacancies()
+        {
+            // Arrange
+            var currentVacancy = _testVacancies[0]; // Senior .NET Developer
+
+            // Act
+            var result = _vacancySearchService.GetSimilarVacancies(currentVacancy, 3);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.IsTrue(result.Data.Items.Count <= 3);
+            Assert.IsTrue(result.Data.Items.All(v =>
+                v.CompanyName != currentVacancy.CompanyName || v.Title != currentVacancy.Title));
+        }
+
+        [TestMethod]
+        public void GetSimilarVacancies_WithCountParameter_ReturnsCorrectNumberOfVacancies()
+        {
+            // Arrange
+            var currentVacancy = _testVacancies[0];
+            var count = 2;
+
+            // Act
+            var result = _vacancySearchService.GetSimilarVacancies(currentVacancy, count);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual(count, result.Data.Items.Count);
+        }
     }
 }
