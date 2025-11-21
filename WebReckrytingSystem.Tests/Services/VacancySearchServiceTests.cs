@@ -469,5 +469,40 @@ namespace UnitTests.Services
             // CompanyName не содержит ключевых слов: 0
             // Итого: 25
         }
+        [TestMethod]
+        public void SearchVacancies_WhenRepositoryThrowsException_ReturnsError()
+        {
+            // Arrange
+            _mockVacancyRepository.Setup(x => x.GetPublishedVacancies())
+                .Throws(new Exception("Database connection failed"));
+
+            var model = CreateValidSearchModel();
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Произошла ошибка при поиске вакансий", result.Message);
+        }
+
+        [TestMethod]
+        public void SearchVacancies_WithCaseInsensitiveSearch_ReturnsResults()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+            model.Keywords = "developer"; // в нижнем регистре
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.IsTrue(result.Data.Items.Count > 0);
+            Assert.IsTrue(result.Data.Items.All(v =>
+                v.Title.ToLower().Contains("developer") ||
+                v.Description.ToLower().Contains("developer") ||
+                v.Requirements.ToLower().Contains("developer")));
+        }
     }
 }
