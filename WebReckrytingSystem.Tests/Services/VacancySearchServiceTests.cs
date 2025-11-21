@@ -263,5 +263,96 @@ namespace UnitTests.Services
             Assert.AreEqual(0, result.Data.Items.Count);
             Assert.AreEqual("По вашему запросу ничего не найдено", result.Message);
         }
+        [TestMethod]
+        public void SearchVacancies_WithNegativeSalary_ReturnsError()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+            model.SalaryFrom = -50000;
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Зарплата не может быть отрицательной", result.Message);
+            _mockVacancyRepository.Verify(x => x.GetPublishedVacancies(), Times.Never);
+        }
+
+        [TestMethod]
+        public void SearchVacancies_WithSalaryFromGreaterThanSalaryTo_ReturnsError()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+            model.SalaryFrom = 200000;
+            model.SalaryTo = 100000;
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Зарплата 'от' не может быть больше зарплаты 'до'", result.Message);
+        }
+
+        [TestMethod]
+        public void SearchVacancies_WithInvalidEmploymentType_ReturnsError()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+            model.EmploymentType = "invalid_type";
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Недопустимый тип занятости", result.Message);
+        }
+
+        [TestMethod]
+        public void SearchVacancies_WithInvalidWorkSchedule_ReturnsError()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+            model.WorkSchedule = "invalid_schedule";
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Недопустимый график работы", result.Message);
+        }
+
+        [TestMethod]
+        public void SearchVacancies_WithInvalidPageNumber_ReturnsError()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+            model.Page = 0;
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Некорректный номер страницы", result.Message);
+        }
+
+        [TestMethod]
+        public void SearchVacancies_WithInvalidPageSize_ReturnsError()
+        {
+            // Arrange
+            var model = CreateValidSearchModel();
+            model.PageSize = 0;
+
+            // Act
+            var result = _vacancySearchService.SearchVacancies(model);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Некорректный размер страницы", result.Message);
+        }
     }
 }
