@@ -35,14 +35,14 @@ namespace UnitTests.Pages.Vacancy
         {
             // Arrange
             _searchModel.SearchData = new SearchVacancyViewModel { Keywords = ".NET" };
-            var searchResult = new SearchResult<Vacancy>
+            var searchResult = new SearchResult<WebReckrytingSystem.Models.Vacancy>
             {
-                Items = new List<Vacancy> { new Vacancy { Title = "Senior .NET Developer" } },
+                Items = new List<WebReckrytingSystem.Models.Vacancy> { new WebReckrytingSystem.Models.Vacancy { Title = "Senior .NET Developer" } },
                 TotalCount = 1
             };
 
             _mockVacancySearchService.Setup(x => x.SearchVacancies(It.IsAny<SearchVacancyViewModel>()))
-                .Returns(ServiceResult<SearchResult<Vacancy>>.Success("Найдено 1 вакансий", searchResult));
+                .Returns(ServiceResult<SearchResult<WebReckrytingSystem.Models.Vacancy>>.Success("Найдено 1 вакансий", searchResult));
 
             // Act
             var result = await _searchModel.OnGetAsync();
