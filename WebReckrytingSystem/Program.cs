@@ -43,6 +43,9 @@ builder.Services.AddScoped<IVacancyRepository, VacancyRepository>();
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<IVacancyService, VacancyService>();
 
+// Регистрация сервиса поиска вакансий
+builder.Services.AddScoped<IVacancySearchService, VacancySearchService>();
+
 var app = builder.Build();
 
 // Конфигурация HTTP pipeline
