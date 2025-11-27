@@ -15,10 +15,12 @@ namespace WebReckrytingSystem.Models
         public string Title { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Описание вакансии обязательно")]
+        [StringLength(2000, ErrorMessage = "Описание не должно превышать 2000 символов")]
         [Display(Name = "Описание вакансии")]
         public string Description { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Требования к кандидату обязательны")]
+        [StringLength(2000, ErrorMessage = "Требования не должны превышать 2000 символов")]
         [Display(Name = "Требования к кандидату")]
         public string Requirements { get; set; } = string.Empty;
 
