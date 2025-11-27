@@ -128,11 +128,88 @@ namespace WebReckrytingSystem.Services
             return ServiceResult.Success("Валидация пройдена");
         }
 
-        public ServiceResult<Vacancy> UpdateVacancy(string companyName, string title, CreateVacancyViewModel model)
+        // VacancyService.cs - добавляю метод UpdateVacancy
+        public ServiceResult<Vacancy> UpdateVacancy(string companyName, string title, string userEmail, CreateVacancyViewModel model)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation($"Обновление вакансии: {companyName} - {title} пользователем: {userEmail}");
+            _logger.LogInformation($"Новые данные: Company={model.CompanyName}, Title={model.Title}");
+
+            // 1. Проверка прав доступа
+            var user = _userRepository.FindByEmail(userEmail);
+            if (user == null || user.Role != "employer")
+            {
+                _logger.LogWarning($"Попытка редактирования вакансии не-работодателем: {userEmail}");
+                return ServiceResult<Vacancy>.Error("Только работодатели могут редактировать вакансии");
+            }
+
+            // 2. Поиск вакансии
+            var existingVacancy = _vacancyRepository.GetByCompanyAndTitle(companyName, title);
+            if (existingVacancy == null)
+            {
+                _logger.LogWarning($"Вакансия не найдена: {companyName} - {title}");
+                return ServiceResult<Vacancy>.Error("Вакансия не найдена");
+            }
+
+            // 3. Проверка авторства
+            if (existingVacancy.AuthorEmail != userEmail)
+            {
+                _logger.LogWarning($"Попытка редактирования чужой вакансии. Автор: {existingVacancy.AuthorEmail}, Пользователь: {userEmail}");
+                return ServiceResult<Vacancy>.Error("Вы можете редактировать только свои вакансии");
+            }
+
+            // 4. Проверка компании
+            var company = _companyRepository.FindByName(model.CompanyName.Trim());
+            if (company == null)
+            {
+                _logger.LogWarning($"Компания не найдена: {model.CompanyName}");
+                return ServiceResult<Vacancy>.Error("Компания не найдена");
+            }
+
+            // 5. Проверка дубликатов (если изменилось название)
+            if (!string.Equals(existingVacancy.Title, model.Title.Trim(), StringComparison.OrdinalIgnoreCase))
+            {
+                var duplicateVacancy = _vacancyRepository.GetByCompanyAndTitle(model.CompanyName, model.Title);
+                if (duplicateVacancy != null)
+                {
+                    _logger.LogWarning($"Дубликат вакансии: {model.CompanyName} - {model.Title}");
+                    return ServiceResult<Vacancy>.Error("Вакансия с таким названием уже существует в этой компании");
+                }
+            }
+
+            // 6. Валидация данных вакансии
+            var validationResult = ValidateVacancyData(model);
+            if (!validationResult.IsSuccess)
+            {
+                _logger.LogWarning($"Ошибка валидации: {validationResult.Message}");
+                return ServiceResult<Vacancy>.Error(validationResult.Message);
+            }
+
+            try
+            {
+                // 7. Обновление вакансии
+                existingVacancy.CompanyName = model.CompanyName.Trim();
+                existingVacancy.Title = model.Title.Trim();
+                existingVacancy.Description = model.Description.Trim();
+                existingVacancy.Requirements = model.Requirements.Trim();
+                existingVacancy.SalaryFrom = model.SalaryFrom;
+                existingVacancy.SalaryTo = model.SalaryTo;
+                existingVacancy.EmploymentType = model.EmploymentType;
+                existingVacancy.WorkSchedule = model.WorkSchedule;
+
+                _logger.LogInformation("Сохранение обновленной вакансии в репозиторий");
+                var updatedVacancy = _vacancyRepository.Update(existingVacancy);
+                _logger.LogInformation("Вакансия успешно обновлена");
+
+                return ServiceResult<Vacancy>.Success("Вакансия успешно обновлена!", updatedVacancy);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Ошибка при обновлении вакансии: {companyName} - {title}");
+                return ServiceResult<Vacancy>.Error($"Ошибка при обновлении вакансии: {ex.Message}");
+            }
         }
 
+        // Уже существующий метод GetVacancy - убедимся что он есть
         public Vacancy? GetVacancy(string companyName, string title)
         {
             return _vacancyRepository.GetByCompanyAndTitle(companyName, title);
