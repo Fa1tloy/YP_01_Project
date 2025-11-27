@@ -80,13 +80,22 @@
 
                     @if (Model.Vacancies.Any())
                     {
+                        
+                    
+                        <!-- В блоке списка вакансий обновлю карточку вакансии -->
                         <div class="list-group">
                             @foreach (var vacancy in Model.Vacancies)
                             {
                                 <div class="list-group-item">
                                     <div class="d-flex w-100 justify-content-between">
                                         <h6 class="mb-1">@vacancy.Title</h6>
-                                        <small class="text-muted">@vacancy.CompanyName</small>
+                                        <div>
+                                            <small class="text-muted me-3">@vacancy.CompanyName</small>
+                                            <a href="/Vacancy/Edit/@Uri.EscapeDataString(vacancy.CompanyName)/@Uri.EscapeDataString(vacancy.Title)"
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-edit"></i> Редактировать
+                                            </a>
+                                        </div>
                                     </div>
                                     <p class="mb-1">@vacancy.Description</p>
                                     <div class="d-flex justify-content-between align-items-center">
