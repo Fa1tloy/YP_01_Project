@@ -52,10 +52,25 @@ namespace WebReckrytingSystem.Tests.Services
             _mockLogger = new Mock<ILogger<VacancyService>>();
 
             _vacancyService = new VacancyService(
-                _mockVacancyRepository.Object,
+              _mockVacancyRepository.Object,
                 _mockCompanyRepository.Object,
-                _mockUserRepository.Object);
+                _mockUserRepository.Object,
+                Mock.Of<ICompanyService>(),
+                _mockLogger.Object);
         }
+        private readonly Vacancy _existingVacancy = new Vacancy
+        {
+            CompanyName = "TechCorp",
+            Title = "Senior .NET Developer",
+            Description = "Разработка высоконагруженных приложений",
+            Requirements = "Опыт работы 3+ года, знание C#, ASP.NET",
+            SalaryFrom = 150000,
+            SalaryTo = 250000,
+            EmploymentType = "full",
+            WorkSchedule = "full_day",
+            AuthorEmail = "hr@techcorp.com"
+        };
+
 
         private CreateVacancyViewModel CreateValidVacancyModel()
         {
@@ -450,6 +465,365 @@ namespace WebReckrytingSystem.Tests.Services
 
             // Assert
             Assert.IsNull(result);
+        }
+        [TestMethod]
+        public void UpdateVacancy_ValidData_ReturnsSuccess()
+        {
+            // Arrange
+            var updateModel = new CreateVacancyViewModel
+            {
+                CompanyName = "TechCorp",
+                Title = "Lead .NET Developer",
+                Description = "Руководство командой разработки",
+                Requirements = "Опыт руководства 2+ года, знание архитектуры",
+                SalaryFrom = 180000,
+                SalaryTo = 280000,
+                EmploymentType = "full",
+                WorkSchedule = "full_day"
+            };
+
+            _mockUserRepository.Setup(x => x.FindByEmail("hr@techcorp.com"))
+                .Returns(_employerUser);
+            _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle("TechCorp", "Senior .NET Developer"))
+                .Returns(_existingVacancy);
+            _mockCompanyRepository.Setup(x => x.FindByName("TechCorp"))
+                .Returns(_testCompany);
+            _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle("TechCorp", "Lead .NET Developer"))
+                .Returns((Vacancy)null);
+            _mockVacancyRepository.Setup(x => x.Update(It.IsAny<Vacancy>()))
+                .Returns((Vacancy v) => v);
+
+            // Act
+            var result = _vacancyService.UpdateVacancy("TechCorp", "Senior .NET Developer", "hr@techcorp.com", updateModel);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual("Вакансия успешно обновлена!", result.Message);
+            Assert.IsNotNull(result.Data);
+            Assert.AreEqual("Lead .NET Developer", result.Data.Title);
+            Assert.AreEqual(180000, result.Data.SalaryFrom);
+            Assert.AreEqual(280000, result.Data.SalaryTo);
+
+            _mockVacancyRepository.Verify(x => x.Update(It.IsAny<Vacancy>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void UpdateVacancy_JobSeekerRole_ReturnsError()
+        {
+            // Arrange
+            var updateModel = new CreateVacancyViewModel();
+            _mockUserRepository.Setup(x => x.FindByEmail("jobseeker@example.com"))
+                .Returns(_jobSeekerUser);
+
+            // Act
+            var result = _vacancyService.UpdateVacancy("TechCorp", "Senior .NET Developer", "jobseeker@example.com", updateModel);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Только работодатели могут редактировать вакансии", result.Message);
+            Assert.IsNull(result.Data);
+
+            _mockVacancyRepository.Verify(x => x.Update(It.IsAny<Vacancy>()), Times.Never);
+        }
+
+        [TestMethod]
+        public void UpdateVacancy_VacancyNotFound_ReturnsError()
+        {
+            // Arrange
+            var updateModel = new CreateVacancyViewModel();
+            _mockUserRepository.Setup(x => x.FindByEmail("hr@techcorp.com"))
+                .Returns(_employerUser);
+            _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle("TechCorp", "NonExistent"))
+                .Returns((Vacancy)null);
+
+            // Act
+            var result = _vacancyService.UpdateVacancy("TechCorp", "NonExistent", "hr@techcorp.com", updateModel);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Вакансия не найдена", result.Message);
+            Assert.IsNull(result.Data);
+        }
+
+        [TestMethod]
+        public void UpdateVacancy_NotAuthor_ReturnsError()
+        {
+            // Arrange
+            var updateModel = new CreateVacancyViewModel();
+            var otherUserVacancy = new Vacancy
+            {
+                CompanyName = "TechCorp",
+                Title = "Senior .NET Developer",
+                AuthorEmail = "ceo@startup.com" // Другой автор
+            };
+
+            _mockUserRepository.Setup(x => x.FindByEmail("hr@techcorp.com"))
+                .Returns(_employerUser);
+            _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle("TechCorp", "Senior .NET Developer"))
+                .Returns(otherUserVacancy);
+
+            // Act
+            var result = _vacancyService.UpdateVacancy("TechCorp", "Senior .NET Developer", "hr@techcorp.com", updateModel);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Вы можете редактировать только свои вакансии", result.Message);
+            Assert.IsNull(result.Data);
+        }
+
+        [TestMethod]
+        public void UpdateVacancy_EmptyTitle_ReturnsError()
+        {
+            // Arrange
+            var updateModel = new CreateVacancyViewModel
+            {
+                CompanyName = "TechCorp",
+                Title = "", // Пустое название
+                Description = "Описание",
+                Requirements = "Требования",
+                EmploymentType = "full",
+                WorkSchedule = "full_day"
+            };
+
+            _mockUserRepository.Setup(x => x.FindByEmail("hr@techcorp.com"))
+                .Returns(_employerUser);
+            _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle("TechCorp", "Senior .NET Developer"))
+                .Returns(_existingVacancy);
+
+            // Act
+            var result = _vacancyService.UpdateVacancy("TechCorp", "Senior .NET Developer", "hr@techcorp.com", updateModel);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.IsTrue(result.Message.Contains("Название вакансии обязательно"));
+        }
+
+        [TestMethod]
+        public void UpdateVacancy_SalaryFromGreaterThanTo_ReturnsError()
+        {
+            // Arrange
+            var updateModel = new CreateVacancyViewModel
+            {
+                CompanyName = "TechCorp",
+                Title = "Lead .NET Developer",
+                Description = "Описание",
+                Requirements = "Требования",
+                SalaryFrom = 300000,
+                SalaryTo = 200000, // Меньше чем From
+                EmploymentType = "full",
+                WorkSchedule = "full_day"
+            };
+
+            _mockUserRepository.Setup(x => x.FindByEmail("hr@techcorp.com"))
+                .Returns(_employerUser);
+            _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle("TechCorp", "Senior .NET Developer"))
+                .Returns(_existingVacancy);
+            _mockCompanyRepository.Setup(x => x.FindByName("TechCorp"))
+                .Returns(_testCompany);
+
+            // Act
+            var result = _vacancyService.UpdateVacancy("TechCorp", "Senior .NET Developer", "hr@techcorp.com", updateModel);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Зарплата 'от' не может быть больше зарплаты 'до'", result.Message);
+        }
+
+        [TestMethod]
+        public void UpdateVacancy_NegativeSalary_ReturnsError()
+        {
+            // Arrange
+            var updateModel = new CreateVacancyViewModel
+            {
+                CompanyName = "TechCorp",
+                Title = "Lead .NET Developer",
+                Description = "Описание",
+                Requirements = "Требования",
+                SalaryFrom = -50000, // Отрицательная зарплата
+                EmploymentType = "full",
+                WorkSchedule = "full_day"
+            };
+
+            _mockUserRepository.Setup(x => x.FindByEmail("hr@techcorp.com"))
+                .Returns(_employerUser);
+            _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle("TechCorp", "Senior .NET Developer"))
+                .Returns(_existingVacancy);
+            _mockCompanyRepository.Setup(x => x.FindByName("TechCorp"))
+                .Returns(_testCompany);
+
+            // Act
+            var result = _vacancyService.UpdateVacancy("TechCorp", "Senior .NET Developer", "hr@techcorp.com", updateModel);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Зарплата не может быть отрицательной", result.Message);
+        }
+
+        [TestMethod]
+        public void UpdateVacancy_CompanyNotFound_ReturnsError()
+        {
+            // Arrange
+            var updateModel = new CreateVacancyViewModel
+            {
+                CompanyName = "NonExistentCompany",
+                Title = "Lead .NET Developer",
+                Description = "Описание",
+                Requirements = "Требования",
+                EmploymentType = "full",
+                WorkSchedule = "full_day"
+            };
+
+            _mockUserRepository.Setup(x => x.FindByEmail("hr@techcorp.com"))
+                .Returns(_employerUser);
+            _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle("TechCorp", "Senior .NET Developer"))
+                .Returns(_existingVacancy);
+            _mockCompanyRepository.Setup(x => x.FindByName("NonExistentCompany"))
+                .Returns((Company)null);
+
+            // Act
+            var result = _vacancyService.UpdateVacancy("TechCorp", "Senior .NET Developer", "hr@techcorp.com", updateModel);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Компания не найдена", result.Message);
+        }
+
+        [TestMethod]
+        public void UpdateVacancy_DuplicateTitle_ReturnsError()
+        {
+            // Arrange
+            var updateModel = new CreateVacancyViewModel
+            {
+                CompanyName = "TechCorp",
+                Title = "Frontend React Developer", // Название которое уже существует
+                Description = "Описание",
+                Requirements = "Требования",
+                EmploymentType = "full",
+                WorkSchedule = "full_day"
+            };
+
+            var duplicateVacancy = new Vacancy
+            {
+                CompanyName = "TechCorp",
+                Title = "Frontend React Developer",
+                AuthorEmail = "hr@techcorp.com"
+            };
+
+            _mockUserRepository.Setup(x => x.FindByEmail("hr@techcorp.com"))
+                .Returns(_employerUser);
+            _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle("TechCorp", "Senior .NET Developer"))
+                .Returns(_existingVacancy);
+            _mockCompanyRepository.Setup(x => x.FindByName("TechCorp"))
+                .Returns(_testCompany);
+            _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle("TechCorp", "Frontend React Developer"))
+                .Returns(duplicateVacancy);
+
+            // Act
+            var result = _vacancyService.UpdateVacancy("TechCorp", "Senior .NET Developer", "hr@techcorp.com", updateModel);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Вакансия с таким названием уже существует в этой компании", result.Message);
+        }
+
+        [TestMethod]
+        public void UpdateVacancy_InvalidEmploymentType_ReturnsError()
+        {
+            // Arrange
+            var updateModel = new CreateVacancyViewModel
+            {
+                CompanyName = "TechCorp",
+                Title = "Lead .NET Developer",
+                Description = "Описание",
+                Requirements = "Требования",
+                EmploymentType = "invalid_type", // Невалидный тип
+                WorkSchedule = "full_day"
+            };
+
+            _mockUserRepository.Setup(x => x.FindByEmail("hr@techcorp.com"))
+                .Returns(_employerUser);
+            _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle("TechCorp", "Senior .NET Developer"))
+                .Returns(_existingVacancy);
+            _mockCompanyRepository.Setup(x => x.FindByName("TechCorp"))
+                .Returns(_testCompany);
+
+            // Act
+            var result = _vacancyService.UpdateVacancy("TechCorp", "Senior .NET Developer", "hr@techcorp.com", updateModel);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Недопустимый тип занятости", result.Message);
+        }
+
+        [TestMethod]
+        public void UpdateVacancy_ValidEmploymentTypes_ReturnsSuccess()
+        {
+            // Arrange
+            var validTypes = new[] { "full", "part", "project", "internship", "volunteer" };
+
+            foreach (var employmentType in validTypes)
+            {
+                var updateModel = new CreateVacancyViewModel
+                {
+                    CompanyName = "TechCorp",
+                    Title = "Lead .NET Developer",
+                    Description = "Описание",
+                    Requirements = "Требования",
+                    EmploymentType = employmentType,
+                    WorkSchedule = "full_day"
+                };
+
+                _mockUserRepository.Setup(x => x.FindByEmail("hr@techcorp.com"))
+                    .Returns(_employerUser);
+                _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle("TechCorp", "Senior .NET Developer"))
+                    .Returns(_existingVacancy);
+                _mockCompanyRepository.Setup(x => x.FindByName("TechCorp"))
+                    .Returns(_testCompany);
+                _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle("TechCorp", "Lead .NET Developer"))
+                    .Returns((Vacancy)null);
+                _mockVacancyRepository.Setup(x => x.Update(It.IsAny<Vacancy>()))
+                    .Returns((Vacancy v) => v);
+
+                // Act
+                var result = _vacancyService.UpdateVacancy("TechCorp", "Senior .NET Developer", "hr@techcorp.com", updateModel);
+
+                // Assert
+                Assert.IsTrue(result.IsSuccess, $"Employment type '{employmentType}' should be valid");
+                Assert.AreEqual(employmentType, result.Data.EmploymentType);
+            }
+        }
+
+        [TestMethod]
+        public void UpdateVacancy_RepositoryThrowsException_ReturnsError()
+        {
+            // Arrange
+            var updateModel = new CreateVacancyViewModel
+            {
+                CompanyName = "TechCorp",
+                Title = "Lead .NET Developer",
+                Description = "Описание",
+                Requirements = "Требования",
+                EmploymentType = "full",
+                WorkSchedule = "full_day"
+            };
+
+            _mockUserRepository.Setup(x => x.FindByEmail("hr@techcorp.com"))
+                .Returns(_employerUser);
+            _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle("TechCorp", "Senior .NET Developer"))
+                .Returns(_existingVacancy);
+            _mockCompanyRepository.Setup(x => x.FindByName("TechCorp"))
+                .Returns(_testCompany);
+            _mockVacancyRepository.Setup(x => x.GetByCompanyAndTitle("TechCorp", "Lead .NET Developer"))
+                .Returns((Vacancy)null);
+            _mockVacancyRepository.Setup(x => x.Update(It.IsAny<Vacancy>()))
+                .Throws(new Exception("Database connection failed"));
+
+            // Act
+            var result = _vacancyService.UpdateVacancy("TechCorp", "Senior .NET Developer", "hr@techcorp.com", updateModel);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.IsTrue(result.Message.Contains("Ошибка при обновлении вакансии"));
         }
     }
 }
