@@ -44,28 +44,34 @@ namespace WebReckrytingSystem.Models
             });
 
             // Конфигурация для Resume
+            // Конфигурация для Resume
             modelBuilder.Entity<Resume>().ToTable("resumes", t => t.ExcludeFromMigrations());
             modelBuilder.Entity<Resume>(entity =>
             {
                 entity.HasKey(e => e.UserEmail);
                 entity.Property(e => e.UserEmail)
-                    .HasColumnName("user_email") // Добавлено имя столбца
+                    .HasColumnName("user_email")
                     .HasMaxLength(255);
                 entity.Property(e => e.DesiredPosition)
-                    .HasColumnName("desired_position") // Добавлено имя столбца
+                    .HasColumnName("desired_position")
                     .HasMaxLength(255)
                     .IsRequired();
                 entity.Property(e => e.ExperienceDescription)
-                    .HasColumnName("experience_description"); // Добавлено имя столбца
+                    .HasColumnName("experience_description");
                 entity.Property(e => e.EducationDescription)
-                    .HasColumnName("education_description"); // Добавлено имя столбца
+                    .HasColumnName("education_description");
                 entity.Property(e => e.Skills)
-                    .HasColumnName("skills"); // Добавлено имя столбца
+                    .HasColumnName("skills");
                 entity.Property(e => e.SalaryExpectations)
-                    .HasColumnName("salary_expectations"); // Добавлено имя столбца
+                    .HasColumnName("salary_expectations");
                 entity.Property(e => e.IsPublished)
-                    .HasColumnName("is_published") // Добавлено имя столбца
+                    .HasColumnName("is_published")
                     .HasDefaultValue(false);
+
+                // ✅ Новое поле PracticesJson
+                entity.Property(e => e.PracticesJson)
+                    .HasColumnName("practices_json")
+                    .HasColumnType("text"); // MySQL TEXT
 
                 // Связь с User
                 entity.HasOne(r => r.User)

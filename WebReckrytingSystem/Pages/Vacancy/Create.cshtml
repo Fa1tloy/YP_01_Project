@@ -1,143 +1,119 @@
 ﻿@page
 @model WebReckrytingSystem.Pages.Vacancy.CreateModel
 @{
-    ViewData["Title"] = "Создание вакансии";
+    ViewData["Title"] = "Создать вакансию";
 }
 
-<div class="container mt-4">
+<div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Создание вакансии</h4>
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-gradient-primary text-white rounded-top">
+                    <h3 class="mb-0">Новая вакансия</h3>
                 </div>
-                <div class="card-body">
-                    <!-- Общие ошибки (не привязанные к конкретным полям) -->
-                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-                    {
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            @Model.ErrorMessage
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <div class="card-body p-4">
+                    <form method="post" id="vacancyForm" novalidate>
+                        <div asp-validation-summary="All" class="alert alert-danger rounded-pill"></div>
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label asp-for="VacancyData.CompanyName" class="form-label fw-600">Компания *</label>
+                                <select asp-for="VacancyData.CompanyName" class="form-select rounded-pill" required>
+                                    <option value="">Выберите компанию</option>
+                                    @foreach (var c in Model.Companies)
+                                    {
+                                        <option value="@c.Name">@c.Name</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="VacancyData.CompanyName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="VacancyData.Title" class="form-label fw-600">Должность *</label>
+                                <input asp-for="VacancyData.Title" class="form-control rounded-pill" placeholder="Senior .NET Developer" required />
+                                <span asp-validation-for="VacancyData.Title" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="VacancyData.EmploymentType" class="form-label fw-600">Тип занятости *</label>
+                                <select asp-for="VacancyData.EmploymentType" class="form-select rounded-pill" required>
+                                    <option value="full">Полная занятость</option>
+                                    <option value="part">Частичная</option>
+                                    <option value="project">Проектная</option>
+                                    <option value="internship">Стажировка</option>
+                                    <option value="volunteer">Волонтерство</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="VacancyData.WorkSchedule" class="form-label fw-600">График *</label>
+                                <select asp-for="VacancyData.WorkSchedule" class="form-select rounded-pill" required>
+                                    <option value="full_day">Полный день</option>
+                                    <option value="shifts">Сменный</option>
+                                    <option value="flexible">Гибкий</option>
+                                    <option value="remote">Удалёнка</option>
+                                    <option value="shift_work">Вахта</option>
+                                </select>
+                            </div>
+
+                            <!-- Зарплатный слайдер -->
+                            <div class="col-12">
+                                <label class="form-label fw-600">Диапазон зарплаты, ₽</label>
+                                <div class="d-flex align-items-center gap-3">
+                                    <input type="number" asp-for="VacancyData.SalaryFrom" class="form-control rounded-pill" placeholder="От" min="0" />
+                                    <input type="range" class="form-range flex-grow-1" id="salaryRange" min="0" max="500000" step="10000" />
+                                    <input type="number" asp-for="VacancyData.SalaryTo" class="form-control rounded-pill" placeholder="До" min="0" />
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="VacancyData.Description" class="form-label fw-600">Описание вакансии *</label>
+                                <textarea asp-for="VacancyData.Description" class="form-control rounded-3" rows="4" placeholder="Обязанности, задачи, условия..." required></textarea>
+                                <span asp-validation-for="VacancyData.Description" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="VacancyData.Requirements" class="form-label fw-600">Требования *</label>
+                                <textarea asp-for="VacancyData.Requirements" class="form-control rounded-3" rows="4" placeholder="Опыт, навыки, образование..." required></textarea>
+                                <span asp-validation-for="VacancyData.Requirements" class="text-danger small"></span>
+                            </div>
                         </div>
-                    }
 
-                    <!-- Сообщения об ошибках валидации модели -->
-                    <div asp-validation-summary="All" class="alert alert-danger"></div>
-
-                    @if (!Model.Companies.Any())
-                    {
-                        <div class="alert alert-info">
-                            <h5>У вас нет компаний</h5>
-                            <p>Для создания вакансии сначала нужно создать компанию.</p>
-                            <a href="/Company/Create" class="btn btn-primary">Создать компанию</a>
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <a href="/Account/EmployerDashboard" class="btn btn-outline-secondary rounded-pill px-4">← Назад</a>
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5">
+                                <i class="fas fa-plus me-2"></i>Создать вакансию
+                            </button>
                         </div>
-                    }
-                    else
-                    {
-                        <form method="post" id="vacancyForm">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h5 class="border-bottom pb-2">Основная информация</h5>
-
-                                    <div class="mb-3">
-                                        <label asp-for="VacancyData.CompanyName" class="form-label">Компания *</label>
-                                        <select asp-for="VacancyData.CompanyName" class="form-control @(ViewData.ModelState["VacancyData.CompanyName"]?.Errors.Any() == true ? "is-invalid" : "")" required>
-                                            <option value="">Выберите компанию</option>
-                                            @foreach (var company in Model.Companies)
-                                            {
-                                                <option value="@company.Name">@company.Name</option>
-                                            }
-                                        </select>
-                                        <span asp-validation-for="VacancyData.CompanyName" class="text-danger"></span>
-                                        <small class="form-text text-muted">
-                                            Нет подходящей компании? <a href="/Company/Create">Создать новую</a>
-                                        </small>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label asp-for="VacancyData.Title" class="form-label">Должность *</label>
-                                        <input asp-for="VacancyData.Title" class="form-control @(ViewData.ModelState["VacancyData.Title"]?.Errors.Any() == true ? "is-invalid" : "")" placeholder="Например, Senior .NET Developer" required />
-                                        <span asp-validation-for="VacancyData.Title" class="text-danger"></span>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label asp-for="VacancyData.SalaryFrom" class="form-label">Зарплата от (руб.)</label>
-                                        <input asp-for="VacancyData.SalaryFrom" type="number" class="form-control @(ViewData.ModelState["VacancyData.SalaryFrom"]?.Errors.Any() == true ? "is-invalid" : "")" placeholder="Например, 100000" min="0" max="9999999" />
-                                        <span asp-validation-for="VacancyData.SalaryFrom" class="text-danger"></span>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label asp-for="VacancyData.SalaryTo" class="form-label">Зарплата до (руб.)</label>
-                                        <input asp-for="VacancyData.SalaryTo" type="number" class="form-control @(ViewData.ModelState["VacancyData.SalaryTo"]?.Errors.Any() == true ? "is-invalid" : "")" placeholder="Например, 200000" min="0" max="9999999" />
-                                        <span asp-validation-for="VacancyData.SalaryTo" class="text-danger"></span>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <h5 class="border-bottom pb-2">Условия работы</h5>
-
-                                    <div class="mb-3">
-                                        <label asp-for="VacancyData.EmploymentType" class="form-label">Тип занятости *</label>
-                                        <select asp-for="VacancyData.EmploymentType" class="form-control @(ViewData.ModelState["VacancyData.EmploymentType"]?.Errors.Any() == true ? "is-invalid" : "")" required>
-                                            <option value="">Выберите тип занятости</option>
-                                            <option value="full">Полная занятость</option>
-                                            <option value="part">Частичная занятость</option>
-                                            <option value="project">Проектная работа</option>
-                                            <option value="internship">Стажировка</option>
-                                            <option value="volunteer">Волонтерство</option>
-                                        </select>
-                                        <span asp-validation-for="VacancyData.EmploymentType" class="text-danger"></span>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label asp-for="VacancyData.WorkSchedule" class="form-label">График работы *</label>
-                                        <select asp-for="VacancyData.WorkSchedule" class="form-control @(ViewData.ModelState["VacancyData.WorkSchedule"]?.Errors.Any() == true ? "is-invalid" : "")" required>
-                                            <option value="">Выберите график работы</option>
-                                            <option value="full_day">Полный день</option>
-                                            <option value="shifts">Сменный график</option>
-                                            <option value="flexible">Гибкий график</option>
-                                            <option value="remote">Удаленная работа</option>
-                                            <option value="shift_work">Вахтовый метод</option>
-                                        </select>
-                                        <span asp-validation-for="VacancyData.WorkSchedule" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row mt-3">
-                                <div class="col-12">
-                                    <h5 class="border-bottom pb-2">Описание вакансии</h5>
-
-                                    <div class="mb-3">
-                                        <label asp-for="VacancyData.Description" class="form-label">Описание вакансии *</label>
-                                        <textarea asp-for="VacancyData.Description" class="form-control @(ViewData.ModelState["VacancyData.Description"]?.Errors.Any() == true ? "is-invalid" : "")" rows="4" placeholder="Опишите вакансию, обязанности, условия работы..." required></textarea>
-                                        <span asp-validation-for="VacancyData.Description" class="text-danger"></span>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label asp-for="VacancyData.Requirements" class="form-label">Требования к кандидату *</label>
-                                        <textarea asp-for="VacancyData.Requirements" class="form-control @(ViewData.ModelState["VacancyData.Requirements"]?.Errors.Any() == true ? "is-invalid" : "")" rows="4" placeholder="Опишите требования к кандидату (образование, опыт, навыки)..." required></textarea>
-                                        <span asp-validation-for="VacancyData.Requirements" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row mt-4">
-                                <div class="col-12">
-                                    <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-success" id="submitBtn">
-                                            <i class="fas fa-plus"></i> Создать вакансию
-                                        </button>
-                                        <a href="/Account/EmployerDashboard" class="btn btn-secondary">Отмена</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    }
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // toast
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+                <text>showToast('@Html.Raw(Model.SuccessMessage)', 'success');</text>
+        }
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+                <text>showToast('@Html.Raw(Model.ErrorMessage)', 'error');</text>
+        }
+
+        // range-slider
+        const range = document.getElementById('salaryRange');
+        const from = document.querySelector('input[name="VacancyData.SalaryFrom"]');
+        const to = document.querySelector('input[name="VacancyData.SalaryTo"]');
+        range.addEventListener('input', () => {
+            const val = +range.value;
+            from.value = val;
+            to.value = Math.min(val + 50000, 500000);
+        });
+    </script>
+}

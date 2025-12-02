@@ -1,5 +1,4 @@
-﻿// Models/CreateResumeViewModel.cs
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace WebReckrytingSystem.Models
 {
@@ -41,12 +40,12 @@ namespace WebReckrytingSystem.Models
         public int? GraduationYear { get; set; }
 
         // Навыки
-        [Required(ErrorMessage = "Добавьте хотя бы один навык")]
-        [MinLength(1, ErrorMessage = "Добавьте хотя бы один навык")]
-        [Display(Name = "Ключевые навыки")]
-        public List<string> Skills { get; set; } = new();
+        public List<string> Skills { get; set; } = new(); // оставлено для совместимости
 
         [Display(Name = "Опубликовать резюме")]
         public bool IsPublished { get; set; } = true;
+
+        // Практики
+        public List<PracticeViewModel> Practices { get; set; } = new();
     }
 }

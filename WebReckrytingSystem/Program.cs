@@ -46,6 +46,9 @@ builder.Services.AddScoped<IVacancyService, VacancyService>();
 // Регистрация сервиса поиска вакансий
 builder.Services.AddScoped<IVacancySearchService, VacancySearchService>();
 
+
+builder.WebHost.UseUrls("http://0.0.0.0:5024");
+
 var app = builder.Build();
 
 // Конфигурация HTTP pipeline
@@ -64,5 +67,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
-
+ // добавляем свой   
 app.Run();

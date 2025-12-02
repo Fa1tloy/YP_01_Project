@@ -1,103 +1,107 @@
-﻿@* Pages/Account/JobSeekerDashboard.cshtml *@
-@page
+﻿@page
 @model WebReckrytingSystem.Pages.Account.JobSeekerDashboardModel
 @{
     ViewData["Title"] = "Личный кабинет соискателя";
 }
 
 <div class="container mt-5">
-    <div class="row">
+    <div class="row g-4">
         <div class="col-md-4">
-            <div class="card">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Добро пожаловать, @Model.UserFirstName!</h5>
-                    <p class="text-muted">Личный кабинет соискателя</p>
+            <div class="card shadow-lg border-0 text-center" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff;">
+                <div class="card-body py-5">
+                    <i class="fas fa-user-graduate fa-3x mb-3"></i>
+                    <h4>@Model.UserFirstName</h4>
+                    <p class="mb-0">Соискатель</p>
                 </div>
             </div>
 
-            <div class="card mt-3">
+            <div class="card shadow-sm mt-4">
                 <div class="card-body">
-                    <h6>Быстрые действия</h6>
+                    <h6 class="fw-bold mb-3">Быстрые действия</h6>
                     <div class="d-grid gap-2">
                         @if (Model.HasResume)
                         {
-                            <div class="card mt-3">
-                                <div class="card-body">
-                                    <h5 class="card-title">Ваше резюме</h5>
-                                    <p class="text-success">
-                                        <i class="fas fa-check-circle me-2"></i>У вас есть опубликованное резюме
-                                    </p>
-                                    <div class="d-grid gap-2 d-md-flex">
-                                        <a href="/Account/ViewResume" class="btn btn-primary me-md-2">
-                                            <i class="fas fa-eye me-2"></i>Просмотреть резюме
-                                        </a>
-                                        <a href="/Account/EditResume" class="btn btn-outline-primary">
-                                            <i class="fas fa-edit me-2"></i>Редактировать
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
+                            <a href="/Account/ViewResume" class="btn btn-outline-primary rounded-pill">
+                                <i class="fas fa-eye me-2"></i>Просмотреть резюме
+                            </a>
+                            <a href="/Account/EditResume" class="btn btn-outline-primary rounded-pill">
+                                <i class="fas fa-edit me-2"></i>Редактировать
+                            </a>
                         }
                         else
                         {
-                            <div class="card mt-3">
-                                <div class="card-body">
-                                    <h5 class="card-title">Создайте резюме</h5>
-                                    <p class="text-muted">Создайте резюме, чтобы начать поиск работы</p>
-                                    <a href="/Account/CreateResume" class="btn btn-primary">
-                                        <i class="fas fa-plus me-2"></i>Создать резюме
-                                    </a>
-                                </div>
-                            </div>
+                            <a href="/Account/CreateResume" class="btn btn-primary rounded-pill">
+                                <i class="fas fa-plus me-2"></i>Создать резюме
+                            </a>
                         }
-                        <div class="d-grid gap-2">
-                            <a href="/Vacancy/Search" class="btn btn-outline-primary">Найти вакансии</a>
-                        </div>
-                        <a href="#" class="btn btn-outline-primary">Мои отклики</a>
+                        <a href="/Vacancy/Search" class="btn btn-outline-primary rounded-pill">
+                            <i class="fas fa-search me-2"></i>Найти вакансии
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="col-md-8">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Статистика</h5>
-                    <div class="row text-center">
-                        <div class="col-4">
-                            <div class="border rounded p-3">
-                                <h4 class="text-primary">0</h4>
-                                <small>Откликов</small>
-                            </div>
+            <!-- Прогресс-бар профиля -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h5 class="mb-1">Профиль заполнен на <strong>@(Model.HasResume ? "100" : "50")%</strong></h5>
+                        <div class="progress" style="height: 10px; border-radius: 1rem;">
+                            <div class="progress-bar bg-gradient-success" style="width: @(Model.HasResume ? 100 : 50)%; border-radius: 1rem;"></div>
                         </div>
-                        <div class="col-4">
-                            <div class="border rounded p-3">
-                                <h4 class="text-success">0</h4>
-                                <small>Приглашений</small>
-                            </div>
+                    </div>
+                    <i class="fas fa-chart-line fa-2x text-success ms-3"></i>
+                </div>
+            </div>
+
+            <!-- Статистика -->
+            <div class="row g-4 text-center mb-4">
+                <div class="col-4">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <div class="display-6 fw-bold text-primary">0</div>
+                            <div class="text-muted">Откликов</div>
                         </div>
-                        <div class="col-4">
-                            <div class="border rounded p-3">
-                                <h4 class="text-info">@(Model.HasResume ? "1" : "0")</h4>
-                                <small>Резюме</small>
-                            </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <div class="display-6 fw-bold text-success">0</div>
+                            <div class="text-muted">Приглашений</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <div class="display-6 fw-bold text-info">@(Model.HasResume ? "1" : "0")</div>
+                            <div class="text-muted">Резюме</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="card mt-3">
+            <!-- Резюме-виджет -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-600">Моё резюме</h5>
+                    <span class="badge bg-@(Model.HasResume ? "success" : "secondary") rounded-pill">@(Model.HasResume ? "Готово" : "Не создано")</span>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title">@(Model.HasResume ? "Ваше резюме" : "Создайте резюме")</h5>
                     @if (Model.HasResume)
                     {
-                        <p class="text-success">✓ У вас есть опубликованное резюме</p>
-                        <a asp-page="/Account/ViewResume" class="btn btn-primary">Просмотреть резюме</a>
+                        <p class="text-success mb-3"><i class="fas fa-check-circle me-2"></i>Резюме опубликовано и видно работодателям</p>
+                        <a asp-page="/Account/ViewResume" class="btn btn-primary rounded-pill">Просмотреть резюме</a>
                     }
                     else
                     {
-                        <p class="text-muted">Создайте резюме, чтобы начать поиск работы</p>
-                        <a asp-page="/Account/CreateResume" class="btn btn-primary">Создать резюме</a>
+                        <p class="text-muted mb-3">Создайте резюме, чтобы начать поиск работы</p>
+                        <a asp-page="/Account/CreateResume" class="btn btn-primary rounded-pill">
+                            <i class="fas fa-plus me-2"></i>Создать резюме
+                        </a>
                     }
                 </div>
             </div>
