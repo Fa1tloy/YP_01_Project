@@ -1,0 +1,113 @@
+﻿@page
+@model WebReckrytingSystem.Pages.Admin.Companies.CompaniesModel
+@{
+    ViewData["Title"] = "Компании";
+    Layout = "_AdminLayout";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-building me-2"></i>Управление компаниями</h5>
+        <span class="badge bg-light text-success">@Model.Companies.TotalCount</span>
+    </div>
+    <div class="card-body">
+        <!-- Фильтры -->
+        <form method="get" class="row g-3 mb-4">
+            <div class="col-md-5">
+                <input asp-for="SearchName" class="form-control" placeholder="Название компании" />
+            </div>
+            <div class="col-md-3">
+                <select asp-for="FilterStatus" class="form-select">
+                    <option value="">Все статусы</option>
+                    <option value="verified">Верифицированные</option>
+                    <option value="pending">Ожидают проверки</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-success w-100">
+                    <i class="fas fa-search"></i> Найти
+                </button>
+            </div>
+        </form>
+
+        <!-- Таблица -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Название</th>
+                        <th>Описание</th>
+                        <th>Веб-сайт</th>
+                        <th>Статус</th>
+                        <th>Вакансий</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var company in Model.Companies.Items)
+                    {
+                        <tr>
+                            <td><strong>@company.Name</strong></td>
+                            <td>@Truncate(company.Description, 100)</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(company.Website))
+                                {
+                                    <a href="@company.Website" target="_blank">@company.Website</a>
+                                }
+                            </td>
+                            <td>
+                                @if (company.Verified)
+                                {
+                                    <span class="badge bg-success"><i class="fas fa-check"></i> Верифицирована</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark"><i class="fas fa-clock"></i> Ожидает</span>
+                                }
+                            </td>
+                            <td>@company.Vacancies.Count</td>
+                            <td>
+                                @if (!company.Verified)
+                                {
+                                    <form method="post" asp-page-handler="Verify" class="d-inline">
+                                        <input type="hidden" name="companyName" value="@company.Name" />
+                                        <button type="submit" class="btn btn-sm btn-success" title="Верифицировать">
+                                            <i class="fas fa-check-circle"></i>
+                                        </button>
+                                    </form>
+                                }
+                                <a asp-page="/Admin/CompanyDetails" asp-route-name="@company.Name" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <form method="post" asp-page-handler="Delete" class="d-inline" onsubmit="return confirm('Удалить компанию?')">
+                                    <input type="hidden" name="companyName" value="@company.Name" />
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Пагинация -->
+        @if (Model.Companies.TotalPages > 1)
+        {
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <!-- ... такая же пагинация как в Users ... -->
+                </ul>
+            </nav>
+        }
+    </div>
+</div>
+
+@functions {
+    string Truncate(string text, int maxLength)
+    {
+        if (string.IsNullOrEmpty(text)) return "";
+        return text.Length <= maxLength ? text : text.Substring(0, maxLength) + "...";
+    }
+}

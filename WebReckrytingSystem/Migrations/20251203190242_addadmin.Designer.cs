@@ -11,8 +11,8 @@ using WebReckrytingSystem.Models;
 namespace WebReckrytingSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251201204108_AddPracticesJsonToResume")]
-    partial class AddPracticesJsonToResume
+    [Migration("20251203190242_addadmin")]
+    partial class addadmin
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

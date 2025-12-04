@@ -1,0 +1,57 @@
+﻿@page
+@model WebReckrytingSystem.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "Дашборд";
+    Layout = "_AdminLayout";
+}
+<div class="alert alert-info">
+    <p>Email: @User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value</p>
+    <p>Роль: @User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value</p>
+    <p>IsAuthenticated: @User.Identity.IsAuthenticated</p>
+</div>
+<h2 class="mb-4">Дашборд</h2>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <i class="fa fa-users fa-2x text-primary"></i>
+                <h5 class="mt-2">@Model.Stats.TotalUsers</h5>
+                <p class="text-muted mb-0">Пользователей</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <i class="fa fa-building fa-2x text-success"></i>
+                <h5 class="mt-2">@Model.Stats.TotalCompanies</h5>
+                <p class="text-muted mb-0">Компаний</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <i class="fa fa-briefcase fa-2x text-info"></i>
+                <h5 class="mt-2">@Model.Stats.TotalVacancies</h5>
+                <p class="text-muted mb-0">Вакансий</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <i class="fa fa-file-alt fa-2x text-warning"></i>
+                <h5 class="mt-2">@Model.Stats.TotalResumes</h5>
+                <p class="text-muted mb-0">Резюме</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-warning">
+    <i class="fa fa-exclamation-triangle me-2"></i>
+    Ожидают верификации: <strong>@Model.Stats.PendingVerifications</strong> компаний
+    <a asp-page="/Admin/Companies/Index" class="btn btn-sm btn-warning ms-3">Проверить</a>
+</div>

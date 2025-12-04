@@ -4,16 +4,25 @@
     ViewData["Title"] = "RecruitingSystem";
 }
 
-<section class="hero-section min-vh-100 d-flex align-items-center">
-    <div class="container text-center text-white">
-        <h1 class="display-3 fw-bold mb-3 animate__animated animate__fadeInDown">Найдите работу мечты</h1>
-        <p class="lead mb-4 animate__animated animate__fadeInUp">Или идеального сотрудника. Быстро. Просто. Эффективно.</p>
+<<section class="hero-section">
+    <div class="hero-overlay"></div>   <!-- размытие + затемнение -->
+    <div class="hero-content text-center text-white">
+        <h1 class="display-3 fw-bold mb-3 animate__animated animate__fadeInDown">
+            Найдите работу мечты
+        </h1>
+        <p class="lead mb-4 animate__animated animate__fadeInUp">
+            Или идеального сотрудника. Быстро. Просто. Эффективно.
+        </p>
+
+        <!-- кнопки на изображении -->
         <div class="d-flex justify-content-center gap-3 flex-wrap animate__animated animate__fadeInUp animate__delay-1s">
-            <a asp-page="/Account/Register" asp-route-role="job_seeker" class="btn btn-light btn-lg px-4 py-3 fw-600 rounded-pill">
-                🎯 Найти работу
+            <a asp-page="/Account/Register" asp-route-role="job_seeker"
+               class="btn btn-light btn-lg px-4 py-3 fw-600 rounded-pill">
+                 Найти работу
             </a>
-            <a asp-page="/Account/Register" asp-route-role="employer" class="btn btn-outline-light btn-lg px-4 py-3 fw-600 rounded-pill">
-                💼 Найти сотрудников
+            <a asp-page="/Account/Register" asp-route-role="employer"
+               class="btn btn-outline-light btn-lg px-4 py-3 fw-600 rounded-pill">
+                 Найти сотрудников
             </a>
         </div>
     </div>
@@ -112,28 +121,49 @@
 </section>
 
 <style>
+    /* ---------- HERO-БАННЕР ---------- */
+    /* ---------- размытый фон + затемнение ---------- */
     .hero-section {
-        background: var(--primary-gradient);
-    }
-
-    .step-circle {
-        width: 70px;
-        height: 70px;
-        background: var(--primary-gradient);
-        color: #fff;
-        border-radius: 50%;
+        position: relative;
+        min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.75rem;
-        font-weight: 600;
+        overflow: hidden;
     }
 
-    .card {
-        transition: var(--transition);
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: url("/images/hero-bg.webp") center/cover no-repeat;
+        filter: blur(6px);
+        z-index: 1;
     }
 
-        .card:hover {
-            transform: translateY(-5px);
+        .hero-overlay::after { /* лёгкое затемнение, чтобы текст читался */
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
         }
+
+    /* ---------- содержимое поверх фона ---------- */
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 800px;
+        padding: 0 1rem;
+    }
+
+        /* кнопки */
+        .hero-content .btn {
+            min-width: 200px; /* одинаковая ширина */
+            border-width: 2px;
+            transition: all 0.3s ease;
+        }
+
+            .hero-content .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            }
 </style>

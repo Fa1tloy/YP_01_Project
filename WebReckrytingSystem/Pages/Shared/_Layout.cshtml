@@ -33,6 +33,14 @@
                                     Личный кабинет
                                 </a>
                             </li>
+                            @if (User.IsInRole("admin"))  // <-- Добавьте это
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-warning" href="/Admin">
+                                        <i class="fas fa-cog"></i> Админ-панель
+                                    </a>
+                                </li>
+                            }
                         }
                         else
                         {

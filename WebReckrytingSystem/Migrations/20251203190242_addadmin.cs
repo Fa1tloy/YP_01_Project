@@ -5,7 +5,7 @@
 namespace WebReckrytingSystem.Migrations
 {
     /// <inheritdoc />
-    public partial class AddPracticesJsonToResume : Migration
+    public partial class addadmin : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
