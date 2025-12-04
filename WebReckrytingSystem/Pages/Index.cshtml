@@ -1,12 +1,15 @@
 ﻿@page
 @model WebReckrytingSystem.Pages.IndexModel
 @{
-    ViewData["Title"] = "RecruitingSystem";
+    ViewData["Title"] = "СтудентБридж";
 }
 
-<<section class="hero-section">
-    <div class="hero-overlay"></div>   <!-- размытие + затемнение -->
+<section class="hero-section">
+    <div class="hero-overlay"></div>
     <div class="hero-content text-center text-white">
+
+        
+
         <h1 class="display-3 fw-bold mb-3 animate__animated animate__fadeInDown">
             Найдите работу мечты
         </h1>
@@ -14,19 +17,20 @@
             Или идеального сотрудника. Быстро. Просто. Эффективно.
         </p>
 
-        <!-- кнопки на изображении -->
         <div class="d-flex justify-content-center gap-3 flex-wrap animate__animated animate__fadeInUp animate__delay-1s">
             <a asp-page="/Account/Register" asp-route-role="job_seeker"
                class="btn btn-light btn-lg px-4 py-3 fw-600 rounded-pill">
-                 Найти работу
+                Найти работу
             </a>
             <a asp-page="/Account/Register" asp-route-role="employer"
                class="btn btn-outline-light btn-lg px-4 py-3 fw-600 rounded-pill">
-                 Найти сотрудников
+                Найти сотрудников
             </a>
         </div>
     </div>
 </section>
+
+<!-- Остальные секции остаются без изменений... -->
 
 <section class="py-5">
     <div class="container">
@@ -88,7 +92,7 @@
 
 <section class="py-5">
     <div class="container">
-        <div class="row text-center g-4">
+        <div class="text-center g-4">
             <div class="col-6 col-md-3">
                 <div class="display-5 fw-bold text-primary">500+</div>
                 <div class="text-muted">Компаний</div>
@@ -122,7 +126,6 @@
 
 <style>
     /* ---------- HERO-БАННЕР ---------- */
-    /* ---------- размытый фон + затемнение ---------- */
     .hero-section {
         position: relative;
         min-height: 100vh;
@@ -140,14 +143,13 @@
         z-index: 1;
     }
 
-        .hero-overlay::after { /* лёгкое затемнение, чтобы текст читался */
+        .hero-overlay::after {
             content: "";
             position: absolute;
             inset: 0;
             background: rgba(0, 0, 0, 0.45);
         }
 
-    /* ---------- содержимое поверх фона ---------- */
     .hero-content {
         position: relative;
         z-index: 2;
@@ -155,9 +157,8 @@
         padding: 0 1rem;
     }
 
-        /* кнопки */
         .hero-content .btn {
-            min-width: 200px; /* одинаковая ширина */
+            min-width: 200px;
             border-width: 2px;
             transition: all 0.3s ease;
         }
@@ -166,4 +167,36 @@
                 transform: translateY(-2px);
                 box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
             }
+
+    /* ---------- СТИЛИ ДЛЯ ЛОГОТИПОВ ---------- */
+    .logo-nav {
+       
+        transition: transform 0.3s ease;
+    }
+
+    .navbar-brand:hover .logo-nav {
+        transform: scale(1.05);
+    }
+
+    .logo-hero {
+        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+    }
+
+    .logo-footer {
+        
+    }
+
+    /* ---------- STEP CIRCLES ---------- */
+    .step-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.5rem;
+    }
 </style>
