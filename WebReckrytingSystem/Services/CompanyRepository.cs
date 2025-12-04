@@ -20,7 +20,11 @@ namespace WebReckrytingSystem.Services
 
         public ICollection<Company> GetUserCompanies(string userEmail)
         {
-            return _context.Companies.ToList();
+            return _context.Vacancies
+                .Where(v => v.AuthorEmail == userEmail)
+                .Select(v => v.Company)
+                .Distinct()
+                .ToList();
         }
 
         public Company Save(Company company)

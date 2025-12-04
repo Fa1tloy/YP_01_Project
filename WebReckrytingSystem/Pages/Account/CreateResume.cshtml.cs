@@ -1,19 +1,21 @@
-// Pages/Account/CreateResume.cshtml.cs
-using Microsoft.AspNetCore.Mvc;
+п»їusing Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
 using WebReckrytingSystem.Models;
 using WebReckrytingSystem.Services;
+using Microsoft.Extensions.Logging;
 
 namespace WebReckrytingSystem.Pages.Account
 {
     public class CreateResumeModel : PageModel
     {
         private readonly IResumeService _resumeService;
+        private readonly ILogger<CreateResumeModel> _logger;
 
-        public CreateResumeModel(IResumeService resumeService)
+        public CreateResumeModel(IResumeService resumeService, ILogger<CreateResumeModel> logger)
         {
             _resumeService = resumeService;
+            _logger = logger;
         }
 
         [BindProperty]
@@ -24,26 +26,50 @@ namespace WebReckrytingSystem.Pages.Account
 
         public IActionResult OnGet()
         {
-            // Проверяем, что пользователь - соискатель
             if (User.FindFirst(ClaimTypes.Role)?.Value != "job_seeker")
             {
                 return RedirectToPage("/AccessDenied");
             }
-
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
+            _logger.LogInformation("=== РќРђР§РђР›Рћ РћР‘Р РђР‘РћРўРљР POST ===");
+
+            // Р§РёС‚Р°РµРј СЃРєСЂС‹С‚РѕРµ РїРѕР»Рµ РЅР°РІС‹РєРѕРІ
+            var skillsHidden = Request.Form["SkillsHidden"].FirstOrDefault();
+            _logger.LogInformation($"РџРѕР»СѓС‡РµРЅ SkillsHidden: {skillsHidden}");
+
+            if (!string.IsNullOrEmpty(skillsHidden))
+            {
+                try
+                {
+                    ResumeData.Skills = System.Text.Json.JsonSerializer.Deserialize<List<string>>(skillsHidden) ?? new List<string>();
+                    _logger.LogInformation($"Р”РµСЃРµСЂРёР°Р»РёР·РѕРІР°РЅРѕ РЅР°РІС‹РєРѕРІ: {ResumeData.Skills.Count}");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "РћС€РёР±РєР° РґРµСЃРµСЂРёР°Р»РёР·Р°С†РёРё РЅР°РІС‹РєРѕРІ");
+                    ResumeData.Skills = new List<string>();
+                }
+            }
+
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("ModelState РЅРµ РІР°Р»РёРґРµРЅ:");
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    _logger.LogWarning($"РћС€РёР±РєР°: {error.ErrorMessage}");
+                }
+                ModelState.Remove("ResumeData.Skills");
                 return Page();
             }
 
             var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
             if (string.IsNullOrEmpty(userEmail))
             {
-                ErrorMessage = "Ошибка аутентификации";
+                ErrorMessage = "РћС€РёР±РєР° Р°СѓС‚РµРЅС‚РёС„РёРєР°С†РёРё";
                 return Page();
             }
 
@@ -51,34 +77,28 @@ namespace WebReckrytingSystem.Pages.Account
 
             if (result.IsSuccess)
             {
-                // Успешное создание - редирект на просмотр резюме
-                TempData["SuccessMessage"] = "Резюме успешно создано и опубликовано!";
+                TempData["SuccessMessage"] = "Р РµР·СЋРјРµ СѓСЃРїРµС€РЅРѕ СЃРѕР·РґР°РЅРѕ Рё РѕРїСѓР±Р»РёРєРѕРІР°РЅРѕ!";
                 return RedirectToPage("/Account/ViewResume");
             }
             else
             {
                 ErrorMessage = result.Message;
+                ModelState.Remove("ResumeData.Skills");
                 return Page();
             }
         }
 
-        // Методы для AJAX остаются без изменений
+        // РњРµС‚РѕРґС‹ РґР»СЏ AJAX РѕСЃС‚Р°СЋС‚СЃСЏ Р±РµР· РёР·РјРµРЅРµРЅРёР№
         public IActionResult OnPostAddSkill([FromBody] string skill)
         {
             if (string.IsNullOrWhiteSpace(skill))
-            {
-                return new JsonResult(new { success = false, message = "Навык не может быть пустым" });
-            }
+                return new JsonResult(new { success = false, message = "РќР°РІС‹Рє РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј" });
 
             if (ResumeData.Skills.Count >= 20)
-            {
-                return new JsonResult(new { success = false, message = "Максимум 20 навыков" });
-            }
+                return new JsonResult(new { success = false, message = "РњР°РєСЃРёРјСѓРј 20 РЅР°РІС‹РєРѕРІ" });
 
             if (ResumeData.Skills.Contains(skill, StringComparer.OrdinalIgnoreCase))
-            {
-                return new JsonResult(new { success = false, message = "Такой навык уже добавлен" });
-            }
+                return new JsonResult(new { success = false, message = "РўР°РєРѕР№ РЅР°РІС‹Рє СѓР¶Рµ РґРѕР±Р°РІР»РµРЅ" });
 
             ResumeData.Skills.Add(skill);
             return new JsonResult(new { success = true, skills = ResumeData.Skills });

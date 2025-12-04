@@ -18,7 +18,13 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/AccessDenied";
         options.ExpireTimeSpan = TimeSpan.FromDays(30);
         options.SlidingExpiration = true;
+
     });
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireRole("admin"));
+});
 
 // Регистрация контекста базы данных
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -43,8 +49,16 @@ builder.Services.AddScoped<IVacancyRepository, VacancyRepository>();
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<IVacancyService, VacancyService>();
 
+
+// Добавить в builder.Services:
+builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+
 // Регистрация сервиса поиска вакансий
 builder.Services.AddScoped<IVacancySearchService, VacancySearchService>();
+
+
+builder.WebHost.UseUrls("http://0.0.0.0:5024");
 
 var app = builder.Build();
 
@@ -64,5 +78,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
-
+ // добавляем свой   
 app.Run();

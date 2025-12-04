@@ -1,204 +1,202 @@
 ﻿@page
-@model IndexModel
+@model WebReckrytingSystem.Pages.IndexModel
 @{
-    ViewData["Title"] = "Главная";
+    ViewData["Title"] = "СтудентБридж";
 }
 
-<!-- Hero Section -->
-<!-- Hero Section -->
-<!-- Hero Section -->
-<section class="hero-section bg-primary text-white py-5">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-4">Найдите работу мечты или идеального сотрудника</h1>
-                <p class="lead mb-4">Мы помогаем соискателям найти лучшие вакансии, а компаниям - талантливых специалистов</p>
-               
-            </div>
-            <div class="col-lg-6 text-center">
-                <div class="hero-image mt-4 mt-lg-0">
-                    <svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="50" y="80" width="300" height="140" rx="10" fill="white" fill-opacity="0.1" />
-                        <circle cx="200" cy="70" r="30" fill="white" fill-opacity="0.2" />
-                        <rect x="80" y="120" width="240" height="10" rx="5" fill="white" fill-opacity="0.3" />
-                        <rect x="80" y="140" width="180" height="8" rx="4" fill="white" fill-opacity="0.3" />
-                        <rect x="80" y="160" width="200" height="8" rx="4" fill="white" fill-opacity="0.3" />
-                        <rect x="80" y="180" width="150" height="8" rx="4" fill="white" fill-opacity="0.3" />
-                    </svg>
-                </div>
-            </div>
+<section class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-content text-center text-white">
+
+        
+
+        <h1 class="display-3 fw-bold mb-3 animate__animated animate__fadeInDown">
+            Найдите работу мечты
+        </h1>
+        <p class="lead mb-4 animate__animated animate__fadeInUp">
+            Или идеального сотрудника. Быстро. Просто. Эффективно.
+        </p>
+
+        <div class="d-flex justify-content-center gap-3 flex-wrap animate__animated animate__fadeInUp animate__delay-1s">
+            <a asp-page="/Account/Register" asp-route-role="job_seeker"
+               class="btn btn-light btn-lg px-4 py-3 fw-600 rounded-pill">
+                Найти работу
+            </a>
+            <a asp-page="/Account/Register" asp-route-role="employer"
+               class="btn btn-outline-light btn-lg px-4 py-3 fw-600 rounded-pill">
+                Найти сотрудников
+            </a>
         </div>
     </div>
 </section>
 
-<!-- Features Section -->
+<!-- Остальные секции остаются без изменений... -->
+
 <section class="py-5">
     <div class="container">
         <div class="text-center mb-5">
-            <h2 class="fw-bold">Почему выбирают нас?</h2>
-            <p class="text-muted">Быстро, удобно и эффективно</p>
+            <h2 class="fw-bold">Почему выбирают нас</h2>
+            <p class="text-muted">Современная платформа для поиска работы и талантов</p>
         </div>
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="feature-icon mb-3">
-                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                                <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
-                                <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
-                                <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline>
-                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                            </svg>
-                        </div>
-                        <h5 class="fw-bold">Умный поиск</h5>
-                        <p class="text-muted">Интеллектуальная система подбора вакансий и кандидатов по вашим критериям</p>
-                    </div>
+                <div class="card border-0 shadow-lg h-100 text-center p-4">
+                    <div class="mb-3"><i class="fas fa-brain fa-3x text-primary"></i></div>
+                    <h5 class="fw-bold">Умный поиск</h5>
+                    <p class="text-muted">ИИ подбирает вакансии и кандидатов под ваши критерии</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="feature-icon mb-3">
-                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                        </div>
-                        <h5 class="fw-bold">Простая регистрация</h5>
-                        <p class="text-muted">Всего 2 минуты для создания аккаунта и начала поиска работы или сотрудников</p>
-                    </div>
+                <div class="card border-0 shadow-lg h-100 text-center p-4">
+                    <div class="mb-3"><i class="fas fa-rocket fa-3x text-success"></i></div>
+                    <h5 class="fw-bold">2 минуты до старта</h5>
+                    <p class="text-muted">Регистрация и первый шаг к успеху — быстрее, чем кофе остынет</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="feature-icon mb-3">
-                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                            </svg>
-                        </div>
-                        <h5 class="fw-bold">Безопасность</h5>
-                        <p class="text-muted">Ваши данные защищены и не передаются третьим лицам</p>
-                    </div>
+                <div class="card border-0 shadow-lg h-100 text-center p-4">
+                    <div class="mb-3"><i class="fas fa-shield-alt fa-3x text-info"></i></div>
+                    <h5 class="fw-bold">Безопасность</h5>
+                    <p class="text-muted">Ваши данные защищены по стандартам GDPR</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- How It Works Section -->
 <section class="py-5 bg-light">
     <div class="container">
         <div class="text-center mb-5">
-            <h2 class="fw-bold">Как это работает?</h2>
-            <p class="text-muted">Всего 3 простых шага к успеху</p>
+            <h2 class="fw-bold">Как это работает</h2>
+            <p class="text-muted">3 простых шага к успеху</p>
         </div>
-        <div class="row g-4">
+        <div class="row g-4 text-center">
             <div class="col-md-4">
-                <div class="text-center">
-                    <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                        <span class="fs-4 fw-bold">1</span>
-                    </div>
-                    <h5 class="fw-bold">Регистрация</h5>
-                    <p class="text-muted">Создайте аккаунт как соискатель или работодатель</p>
-                </div>
+                <div class="step-circle mx-auto mb-3">1</div>
+                <h5>Регистрация</h5>
+                <p class="text-muted">Создайте аккаунт за 60 секунд</p>
             </div>
             <div class="col-md-4">
-                <div class="text-center">
-                    <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                        <span class="fs-4 fw-bold">2</span>
-                    </div>
-                    <h5 class="fw-bold">Заполнение профиля</h5>
-                    <p class="text-muted">Добавьте информацию о себе или своей компании</p>
-                </div>
+                <div class="step-circle mx-auto mb-3">2</div>
+                <h5>Профиль</h5>
+                <p class="text-muted">Заполните информацию о себе / компании</p>
             </div>
             <div class="col-md-4">
-                <div class="text-center">
-                    <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                        <span class="fs-4 fw-bold">3</span>
-                    </div>
-                    <h5 class="fw-bold">Начало работы</h5>
-                    <p class="text-muted">Ищите вакансии или кандидатов и подавайте заявки</p>
-                </div>
+                <div class="step-circle mx-auto mb-3">3</div>
+                <h5>Старт</h5>
+                <p class="text-muted">Начните поиск работы или талантов</p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Stats Section -->
 <section class="py-5">
     <div class="container">
-        <div class="row text-center">
-            <div class="col-md-3 col-6 mb-4">
-                <div class="stat-number text-primary fw-bold display-6">500+</div>
-                <div class="stat-label text-muted">Компаний</div>
+        <div class="text-center g-4">
+            <div class="col-6 col-md-3">
+                <div class="display-5 fw-bold text-primary">500+</div>
+                <div class="text-muted">Компаний</div>
             </div>
-            <div class="col-md-3 col-6 mb-4">
-                <div class="stat-number text-primary fw-bold display-6">10K+</div>
-                <div class="stat-label text-muted">Соискателей</div>
+            <div class="col-6 col-md-3">
+                <div class="display-5 fw-bold text-success">10K+</div>
+                <div class="text-muted">Соискателей</div>
             </div>
-            <div class="col-md-3 col-6 mb-4">
-                <div class="stat-number text-primary fw-bold display-6">2K+</div>
-                <div class="stat-label text-muted">Вакансий</div>
+            <div class="col-6 col-md-3">
+                <div class="display-5 fw-bold text-info">2K+</div>
+                <div class="text-muted">Вакансий</div>
             </div>
-            <div class="col-md-3 col-6 mb-4">
-                <div class="stat-number text-primary fw-bold display-6">95%</div>
-                <div class="stat-label text-muted">Успешных наймов</div>
+            <div class="col-6 col-md-3">
+                <div class="display-5 fw-bold text-warning">95%</div>
+                <div class="text-muted">Успешных наймов</div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- CTA Section -->
-<!-- CTA Section -->
-<section class="py-5 bg-primary text-white">
+<section class="py-5 bg-primary text-white text-center">
     <div class="container">
-        <div class="row justify-content-center text-center">
-            <div class="col-lg-8">
-                <h2 class="fw-bold mb-3">Готовы начать?</h2>
-                <p class="lead mb-4">Присоединяйтесь к тысячам успешных компаний и соискателей</p>
-                <div class="d-flex justify-content-center gap-3 flex-wrap">
-                    <a asp-page="/Account/Register" asp-route-role="job_seeker" class="btn btn-light btn-lg px-4 py-2 fw-semibold">
-                        🎯 Найти работу
-                    </a>
-                    <a asp-page="/Account/Register" asp-route-role="employer" class="btn btn-outline-light btn-lg px-4 py-2 fw-semibold">
-                        💼 Найти сотрудников
-                    </a>
-                </div>
-            </div>
+        <h2 class="fw-bold mb-3">Готовы начать?</h2>
+        <p class="lead mb-4">Присоединяйтесь к тысячам успешных компаний и соискателей</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a asp-page="/Account/Register" asp-route-role="job_seeker" class="btn btn-light btn-lg px-5 py-3 fw-600 rounded-pill">🎯 Найти работу</a>
+            <a asp-page="/Account/Register" asp-route-role="employer" class="btn btn-outline-light btn-lg px-5 py-3 fw-600 rounded-pill">💼 Найти сотрудников</a>
         </div>
     </div>
 </section>
 
 <style>
+    /* ---------- HERO-БАННЕР ---------- */
     .hero-section {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
     }
 
-    .feature-icon {
-        color: #667eea;
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: url("/images/hero-bg.webp") center/cover no-repeat;
+        filter: blur(6px);
+        z-index: 1;
     }
 
-    .step-number {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .hero-overlay::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+        }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 800px;
+        padding: 0 1rem;
     }
 
-    .stat-number {
-        font-family: 'Arial', sans-serif;
-    }
+        .hero-content .btn {
+            min-width: 200px;
+            border-width: 2px;
+            transition: all 0.3s ease;
+        }
 
-    .card {
+            .hero-content .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            }
+
+    /* ---------- СТИЛИ ДЛЯ ЛОГОТИПОВ ---------- */
+    .logo-nav {
+       
         transition: transform 0.3s ease;
     }
 
-        .card:hover {
-            transform: translateY(-5px);
-        }
+    .navbar-brand:hover .logo-nav {
+        transform: scale(1.05);
+    }
 
-    .hero-image svg {
-        filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));
+    .logo-hero {
+        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+    }
+
+    .logo-footer {
+        
+    }
+
+    /* ---------- STEP CIRCLES ---------- */
+    .step-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.5rem;
     }
 </style>

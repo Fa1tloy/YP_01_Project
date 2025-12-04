@@ -23,5 +23,6 @@ namespace WebReckrytingSystem.Models
 
         // Навигационное свойство
         public User User { get; set; } = null!;
+        public string? PracticesJson { get; set; }
     }
 }

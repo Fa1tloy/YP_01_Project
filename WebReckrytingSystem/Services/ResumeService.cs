@@ -1,6 +1,5 @@
-﻿
-
-// Services/ResumeService.cs
+﻿using System.Net.NetworkInformation;
+using System.Text.Json;
 using WebReckrytingSystem.Data;
 using WebReckrytingSystem.Models;
 
@@ -17,12 +16,10 @@ namespace WebReckrytingSystem.Services
 
         public ServiceResult<Resume> CreateResume(string userEmail, CreateResumeViewModel model)
         {
-            // Проверка, что у пользователя еще нет резюме
             var existingResume = _resumeRepository.GetByUserEmail(userEmail);
             if (existingResume != null)
                 return ServiceResult<Resume>.Error("У вас уже есть созданное резюме");
 
-            // Валидация
             var validationResult = ValidateResume(model);
             if (!validationResult.IsSuccess)
                 return ServiceResult<Resume>.Error(validationResult.Message);
@@ -36,8 +33,9 @@ namespace WebReckrytingSystem.Services
                     SalaryExpectations = model.SalaryExpectations,
                     ExperienceDescription = FormatExperienceDescription(model),
                     EducationDescription = FormatEducationDescription(model),
-                    Skills = FormatSkills(model.Skills),
-                    IsPublished = true // Гарантируем публикацию при создании
+                    Skills = string.Join(", ", model.Skills.Select(s => s.Trim()).Distinct()),
+                    IsPublished = true,
+                    PracticesJson = JsonSerializer.Serialize(model.Practices)
                 };
 
                 var savedResume = _resumeRepository.Save(resume);
@@ -65,8 +63,9 @@ namespace WebReckrytingSystem.Services
                 existingResume.SalaryExpectations = model.SalaryExpectations;
                 existingResume.ExperienceDescription = FormatExperienceDescription(model);
                 existingResume.EducationDescription = FormatEducationDescription(model);
-                existingResume.Skills = FormatSkills(model.Skills);
+                existingResume.Skills = string.Join(", ", model.Skills.Select(s => s.Trim()).Distinct());
                 existingResume.IsPublished = model.IsPublished;
+                existingResume.PracticesJson = JsonSerializer.Serialize(model.Practices);
 
                 var updatedResume = _resumeRepository.Update(existingResume);
                 return ServiceResult<Resume>.Success("Резюме успешно обновлено!", updatedResume);
@@ -88,10 +87,18 @@ namespace WebReckrytingSystem.Services
             if (model.Skills.Any(string.IsNullOrWhiteSpace))
                 return ServiceResult.Error("Навык не может быть пустым");
 
-            // Проверка на дубликаты навыков
             var distinctSkills = model.Skills.Select(s => s.Trim().ToLower()).Distinct();
             if (distinctSkills.Count() != model.Skills.Count)
                 return ServiceResult.Error("Обнаружены дублирующиеся навыки");
+
+            if (model.Practices != null && model.Practices.Any())
+            {
+                foreach (var p in model.Practices)
+                {
+                    if (!p.IsValid)
+                        return ServiceResult.Error("Дата окончания практики не может быть раньше даты начала");
+                }
+            }
 
             return ServiceResult.Success("Валидация пройдена");
         }
@@ -105,6 +112,10 @@ namespace WebReckrytingSystem.Services
 
             if (!string.IsNullOrWhiteSpace(model.ExperienceDescription))
                 parts.Add(model.ExperienceDescription.Trim());
+
+            var practicesText = FormatPractices(model.Practices);
+            if (practicesText != null)
+                parts.Add(practicesText);
 
             return parts.Any() ? string.Join("\n", parts) : null;
         }
@@ -138,6 +149,19 @@ namespace WebReckrytingSystem.Services
                                    .Select(s => s.Trim())
                                    .Distinct();
             return validSkills.Any() ? string.Join(", ", validSkills) : null;
+        }
+
+        private string? FormatPractices(List<PracticeViewModel> practices)
+        {
+            if (practices == null || !practices.Any()) return null;
+
+            var parts = new List<string> { "Практики:" };
+            foreach (var p in practices)
+            {
+                var period = $"{p.StartDate:MM.yyyy} – {p.EndDate:MM.yyyy}";
+                parts.Add($"• {p.Place} ({period}){(string.IsNullOrWhiteSpace(p.Description) ? "" : $" — {p.Description}")}");
+            }
+            return string.Join("\n", parts);
         }
 
         public Resume? GetUserResume(string userEmail)

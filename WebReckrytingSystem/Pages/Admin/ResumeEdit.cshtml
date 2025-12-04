@@ -1,0 +1,197 @@
+﻿@page "{email}"
+@model WebReckrytingSystem.Pages.Admin.ResumeEditModel
+@{
+    ViewData["Title"] = "Редактирование резюме";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>@ViewData["Title"]</h2>
+        <a asp-page="/Admin/Resumes" class="btn btn-outline-secondary">← Назад к списку</a>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    <form method="post">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Основная информация</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.DesiredPosition" class="form-label">Желаемая должность *</label>
+                            <input asp-for="ResumeData.DesiredPosition" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.SalaryExpectations" class="form-label">Зарплатные ожидания</label>
+                            <input asp-for="ResumeData.SalaryExpectations" type="number" class="form-control" />
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input asp-for="ResumeData.IsPublished" class="form-check-input" />
+                            <label asp-for="ResumeData.IsPublished" class="form-check-label">
+                                Опубликовано
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Навыки</h5>
+                    </div>
+                    <div class="card-body">
+                        <textarea asp-for="ResumeData.Skills" class="form-control" rows="5"
+                                  placeholder="C#, ASP.NET, SQL"></textarea>
+                        <small class="form-text text-muted">Через запятую</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Описание опыта</h5>
+                    </div>
+                    <div class="card-body">
+                        <textarea asp-for="ResumeData.ExperienceDescription" class="form-control" rows="4"></textarea>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Образование</h5>
+                    </div>
+                    <div class="card-body">
+                        <textarea asp-for="ResumeData.EducationDescription" class="form-control" rows="4"></textarea>
+                    </div>
+                </div>
+
+                <!-- Практики -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Практики</h5>
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="addPractice()">
+                            <i class="fas fa-plus me-1"></i> Добавить
+                        </button>
+                    </div>
+                    <div class="card-body" id="practicesContainer">
+                        @for (int i = 0; i < Model.ResumeData.Practices.Count; i++)
+                        {
+                            <div class="card mb-2 p-3 practice-item">
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Место практики</label>
+                                        <input asp-for="ResumeData.Practices[i].Place" class="form-control" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">С</label>
+                                        <input asp-for="ResumeData.Practices[i].StartDate" type="date" class="form-control" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">По</label>
+                                        <input asp-for="ResumeData.Practices[i].EndDate" type="date" class="form-control" />
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Описание</label>
+                                        <textarea asp-for="ResumeData.Practices[i].Description" class="form-control" rows="2"></textarea>
+                                    </div>
+                                    <div class="col-12 text-end">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removePractice(this)">
+                                            <i class="fas fa-trash me-1"></i> Удалить практику
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Сохранить изменения
+            </button>
+            <a asp-page="/Admin/Resumes" class="btn btn-outline-secondary">Отмена</a>
+        </div>
+    </form>
+</div>
+
+@@section Scripts {
+<script>
+    function removePractice(btn) {
+        const card = btn.closest('.practice-item');
+        card.remove();
+        reindexPractices();
+    }
+
+    function reindexPractices() {
+        const container = document.getElementById('practicesContainer');
+        const cards = container.querySelectorAll('.practice-item');
+
+        cards.forEach((card, index) => {
+            // Обновляем индексы во всех input/textarea
+            const inputs = card.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                const nameAttr = input.getAttribute('name');
+                if (nameAttr) {
+                    input.setAttribute('name', nameAttr.replace(/Practices\[\d+\]/, `Practices[${index}]`));
+                    input.setAttribute('id', input.getAttribute('id')?.replace(/Practices_\d+/, `Practices_${index}`));
+                }
+            });
+
+            // Обновляем индексы в span (для валидации)
+            const spans = card.querySelectorAll('span[data-valmsg-for]');
+            spans.forEach(span => {
+                const forAttr = span.getAttribute('data-valmsg-for');
+                if (forAttr) {
+                    span.setAttribute('data-valmsg-for', forAttr.replace(/Practices\[\d+\]/, `Practices[${index}]`));
+                }
+            });
+        });
+    }
+
+    function addPractice() {
+        const container = document.getElementById('practicesContainer');
+        const index = container.children.length;
+        const div = document.createElement('div');
+        div.className = 'card mb-2 p-3 practice-item';
+
+        div.innerHTML = `
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <label class="form-label">Место практики</label>
+                    <input name="ResumeData.Practices[${index}].Place" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">С</label>
+                    <input name="ResumeData.Practices[${index}].StartDate" type="date" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">По</label>
+                    <input name="ResumeData.Practices[${index}].EndDate" type="date" class="form-control" />
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Описание</label>
+                    <textarea name="ResumeData.Practices[${index}].Description" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="col-12 text-end">
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removePractice(this)">
+                        <i class="fas fa-trash me-1"></i> Удалить практику
+                    </button>
+                </div>
+            </div>
+        `;
+
+        container.appendChild(div);
+    }
+</script>
+}

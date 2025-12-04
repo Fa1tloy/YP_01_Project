@@ -109,6 +109,7 @@ namespace WebReckrytingSystem.Pages.Account
             {
                 "job_seeker" => RedirectToPage("/Account/JobSeekerDashboard"),
                 "employer" => RedirectToPage("/Account/EmployerDashboard"),
+                "admin" => RedirectToPage("/Admin/Index"),  
                 _ => RedirectToPage("/Index")
             };
         }
