@@ -1,99 +1,264 @@
 ﻿@page
 @model WebReckrytingSystem.Pages.Account.RegisterModel
 @{
-    ViewData["Title"] = "Регистрация";
+    ViewData["Title"] = "Регистрация - Твоя Карьера";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="card shadow-lg border-0" style="background: rgba(255,255,255,.85); backdrop-filter: blur(10px);">
-                <div class="card-body p-5">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
-                        <h2 class="fw-bold">Создать аккаунт</h2>
-                        <p class="text-muted">Начните путь к успеху за 60 секунд</p>
+<div class="register-page">
+    <div class="register-container">
+        <div class="register-card">
+            <div class="register-form-section">
+                <div class="brand text-center mb-4">
+                    <img src="~/images/logo.png" alt="Твоя Карьера" class="brand-logo" />
+                    <h2 class="brand-name">Регистрация</h2>
+                    <p class="brand-tagline">Начните карьеру за 60 секунд</p>
+                </div>
+
+                <form method="post" id="registerForm" novalidate>
+                    <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+                    <!-- РОЛИ -->
+                    <div class="form-group mb-4">
+                        <label class="form-label fw-600">Выберите роль</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="RegisterData.Role" id="job_seeker" 
+                                   value="job_seeker" @(Model.RegisterData.Role == "job_seeker" ? "checked" : "") />
+                            <label class="btn btn-outline-primary" for="job_seeker">
+                                <i class="fas fa-user-graduate me-2"></i>Соискатель
+                            </label>
+
+                            <input type="radio" class="btn-check" name="RegisterData.Role" id="employer" 
+                                   value="employer" @(Model.RegisterData.Role == "employer" ? "checked" : "") />
+                            <label class="btn btn-outline-success" for="employer">
+                                <i class="fas fa-building me-2"></i>Работодатель
+                            </label>
+                        </div>
                     </div>
 
-                    <form method="post" id="registerForm" novalidate>
-                        <div asp-validation-summary="All" class="alert alert-danger rounded-pill"></div>
+                    <!-- EMAIL -->
+                    <div class="form-group mb-3">
+                        <label asp-for="RegisterData.Email" class="form-label">
+                            <i class="fas fa-envelope me-2"></i>Email
+                        </label>
+                        <input asp-for="RegisterData.Email" class="form-control form-control-lg" 
+                               placeholder="you@example.com" required autocomplete="email" />
+                        <span asp-validation-for="RegisterData.Email" class="text-danger small"></span>
+                        <div class="email-check-feedback" style="display:none;"></div>
+                    </div>
 
-                        <div class="mb-3">
-                            <label asp-for="RegisterData.Email" class="form-label fw-600"><i class="fas fa-envelope me-1"></i> Email</label>
-                            <input asp-for="RegisterData.Email" class="form-control rounded-pill" placeholder="you@example.com" />
-                            <span asp-validation-for="RegisterData.Email" class="text-danger small"></span>
+                    <!-- ИМЯ ФАМИЛИЯ -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="RegisterData.FirstName" class="form-label">
+                                <i class="fas fa-user me-2"></i>Имя
+                            </label>
+                            <input asp-for="RegisterData.FirstName" class="form-control form-control-lg" required />
                         </div>
-
-                        <div class="mb-3">
-                            <label asp-for="RegisterData.Password" class="form-label fw-600"><i class="fas fa-lock me-1"></i> Пароль</label>
-                            <input asp-for="RegisterData.Password" type="password" class="form-control rounded-pill" placeholder="Минимум 8 символов" />
-                            <span asp-validation-for="RegisterData.Password" class="text-danger small"></span>
+                        <div class="col-md-6">
+                            <label asp-for="RegisterData.LastName" class="form-label">
+                                <i class="fas fa-user me-2"></i>Фамилия
+                            </label>
+                            <input asp-for="RegisterData.LastName" class="form-control form-control-lg" required />
                         </div>
+                    </div>
 
-                        <div class="mb-3">
-                            <label asp-for="RegisterData.ConfirmPassword" class="form-label fw-600"><i class="fas fa-redo me-1"></i> Подтвердите пароль</label>
-                            <input asp-for="RegisterData.ConfirmPassword" type="password" class="form-control rounded-pill" />
-                            <span asp-validation-for="RegisterData.ConfirmPassword" class="text-danger small"></span>
-                        </div>
+                    <!-- КОМПАНИЯ (для работодателя) -->
+                    <div class="form-group mb-3" id="companyGroup" style="display:none;">
+                        <label asp-for="RegisterData.CompanyName" class="form-label">
+                            <i class="fas fa-building me-2"></i>Название компании
+                        </label>
+                        <input asp-for="RegisterData.CompanyName" class="form-control form-control-lg" 
+                               placeholder="ООО Ромашка" />
+                    </div>
 
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label asp-for="RegisterData.FirstName" class="form-label fw-600"><i class="fas fa-user me-1"></i> Имя</label>
-                                <input asp-for="RegisterData.FirstName" class="form-control rounded-pill" />
-                                <span asp-validation-for="RegisterData.FirstName" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label asp-for="RegisterData.LastName" class="form-label fw-600"><i class="fas fa-user me-1"></i> Фамилия</label>
-                                <input asp-for="RegisterData.LastName" class="form-control rounded-pill" />
-                                <span asp-validation-for="RegisterData.LastName" class="text-danger small"></span>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="RegisterData.Role" class="form-label fw-600"><i class="fas fa-users me-1"></i> Роль</label>
-                            <select asp-for="RegisterData.Role" class="form-select rounded-pill" id="roleSelect">
-                                <option value="">Выберите роль</option>
-                                <option value="job_seeker">Соискатель</option>
-                                <option value="employer">Работодатель</option>
-                            </select>
-                            <span asp-validation-for="RegisterData.Role" class="text-danger small"></span>
-                        </div>
-
-                        <div class="mb-4" id="companyField" style="display: none;">
-                            <label asp-for="RegisterData.CompanyName" class="form-label fw-600"><i class="fas fa-building me-1"></i> Название компании</label>
-                            <input asp-for="RegisterData.CompanyName" class="form-control rounded-pill" placeholder="ООО Ромашка" />
-                            <span asp-validation-for="RegisterData.CompanyName" class="text-danger small"></span>
-                        </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5">
-                                <i class="fas fa-user-plus me-2"></i>Создать аккаунт
+                    <!-- ПАРОЛИ -->
+                    <div class="form-group mb-3">
+                        <label asp-for="RegisterData.Password" class="form-label">
+                            <i class="fas fa-lock me-2"></i>Пароль
+                        </label>
+                        <div class="input-group">
+                            <input asp-for="RegisterData.Password" class="form-control form-control-lg" 
+                                   placeholder="Минимум 8 символов" required />
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                <i class="fas fa-eye"></i>
                             </button>
                         </div>
+                    </div>
 
-                        <div class="text-center mt-4">
-                            <p class="mb-0">Уже есть аккаунт? <a href="/Account/Login" class="text-decoration-none">Войти</a></p>
-                        </div>
-                    </form>
-                </div>
+                    <div class="form-group mb-4">
+                        <label asp-for="RegisterData.ConfirmPassword" class="form-label">
+                            <i class="fas fa-redo me-2"></i>Подтвердите пароль
+                        </label>
+                        <input asp-for="RegisterData.ConfirmPassword" class="form-control form-control-lg" 
+                               placeholder="Повторите пароль" required />
+                    </div>
+
+                    <!-- КНОПКА -->
+                    <button type="submit" class="btn btn-success btn-lg w-100 mb-3">
+                        <i class="fas fa-user-plus me-2"></i>Создать аккаунт
+                    </button>
+
+                    <div class="text-center">
+                        <p class="mb-0">
+                            Уже есть аккаунт?
+                            <a asp-page="/Account/Login" class="fw-bold">Войти</a>
+                        </p>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
 
+@section Styles {
+    <style>
+        .register-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .register-container {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .register-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: grid;
+            grid-template-columns: 1fr;
+            min-height: auto;
+        }
+
+        .register-form-section {
+            padding: 3rem;
+        }
+
+        .brand-logo {
+            height: 50px;
+            margin-bottom: 1rem;
+        }
+
+        .brand-name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-tagline {
+            color: #6c757d;
+        }
+
+        @@media (max-width: 768px) {
+            .register-page {
+                padding: 1rem;
+            }
+            
+            .register-form-section {
+                padding: 2rem;
+            }
+        }
+
+        .btn-check:checked + .btn-outline-primary {
+            background-color: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+
+        .btn-check:checked + .btn-outline-success {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+    </style>
+}
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        // показ поля компании
-        document.getElementById('roleSelect').addEventListener('change', e =>
-            document.getElementById('companyField').style.display = e.target.value === 'employer' ? 'block' : 'none');
+        // Переключатель пароля
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.querySelector('input[name="RegisterData.Password"]');
+            const icon = this.querySelector('i');
+            
+            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        });
 
-        // toast
-        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
-        {
-                <text>showToast('@Html.Raw(Model.SuccessMessage)', 'success');</text>
-        }
+        // Показ/скрытие поля компании
+        document.querySelectorAll('input[name="RegisterData.Role"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const companyGroup = document.getElementById('companyGroup');
+                const companyInput = document.querySelector('input[name="RegisterData.CompanyName"]');
+                
+                if (this.value === 'employer') {
+                    companyGroup.style.display = 'block';
+                    companyInput.required = true;
+                } else {
+                    companyGroup.style.display = 'none';
+                    companyInput.required = false;
+                    companyInput.value = '';
+                }
+            });
+        });
+
+
+        let emailTimeout;
+        document.querySelector('input[name="RegisterData.Email"]').addEventListener('input', function() {
+            clearTimeout(emailTimeout);
+            const email = this.value.trim();
+            const feedback = document.querySelector('.email-check-feedback');
+            
+            // Проверяем длину и наличие символа (без includes)
+            if (email.length > 3 && email.indexOf('@@') > -1) { // ИСПРАВЛЕНО: используем indexOf
+                emailTimeout = setTimeout(async () => {
+                    try {
+                        const response = await fetch('/Account/Register?handler=CheckEmail', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                            },
+                            body: JSON.stringify(email)
+                        });
+                        
+                        const result = await response.json();
+                        
+                        feedback.style.display = 'block';
+                        if (result.exists) {
+                            feedback.innerHTML = '<i class="fas fa-times-circle me-1"></i> Email уже занят';
+                            feedback.className = 'email-check-feedback text-danger small mt-1';
+                        } else {
+                            feedback.innerHTML = '<i class="fas fa-check-circle me-1"></i> Email доступен';
+                            feedback.className = 'email-check-feedback text-success small mt-1';
+                        }
+                    } catch (error) {
+                        feedback.style.display = 'none';
+                    }
+                }, 500);
+            } else {
+                feedback.style.display = 'none';
+            }
+        });
+
+        // Автоочистка ошибок
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert.alert-danger');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 8000);
     </script>
 }

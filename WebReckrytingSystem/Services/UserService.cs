@@ -1,52 +1,75 @@
 ﻿using System.Text.RegularExpressions;
 using WebReckrytingSystem.Data;
 using WebReckrytingSystem.Models;
+using Microsoft.Extensions.Logging;
 
 namespace WebReckrytingSystem.Services
 {
     public class UserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly ICompanyRepository _companyRepository; // Добавьте если нужно создавать компанию
+        private readonly ILogger<UserService> _logger;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, ICompanyRepository companyRepository, ILogger<UserService> logger)
         {
             _userRepository = userRepository;
+            _companyRepository = companyRepository;
+            _logger = logger;
         }
 
-        public ServiceResult RegisterUser(
-    string email,
-    string password,
-    string firstName,
-    string lastName,
-    string role)
+        public ServiceResult<User> RegisterUser(
+            string email,
+            string password,
+            string firstName,
+            string lastName,
+            string role,
+            string? companyName = null) // Добавлен параметр
         {
             // Проверка обязательных полей
             if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
-                return ServiceResult.Error("Имя и фамилия обязательны для заполнения");
+                return ServiceResult<User>.Error("Имя и фамилия обязательны для заполнения");
 
             // Валидация email формата
             if (!IsValidEmail(email))
-                return ServiceResult.Error("Неверный формат email");
+                return ServiceResult<User>.Error("Неверный формат email");
 
             // Валидация пароля
             if (string.IsNullOrWhiteSpace(password) || password.Length < 8)
-                return ServiceResult.Error("Пароль должен содержать минимум 8 символов");
+                return ServiceResult<User>.Error("Пароль должен содержать минимум 8 символов");
 
             // Валидация роли
             if (role != "job_seeker" && role != "employer")
-                return ServiceResult.Error("Неверно указана роль. Допустимые значения: job_seeker, employer");
+                return ServiceResult<User>.Error("Неверно указана роль. Допустимые значения: job_seeker, employer");
 
-            // Проверка уникальности email (более детальная)
+            // Проверка уникальности email
             var existingUser = _userRepository.FindByEmail(email);
             if (existingUser != null)
             {
-                return ServiceResult.Error($"Пользователь с email '{email}' уже зарегистрирован. " +
-                                         "Если это ваш аккаунт, перейдите на страницу входа.");
+                return ServiceResult<User>.Error($"Пользователь с email '{email}' уже зарегистрирован. Перейдите на страницу входа.");
+            }
+
+            // Для работодателя - проверяем/создаем компанию
+            if (role == "employer" && !string.IsNullOrWhiteSpace(companyName))
+            {
+                var existingCompany = _companyRepository.FindByName(companyName.Trim());
+                if (existingCompany == null)
+                {
+                    // Создаем компанию автоматически
+                    var newCompany = new Company
+                    {
+                        Name = companyName.Trim(),
+                        Verified = false,
+                        Description = $"Компания {companyName}"
+                    };
+                    _companyRepository.Save(newCompany);
+                    _logger.LogInformation("✅ Компания {CompanyName} создана автоматически", companyName);
+                }
             }
 
             try
             {
-                // Создание нового пользователя
+                // Создание пользователя
                 var newUser = new User
                 {
                     Email = email,
@@ -56,16 +79,54 @@ namespace WebReckrytingSystem.Services
                     Role = role
                 };
 
-                // Сохранение в БД
                 var savedUser = _userRepository.Save(newUser);
 
-                return ServiceResult.Success("Пользователь успешно зарегистрирован!", savedUser);
+                _logger.LogInformation("✅ Пользователь {Email} успешно зарегистрирован", email);
+
+                return ServiceResult<User>.Success("Пользователь успешно зарегистрирован!", savedUser);
             }
             catch (Exception ex)
             {
-                // Логируем ошибку для разработчика
-                Console.WriteLine($"Ошибка при регистрации пользователя: {ex.Message}");
-                return ServiceResult.Error("Произошла ошибка при регистрации. Пожалуйста, попробуйте позже.");
+                _logger.LogError(ex, "❌ Ошибка при регистрации пользователя {Email}", email);
+                return ServiceResult<User>.Error("Произошла ошибка при регистрации. Попробуйте позже.");
+            }
+        }
+
+        public ServiceResult<User> AuthenticateUser(string email, string password)
+        {
+            _logger.LogInformation("🔐 Аутентификация пользователя: {Email}", email);
+
+            // Проверка на пустые данные
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            {
+                _logger.LogWarning("⚠️ Пустые Email или пароль");
+                return ServiceResult<User>.Error("Email и пароль обязательны для заполнения");
+            }
+
+            // Поиск пользователя
+            var user = _userRepository.FindByEmail(email);
+            if (user == null)
+            {
+                _logger.LogWarning("⚠️ Пользователь не найден: {Email}", email);
+                return ServiceResult<User>.Error("Неверный email или пароль");
+            }
+
+            try
+            {
+                // Проверка пароля
+                if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+                {
+                    _logger.LogWarning("⚠️ Неверный пароль для {Email}", email);
+                    return ServiceResult<User>.Error("Неверный email или пароль");
+                }
+
+                _logger.LogInformation("✅ Успешный вход: {Email}", email);
+                return ServiceResult<User>.Success("Успешный вход", user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Ошибка проверки пароля для {Email}", email);
+                return ServiceResult<User>.Error("Произошла ошибка при аутентификации");
             }
         }
 
@@ -73,36 +134,9 @@ namespace WebReckrytingSystem.Services
         {
             if (string.IsNullOrWhiteSpace(email))
                 return false;
-
             string pattern = @"^[^\s@]+@[^\s@]+\.[^\s@]+$";
+            return System.Text.RegularExpressions.Regex.IsMatch(email, pattern);
             return Regex.IsMatch(email, pattern);
-        }
-
-        public ServiceResult AuthenticateUser(string email, string password)
-        {
-            // Проверка на пустые данные
-            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
-                return ServiceResult.Error("Email и пароль обязательны для заполнения");
-
-            // Поиск пользователя
-            var user = _userRepository.FindByEmail(email);
-            if (user == null)
-                return ServiceResult.Error("Неверный email или пароль");
-
-            try
-            {
-                // Проверка пароля
-                if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
-                    return ServiceResult.Error("Неверный email или пароль");
-
-                return ServiceResult.Success("Успешный вход", user);
-            }
-            catch (Exception ex)
-            {
-                // Логируем ошибку для разработчика
-                Console.WriteLine($"Ошибка при проверке пароля: {ex.Message}");
-                return ServiceResult.Error("Произошла ошибка при аутентификации");
-            }
         }
     }
 }
