@@ -1,9 +1,9 @@
-﻿
-@page
+﻿@page
 @using System.Security.Claims
 @model WebReckrytingSystem.Pages.IndexModel
 @{
     ViewData["Title"] = "Твоя Карьера";
+    Layout = "_Layout";
 }
 
 <!-- HERO SECTION -->
@@ -24,15 +24,21 @@
 
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
-                    <li class="nav-item"><a class="nav-link active" href="/">Главная</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/Vacancy/Search">Поиск вакансий</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/Account/Register">Регистрация</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Главная</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Vacancy/Search">Поиск вакансий</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Account/Register">Регистрация</a>
+                    </li>
                 </ul>
 
                 <div class="navbar-nav">
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <span class="nav-item nav-link text-dark">Привет, @User.FindFirst(ClaimTypes.GivenName)?.Value!</span>
+                        <span class="nav-item nav-link text-white">Привет, @User.FindFirst(ClaimTypes.GivenName)?.Value!</span>
                         <form method="post" asp-page="/Account/Logout" class="nav-item">
                             <button type="submit" class="btn btn-login">Выйти</button>
                         </form>
@@ -148,5 +154,3 @@
         </div>
     </div>
 </section>
-
-

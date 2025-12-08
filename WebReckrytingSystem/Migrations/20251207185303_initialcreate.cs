@@ -5,7 +5,7 @@
 namespace WebReckrytingSystem.Migrations
 {
     /// <inheritdoc />
-    public partial class addadmin : Migration
+    public partial class initialcreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

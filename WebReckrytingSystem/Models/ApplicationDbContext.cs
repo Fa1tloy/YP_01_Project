@@ -1,142 +1,164 @@
-﻿// Models/ApplicationDbContext.cs
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using WebReckrytingSystem.Models;
 
 namespace WebReckrytingSystem.Models
 {
     public class ApplicationDbContext : DbContext
     {
+        // Конструктор для миграций (БЕЗ параметров)
+        public ApplicationDbContext() : base()
+        {
+        }
+
+        // Конструктор для работы приложения (С параметрами)
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
 
+        // ВСЕ таблицы
         public DbSet<User> Users { get; set; }
         public DbSet<Resume> Resumes { get; set; }
         public DbSet<Vacancy> Vacancies { get; set; }
         public DbSet<Company> Companies { get; set; }
+        public DbSet<ResumeView> ResumeViews { get; set; }
+        public DbSet<JobApplication> JobApplications { get; set; }
+        public DbSet<SavedVacancy> SavedVacancies { get; set; }
+        public DbSet<DailyAnalytic> DailyAnalytics { get; set; }
 
+        // Для миграций — строка подключения, если опции не переданы
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseMySql(
+                    "Server=localhost;Database=rekryting_system;Uid=root;Pwd=vertrigo;",
+                    new MySqlServerVersion(new Version(8, 0, 21))
+                );
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Конфигурация User
             modelBuilder.Entity<User>().ToTable("users", t => t.ExcludeFromMigrations());
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.Email);
-                entity.Property(e => e.Email)
-                    .HasColumnName("email") // Добавлено имя столбца
-                    .HasMaxLength(255);
-                entity.Property(e => e.PasswordHash)
-                    .HasColumnName("password_hash") // Добавлено имя столбца
-                    .HasMaxLength(255)
-                    .IsRequired();
-                entity.Property(e => e.FirstName)
-                    .HasColumnName("first_name") // Добавлено имя столбца
-                    .HasMaxLength(100)
-                    .IsRequired();
-                entity.Property(e => e.LastName)
-                    .HasColumnName("last_name") // Добавлено имя столбца
-                    .HasMaxLength(100)
-                    .IsRequired();
-                entity.Property(e => e.Role)
-                    .HasColumnName("role") // Добавлено имя столбца
-                    .HasMaxLength(20)
-                    .IsRequired();
+                entity.Property(e => e.Email).HasColumnName("email").HasMaxLength(255);
+                entity.Property(e => e.PasswordHash).HasColumnName("password_hash").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.FirstName).HasColumnName("first_name").HasMaxLength(100).IsRequired();
+                entity.Property(e => e.LastName).HasColumnName("last_name").HasMaxLength(100).IsRequired();
+                entity.Property(e => e.Role).HasColumnName("role").HasMaxLength(20).IsRequired();
+
+                // === НОВОЕ: СВЯЗЬ С КОМПАНИЕЙ ===
+                entity.Property(e => e.CompanyName).HasColumnName("company_name").HasMaxLength(255).IsRequired(false);
+
+                entity.HasOne(u => u.Company)
+                    .WithMany()
+                    .HasForeignKey(u => u.CompanyName)
+                    .HasPrincipalKey(c => c.Name)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
-            // Конфигурация для Resume
-            // Конфигурация для Resume
+            // Конфигурация Resume
             modelBuilder.Entity<Resume>().ToTable("resumes", t => t.ExcludeFromMigrations());
             modelBuilder.Entity<Resume>(entity =>
             {
                 entity.HasKey(e => e.UserEmail);
-                entity.Property(e => e.UserEmail)
-                    .HasColumnName("user_email")
-                    .HasMaxLength(255);
-                entity.Property(e => e.DesiredPosition)
-                    .HasColumnName("desired_position")
-                    .HasMaxLength(255)
-                    .IsRequired();
-                entity.Property(e => e.ExperienceDescription)
-                    .HasColumnName("experience_description");
-                entity.Property(e => e.EducationDescription)
-                    .HasColumnName("education_description");
-                entity.Property(e => e.Skills)
-                    .HasColumnName("skills");
-                entity.Property(e => e.SalaryExpectations)
-                    .HasColumnName("salary_expectations");
-                entity.Property(e => e.IsPublished)
-                    .HasColumnName("is_published")
-                    .HasDefaultValue(false);
+                entity.Property(e => e.UserEmail).HasColumnName("user_email").HasMaxLength(255);
+                entity.Property(e => e.DesiredPosition).HasColumnName("desired_position").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.ExperienceDescription).HasColumnName("experience_description");
+                entity.Property(e => e.EducationDescription).HasColumnName("education_description");
+                entity.Property(e => e.Skills).HasColumnName("skills");
+                entity.Property(e => e.SalaryExpectations).HasColumnName("salary_expectations");
+                entity.Property(e => e.IsPublished).HasColumnName("is_published").HasDefaultValue(false);
+                entity.Property(e => e.PracticesJson).HasColumnName("practices_json").HasColumnType("text");
 
-                // ✅ Новое поле PracticesJson
-                entity.Property(e => e.PracticesJson)
-                    .HasColumnName("practices_json")
-                    .HasColumnType("text"); // MySQL TEXT
-
-                // Связь с User
                 entity.HasOne(r => r.User)
-                      .WithOne()
-                      .HasForeignKey<Resume>(r => r.UserEmail)
-                      .OnDelete(DeleteBehavior.Cascade);
+                    .WithOne() // User не имеет коллекции Resume
+                    .HasForeignKey<Resume>(r => r.UserEmail) // UserEmail является FK
+                    .HasPrincipalKey<User>(u => u.Email) // Связан с PK User.Email
+                    .OnDelete(DeleteBehavior.Cascade);
             });
-            // Конфигурация для Company
+
+            // Конфигурация Company
             modelBuilder.Entity<Company>().ToTable("companies", t => t.ExcludeFromMigrations());
             modelBuilder.Entity<Company>(entity =>
             {
                 entity.HasKey(e => e.Name);
-                entity.Property(e => e.Name)
-                    .HasColumnName("name")
-                    .HasMaxLength(255);
-                entity.Property(e => e.Description)
-                    .HasColumnName("description");
-                entity.Property(e => e.Website)
-                    .HasColumnName("website");
-                entity.Property(e => e.LogoUrl)
-                    .HasColumnName("logo_url");
-                entity.Property(e => e.Verified)
-                    .HasColumnName("verified")
-                    .HasDefaultValue(false);
+                entity.Property(e => e.Name).HasColumnName("name").HasMaxLength(255);
+                entity.Property(e => e.Description).HasColumnName("description");
+                entity.Property(e => e.Website).HasColumnName("website");
+                entity.Property(e => e.LogoUrl).HasColumnName("logo_url");
+                entity.Property(e => e.Verified).HasColumnName("verified").HasDefaultValue(false);
             });
 
-            // Конфигурация для Vacancy
+            // Конфигурация Vacancy
             modelBuilder.Entity<Vacancy>().ToTable("vacancies", t => t.ExcludeFromMigrations());
             modelBuilder.Entity<Vacancy>(entity =>
             {
-                // Составной первичный ключ
                 entity.HasKey(v => new { v.CompanyName, v.Title });
+                entity.Property(e => e.CompanyName).HasColumnName("company_name").HasMaxLength(255);
+                entity.Property(e => e.Title).HasColumnName("title").HasMaxLength(255);
+                entity.Property(e => e.Description).HasColumnName("description");
+                entity.Property(e => e.Requirements).HasColumnName("requirements");
+                entity.Property(e => e.SalaryFrom).HasColumnName("salary_from");
+                entity.Property(e => e.SalaryTo).HasColumnName("salary_to");
+                entity.Property(e => e.EmploymentType).HasColumnName("employment_type");
+                entity.Property(e => e.WorkSchedule).HasColumnName("work_schedule");
+                entity.Property(e => e.AuthorEmail).HasColumnName("author_email").HasMaxLength(255);
 
-                entity.Property(e => e.CompanyName)
-                    .HasColumnName("company_name")
-                    .HasMaxLength(255);
-                entity.Property(e => e.Title)
-                    .HasColumnName("title")
-                    .HasMaxLength(255);
-                entity.Property(e => e.Description)
-                    .HasColumnName("description");
-                entity.Property(e => e.Requirements)
-                    .HasColumnName("requirements");
-                entity.Property(e => e.SalaryFrom)
-                    .HasColumnName("salary_from");
-                entity.Property(e => e.SalaryTo)
-                    .HasColumnName("salary_to");
-                entity.Property(e => e.EmploymentType)
-                    .HasColumnName("employment_type");
-                entity.Property(e => e.WorkSchedule)
-                    .HasColumnName("work_schedule");
-                entity.Property(e => e.AuthorEmail)
-                    .HasColumnName("author_email")
-                    .HasMaxLength(255);
+                entity.HasOne(v => v.Company).WithMany(c => c.Vacancies).HasForeignKey(v => v.CompanyName).OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(v => v.Author).WithMany().HasForeignKey(v => v.AuthorEmail).OnDelete(DeleteBehavior.Restrict);
+            });
 
-                // Связи
-                entity.HasOne(v => v.Company)
-                      .WithMany(c => c.Vacancies)
-                      .HasForeignKey(v => v.CompanyName)
-                      .OnDelete(DeleteBehavior.Cascade);
+            // Конфигурация ResumeView
+            modelBuilder.Entity<ResumeView>().ToTable("resume_views", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<ResumeView>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.ResumeEmail).HasColumnName("resume_email").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.ViewerEmail).HasColumnName("viewer_email").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.ViewedAt).HasColumnName("viewed_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.ViewedFromIp).HasColumnName("viewed_from_ip").HasMaxLength(45);
+            });
 
-                entity.HasOne(v => v.Author)
-                      .WithMany()
-                      .HasForeignKey(v => v.AuthorEmail)
-                      .OnDelete(DeleteBehavior.Cascade);
+            // Конфигурация JobApplication
+            modelBuilder.Entity<JobApplication>().ToTable("job_applications", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<JobApplication>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.StudentEmail).HasColumnName("student_email").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.VacancyCompanyName).HasColumnName("vacancy_company_name").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.VacancyTitle).HasColumnName("vacancy_title").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.CoverLetter).HasColumnName("cover_letter");
+                entity.Property(e => e.Status).HasColumnName("status").HasMaxLength(20).HasDefaultValue("pending");
+                entity.Property(e => e.AppliedAt).HasColumnName("applied_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+            });
+
+            // Конфигурация SavedVacancy
+            modelBuilder.Entity<SavedVacancy>().ToTable("saved_vacancies", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<SavedVacancy>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.StudentEmail).HasColumnName("student_email").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.VacancyCompanyName).HasColumnName("vacancy_company_name").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.VacancyTitle).HasColumnName("vacancy_title").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.SavedAt).HasColumnName("saved_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.HasIndex(e => new { e.StudentEmail, e.VacancyCompanyName, e.VacancyTitle }).IsUnique();
+            });
+
+            // Конфигурация DailyAnalytic
+            modelBuilder.Entity<DailyAnalytic>().ToTable("daily_analytics", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<DailyAnalytic>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.UserEmail).HasColumnName("user_email").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.Date).HasColumnName("date").IsRequired();
+                entity.Property(e => e.ProfileViews).HasColumnName("profile_views").HasDefaultValue(0);
+                entity.Property(e => e.ApplicationsSent).HasColumnName("applications_sent").HasDefaultValue(0);
+                entity.Property(e => e.SavedVacancies).HasColumnName("saved_vacancies").HasDefaultValue(0);
+                entity.HasIndex(e => new { e.UserEmail, e.Date }).IsUnique();
             });
         }
     }

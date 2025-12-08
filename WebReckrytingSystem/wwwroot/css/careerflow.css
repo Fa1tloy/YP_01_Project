@@ -29,6 +29,8 @@ body {
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    margin-top: -76px; /* Фон под navbar */
+    padding-top: 76px; /* Контент не залезает под navbar */
 }
 
 .hero-overlay {

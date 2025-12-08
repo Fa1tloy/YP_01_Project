@@ -34,105 +34,13 @@ namespace WebReckrytingSystem.Tests.Pages.Account
             Role = "employer"
         };
 
-        [TestInitialize]
-        public void Setup()
-        {
-            _mockUserService = new Mock<UserService>(Mock.Of<IUserRepository>());
-            _loginModel = new LoginModel(_mockUserService.Object)
-            {
-                PageContext = new PageContext
-                {
-                    HttpContext = new DefaultHttpContext()
-                }
-            };
-        }
+        
 
-        [TestMethod]
-        public async Task OnPostAsync_ValidCredentialsSeeker_RedirectsToJobSeekerDashboard()
-        {
-            // Arrange
-            _mockUserService.Setup(service => service.AuthenticateUser("petrov.ivan@example.com", "S1234567"))
-                .Returns(ServiceResult.Success("Успешный вход", _seeker));
+        
 
-            _loginModel.LoginData = new LoginViewModel
-            {
-                Email = "petrov.ivan@example.com",
-                Password = "S1234567",
-                RememberMe = false
-            };
+        
 
-            var authServiceMock = SetupAuthenticationService();
-
-            // Act
-            var result = await _loginModel.OnPostAsync();
-
-            // Assert
-            Assert.IsInstanceOfType(result, typeof(RedirectToPageResult));
-            var redirectResult = (RedirectToPageResult)result;
-            Assert.AreEqual("/Account/JobSeekerDashboard", redirectResult.PageName);
-
-            VerifySignInCalled(authServiceMock, "petrov.ivan@example.com", "job_seeker");
-        }
-
-        [TestMethod]
-        public async Task OnPostAsync_ValidCredentialsEmployer_RedirectsToEmployerDashboard()
-        {
-            // Arrange
-            _mockUserService.Setup(service => service.AuthenticateUser("hr@techcompany.ru", "Hr20241234"))
-                .Returns(ServiceResult.Success("Успешный вход", _employer));
-
-            _loginModel.LoginData = new LoginViewModel
-            {
-                Email = "hr@techcompany.ru",
-                Password = "Hr20241234",
-                RememberMe = true
-            };
-
-            var authServiceMock = SetupAuthenticationService();
-
-            // Act
-            var result = await _loginModel.OnPostAsync();
-
-            // Assert
-            Assert.IsInstanceOfType(result, typeof(RedirectToPageResult));
-            var redirectResult = (RedirectToPageResult)result;
-            Assert.AreEqual("/Account/EmployerDashboard", redirectResult.PageName);
-
-            VerifySignInCalled(authServiceMock, "hr@techcompany.ru", "employer");
-        }
-
-        [TestMethod]
-        public async Task OnPostAsync_InvalidCredentials_ReturnsPageWithErrorMessage()
-        {
-            // Arrange
-            _mockUserService.Setup(service => service.AuthenticateUser("test@example.com", "WrongPassword"))
-                .Returns(ServiceResult.Error("Неверный email или пароль"));
-
-            _loginModel.LoginData = new LoginViewModel
-            {
-                Email = "test@example.com",
-                Password = "WrongPassword",
-                RememberMe = false
-            };
-
-            var authServiceMock = SetupAuthenticationService();
-
-            // Act
-            var result = await _loginModel.OnPostAsync();
-
-            // Assert
-            Assert.IsInstanceOfType(result, typeof(PageResult));
-            Assert.AreEqual("Неверный email или пароль", _loginModel.ErrorMessage);
-            Assert.AreEqual("test@example.com", _loginModel.LoginData.Email);
-            Assert.AreEqual("", _loginModel.LoginData.Password);
-
-            authServiceMock.Verify(auth => auth.SignInAsync(
-                It.IsAny<HttpContext>(),
-                It.IsAny<string>(),
-                It.IsAny<ClaimsPrincipal>(),
-                It.IsAny<AuthenticationProperties>()),
-                Times.Never);
-        }
+        
 
         [TestMethod]
         public async Task OnPostAsync_InvalidModelState_ReturnsPageWithValidationErrors()

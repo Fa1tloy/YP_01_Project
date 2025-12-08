@@ -1,32 +1,44 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using WebReckrytingSystem.Data;
 using WebReckrytingSystem.Models;
-using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace WebReckrytingSystem.Services
 {
+    /// <summary>
+    /// Сервис для работы с пользователями (регистрация, аутентификация)
+    /// </summary>
     public class UserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly ICompanyRepository _companyRepository; // Добавьте если нужно создавать компанию
+        private readonly ICompanyRepository _companyRepository;
         private readonly ILogger<UserService> _logger;
 
-        public UserService(IUserRepository userRepository, ICompanyRepository companyRepository, ILogger<UserService> logger)
+        public UserService(
+            IUserRepository userRepository,
+            ICompanyRepository companyRepository,
+            ILogger<UserService> logger)
         {
-            _userRepository = userRepository;
-            _companyRepository = companyRepository;
-            _logger = logger;
+            _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+            _companyRepository = companyRepository ?? throw new ArgumentNullException(nameof(companyRepository));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <summary>
+        /// Регистрация нового пользователя
+        /// </summary>
         public ServiceResult<User> RegisterUser(
             string email,
             string password,
             string firstName,
             string lastName,
             string role,
-            string? companyName = null) // Добавлен параметр
+            string? companyName = null)
         {
-            // Проверка обязательных полей
+            // Валидация обязательных полей
             if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
                 return ServiceResult<User>.Error("Имя и фамилия обязательны для заполнения");
 
@@ -41,6 +53,10 @@ namespace WebReckrytingSystem.Services
             // Валидация роли
             if (role != "job_seeker" && role != "employer")
                 return ServiceResult<User>.Error("Неверно указана роль. Допустимые значения: job_seeker, employer");
+
+            // Для работодателя проверяем наличие названия компании
+            if (role == "employer" && string.IsNullOrWhiteSpace(companyName))
+                return ServiceResult<User>.Error("Для работодателя обязательно указать название компании");
 
             // Проверка уникальности email
             var existingUser = _userRepository.FindByEmail(email);
@@ -65,6 +81,10 @@ namespace WebReckrytingSystem.Services
                     _companyRepository.Save(newCompany);
                     _logger.LogInformation("✅ Компания {CompanyName} создана автоматически", companyName);
                 }
+                else
+                {
+                    _logger.LogInformation("Компания {CompanyName} уже существует, используем существующую", companyName);
+                }
             }
 
             try
@@ -76,7 +96,8 @@ namespace WebReckrytingSystem.Services
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
                     FirstName = firstName.Trim(),
                     LastName = lastName.Trim(),
-                    Role = role
+                    Role = role,
+                    CompanyName = role == "employer" ? companyName?.Trim() : null // === ПРИВЯЗЬ К КОМПАНИИ ТОЛЬКО ДЛЯ РАБОТОДАТЕЛЕЙ ===
                 };
 
                 var savedUser = _userRepository.Save(newUser);
@@ -92,18 +113,19 @@ namespace WebReckrytingSystem.Services
             }
         }
 
+        /// <summary>
+        /// Аутентификация пользователя
+        /// </summary>
         public ServiceResult<User> AuthenticateUser(string email, string password)
         {
             _logger.LogInformation("🔐 Аутентификация пользователя: {Email}", email);
 
-            // Проверка на пустые данные
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
                 _logger.LogWarning("⚠️ Пустые Email или пароль");
                 return ServiceResult<User>.Error("Email и пароль обязательны для заполнения");
             }
 
-            // Поиск пользователя
             var user = _userRepository.FindByEmail(email);
             if (user == null)
             {
@@ -111,31 +133,26 @@ namespace WebReckrytingSystem.Services
                 return ServiceResult<User>.Error("Неверный email или пароль");
             }
 
-            try
+            // Проверка пароля
+            if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
             {
-                // Проверка пароля
-                if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
-                {
-                    _logger.LogWarning("⚠️ Неверный пароль для {Email}", email);
-                    return ServiceResult<User>.Error("Неверный email или пароль");
-                }
+                _logger.LogWarning("⚠️ Неверный пароль для {Email}", email);
+                return ServiceResult<User>.Error("Неверный email или пароль");
+            }
 
-                _logger.LogInformation("✅ Успешный вход: {Email}", email);
-                return ServiceResult<User>.Success("Успешный вход", user);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "❌ Ошибка проверки пароля для {Email}", email);
-                return ServiceResult<User>.Error("Произошла ошибка при аутентификации");
-            }
+            _logger.LogInformation("✅ Успешный вход: {Email}", email);
+            return ServiceResult<User>.Success("Успешный вход", user);
         }
 
+        /// <summary>
+        /// Валидация email формата
+        /// </summary>
         private bool IsValidEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
                 return false;
+
             string pattern = @"^[^\s@]+@[^\s@]+\.[^\s@]+$";
-            return System.Text.RegularExpressions.Regex.IsMatch(email, pattern);
             return Regex.IsMatch(email, pattern);
         }
     }

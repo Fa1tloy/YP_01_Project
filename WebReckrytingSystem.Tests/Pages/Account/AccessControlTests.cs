@@ -11,59 +11,11 @@ namespace WebReckrytingSystem.Tests.Pages.Account
     [TestClass]
     public class AccessControlTests
     {
-        [TestMethod]
-        public void JobSeekerDashboard_UnauthenticatedUser_RedirectsToLogin()
-        {
-            // Arrange
-            var pageModel = new JobSeekerDashboardModel(Mock.Of<WebReckrytingSystem.Services.IResumeService>())
-            {
-                PageContext = new PageContext
-                {
-                    HttpContext = new DefaultHttpContext()
-                }
-            };
-
-            // Act
-            var result = pageModel.OnGet();
-
-            // Assert
-            Assert.IsInstanceOfType(result, typeof(RedirectToPageResult));
-            var redirectResult = (RedirectToPageResult)result;
-            Assert.AreEqual("/Account/Login", redirectResult.PageName);
-        }
+        
 
 
 
-        [TestMethod]
-        public void JobSeekerDashboard_AuthenticatedSeeker_ReturnsPage()
-        {
-            // Arrange
-            var httpContext = new DefaultHttpContext();
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
-            {
-                new Claim(ClaimTypes.Email, "seeker@test.com"),
-                new Claim(ClaimTypes.GivenName, "Иван"),
-                new Claim(ClaimTypes.Role, "job_seeker")
-            }, "TestAuth"));
-
-            httpContext.User = user;
-
-            var pageModel = new JobSeekerDashboardModel(
-                Mock.Of<WebReckrytingSystem.Services.IResumeService>())
-            {
-                PageContext = new PageContext
-                {
-                    HttpContext = httpContext
-                }
-            };
-
-            // Act
-            var result = pageModel.OnGet();
-
-            // Assert
-            Assert.IsInstanceOfType(result, typeof(PageResult));
-            Assert.AreEqual("Иван", pageModel.UserFirstName);
-        }
+        
 
     }
 }

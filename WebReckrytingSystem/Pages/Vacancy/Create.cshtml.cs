@@ -1,10 +1,11 @@
-using Microsoft.AspNetCore.Authorization;
+п»їusing Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
 using WebReckrytingSystem.Data;
 using WebReckrytingSystem.Models;
 using WebReckrytingSystem.Services;
+using Microsoft.Extensions.Logging;
 
 namespace WebReckrytingSystem.Pages.Vacancy
 {
@@ -12,101 +13,92 @@ namespace WebReckrytingSystem.Pages.Vacancy
     public class CreateModel : PageModel
     {
         private readonly IVacancyService _vacancyService;
-        private readonly ICompanyRepository _companyRepository;
+        private readonly ApplicationDbContext _context;
         private readonly ILogger<CreateModel> _logger;
-
-        public CreateModel(IVacancyService vacancyService,
-                         ICompanyRepository companyRepository,
-                         ILogger<CreateModel> logger)
-        {
-            _vacancyService = vacancyService;
-            _companyRepository = companyRepository;
-            _logger = logger;
-        }
 
         [BindProperty]
         public CreateVacancyViewModel VacancyData { get; set; } = new();
 
-        public List<WebReckrytingSystem.Models.Company> Companies { get; set; } = new();
+        public string UserCompanyName { get; set; } = string.Empty;
+        public bool HasCompany { get; set; }
 
+        // вњ… Р”РћР‘РђР’Р›Р•РќР« РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‰РёРµ СЃРІРѕР№СЃС‚РІР°
         public string? SuccessMessage { get; set; }
         public string? ErrorMessage { get; set; }
 
-        public void OnGet()
+        public CreateModel(
+            IVacancyService vacancyService,
+            ApplicationDbContext context,
+            ILogger<CreateModel> logger)
         {
-            _logger.LogInformation("GET запрос на страницу создания вакансии");
-            LoadCompanies();
-            _logger.LogInformation($"Загружено компаний: {Companies.Count}");
+            _vacancyService = vacancyService;
+            _context = context;
+            _logger = logger;
+        }
+
+        public IActionResult OnGet()
+        {
+            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(userEmail))
+                return RedirectToPage("/Account/Login");
+
+            var user = _context.Users
+                .FirstOrDefault(u => u.Email == userEmail);
+
+            if (user?.CompanyName != null)
+            {
+                UserCompanyName = user.CompanyName;
+                VacancyData.CompanyName = user.CompanyName;
+                HasCompany = true;
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "РЎРЅР°С‡Р°Р»Р° СЃРѕР·РґР°Р№С‚Рµ РєРѕРјРїР°РЅРёСЋ РІ РЅР°СЃС‚СЂРѕР№РєР°С… РїСЂРѕС„РёР»СЏ";
+                return RedirectToPage("/Company/Settings");
+            }
+
+            return Page();
         }
 
         public IActionResult OnPost()
         {
-            _logger.LogInformation("POST запрос на создание вакансии");
-            _logger.LogInformation($"ModelState.IsValid: {ModelState.IsValid}");
-
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning("Модель не валидна. Ошибки:");
-                foreach (var error in ModelState)
-                {
-                    foreach (var err in error.Value.Errors)
-                    {
-                        _logger.LogWarning($"Ошибка в поле {error.Key}: {err.ErrorMessage}");
-                    }
-                }
-
-                LoadCompanies();
                 return Page();
             }
 
-            var userEmailClaim = User.FindFirst(ClaimTypes.Email)?.Value;
-            _logger.LogInformation($"Email пользователя: {userEmailClaim}");
+            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(userEmail))
+                return RedirectToPage("/Account/Login");
 
-            if (string.IsNullOrEmpty(userEmailClaim))
+            var user = _context.Users.FirstOrDefault(u => u.Email == userEmail);
+            if (user?.CompanyName != VacancyData.CompanyName)
             {
-                ErrorMessage = "Ошибка аутентификации";
-                _logger.LogError("Email пользователя не найден в claims");
-                LoadCompanies();
+                ModelState.AddModelError("", "Р’С‹ РјРѕР¶РµС‚Рµ СЃРѕР·РґР°РІР°С‚СЊ РІР°РєР°РЅСЃРёРё С‚РѕР»СЊРєРѕ РѕС‚ СЃРІРѕРµР№ РєРѕРјРїР°РЅРёРё");
                 return Page();
             }
 
             try
             {
-                _logger.LogInformation("Вызов VacancyService.CreateVacancy");
-                var result = _vacancyService.CreateVacancy(userEmailClaim, VacancyData);
-                _logger.LogInformation($"Результат создания: IsSuccess={result.IsSuccess}, Message={result.Message}");
+                var result = _vacancyService.CreateVacancy(userEmail, VacancyData);
 
                 if (result.IsSuccess)
                 {
-                    TempData["SuccessMessage"] = "Вакансия успешно опубликована!";
-                    _logger.LogInformation("Успешное создание вакансии, редирект на EmployerDashboard");
+                    // вњ… РСЃРїРѕР»СЊР·СѓРµРј TempData РґР»СЏ РїРµСЂРµРґР°С‡Рё СЃРѕРѕР±С‰РµРЅРёР№
+                    TempData["SuccessMessage"] = "Р’Р°РєР°РЅСЃРёСЏ СѓСЃРїРµС€РЅРѕ СЃРѕР·РґР°РЅР° Рё РѕРїСѓР±Р»РёРєРѕРІР°РЅР°!";
                     return RedirectToPage("/Account/EmployerDashboard");
                 }
                 else
                 {
-                    // Добавляем ошибку в ModelState для отображения в форме
-                    ModelState.AddModelError("", result.Message);
                     ErrorMessage = result.Message;
-                    _logger.LogWarning($"Ошибка создания вакансии: {result.Message}");
-                    LoadCompanies();
                     return Page();
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Исключение при создании вакансии");
-                ErrorMessage = "Произошла ошибка при создании вакансии";
-                LoadCompanies();
+                _logger.LogError(ex, "РћС€РёР±РєР° СЃРѕР·РґР°РЅРёСЏ РІР°РєР°РЅСЃРёРё");
+                ErrorMessage = "РџСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР° РїСЂРё СЃРѕР·РґР°РЅРёРё РІР°РєР°РЅСЃРёРё";
                 return Page();
-            }
-        }
-        private void LoadCompanies()
-        {
-            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
-            if (!string.IsNullOrEmpty(userEmail))
-            {
-                Companies = _companyRepository.GetUserCompanies(userEmail).ToList();
-                _logger.LogInformation($"Загружено компаний для пользователя {userEmail}: {Companies.Count}");
             }
         }
     }

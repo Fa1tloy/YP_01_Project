@@ -1,0 +1,89 @@
+﻿@page
+@model WebReckrytingSystem.Pages.Company.SettingsModel
+@{
+    ViewData["Title"] = "Настройки компании";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        @if (Model.HasCompany)
+                        {
+                            <text>Редактировать компанию</text>
+                        }
+                        else
+                        {
+                            <text>Создать компанию</text>
+                        }
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    @if (!string.IsNullOrEmpty(TempData["SuccessMessage"]?.ToString()))
+                    {
+                        <div class="alert alert-success">
+                            @TempData["SuccessMessage"]
+                        </div>
+                    }
+
+                    @if (!Model.HasCompany)
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Сначала создайте компанию, чтобы иметь возможность публиковать вакансии
+                        </div>
+                    }
+
+                    <form method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="CompanyData.Name" class="form-label">Название компании *</label>
+                            <input asp-for="CompanyData.Name" class="form-control" readonly="@Model.HasCompany" />
+                            @if (Model.HasCompany)
+                            {
+                                <small class="text-muted">Название компании изменить нельзя</small>
+                            }
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CompanyData.Description" class="form-label">Описание</label>
+                            <textarea asp-for="CompanyData.Description" class="form-control" rows="4"
+                                      placeholder="Расскажите о вашей компании"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CompanyData.Website" class="form-label">Веб-сайт</label>
+                            <input asp-for="CompanyData.Website" class="form-control" type="url"
+                                   placeholder="https://company.com" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CompanyData.LogoUrl" class="form-label">Логотип</label>
+                            <input type="file" name="logoFile" class="form-control" accept="image/*" />
+                            @if (!string.IsNullOrEmpty(Model.CompanyData.LogoUrl))
+                            {
+                                <img src="@Model.CompanyData.LogoUrl" class="img-fluid mt-3" style="max-height: 100px;" />
+                            }
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Сохранить
+                            </button>
+                            <a href="/Account/EmployerDashboard" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Назад
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

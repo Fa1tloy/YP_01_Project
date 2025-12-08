@@ -1,68 +1,48 @@
-// Program.cs
-using Microsoft.EntityFrameworkCore;
-using WebReckrytingSystem.Data;
+п»їusing Microsoft.EntityFrameworkCore;
 using WebReckrytingSystem.Models;
 using WebReckrytingSystem.Services;
+using WebReckrytingSystem.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Добавление сервисов в контейнер 
-builder.Services.AddRazorPages();
-
-// Добавляем аутентификацию
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Account/Login";
-        options.AccessDeniedPath = "/AccessDenied";
-        options.ExpireTimeSpan = TimeSpan.FromDays(30);
-        options.SlidingExpiration = true;
-
-    });
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AdminOnly", policy =>
-        policy.RequireRole("admin"));
-});
-
-// Регистрация контекста базы данных
+// 1. DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         new MySqlServerVersion(new Version(8, 0, 21))
     ));
 
-// Регистрация репозиториев и сервисов
+// 2. Р’РЎР• СЂРµРїРѕР·РёС‚РѕСЂРёРё
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<UserService>();
-
-//  регистрацию сервиса компаний
-builder.Services.AddScoped<ICompanyService, CompanyService>();
-
-// ДОБАВЬТЕ ЭТИ СТРОЧКИ:
-builder.Services.AddScoped<IResumeRepository, ResumeRepository>();
-builder.Services.AddScoped<IResumeService, ResumeService>();
-
-// Регистрация репозиториев и сервисов для вакансий
-builder.Services.AddScoped<IVacancyRepository, VacancyRepository>();
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
-builder.Services.AddScoped<IVacancyService, VacancyService>();
-
-
-// Добавить в builder.Services:
-builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<ICompanyService, CompanyService>();
+builder.Services.AddScoped<IVacancyRepository, VacancyRepository>();
+builder.Services.AddScoped<IResumeRepository, ResumeRepository>();
+builder.Services.AddScoped<IResumeService, ResumeService>(); // вњ… Р”РћР‘РђР’Р›Р•РќРћ!
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 
-// Регистрация сервиса поиска вакансий
+// 3. Р’РЎР• СЃРµСЂРІРёСЃС‹
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IVacancyService, VacancyService>();
+builder.Services.AddScoped<AdminService, AdminService>();
 builder.Services.AddScoped<IVacancySearchService, VacancySearchService>();
 
+// 4. РђРІС‚РѕСЂРёР·Р°С†РёСЏ Рё Р°СѓС‚РµРЅС‚РёС„РёРєР°С†РёСЏ
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options => {
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/AccessDenied";
+    });
+builder.Services.AddAuthorization();
 
-builder.WebHost.UseUrls("http://0.0.0.0:5024");
+// 5. Razor Pages Рё Controllers (РґР»СЏ AJAX)
+builder.Services.AddRazorPages();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Конфигурация HTTP pipeline
+// 6. РљРѕРЅРІРµР№РµСЂ HTTP
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -71,12 +51,12 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
+// 7. РњР°СЂС€СЂСѓС‚С‹
 app.MapRazorPages();
- // добавляем свой   
+app.MapControllers();
+
 app.Run();
