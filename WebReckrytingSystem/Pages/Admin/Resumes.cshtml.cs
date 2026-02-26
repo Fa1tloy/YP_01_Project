@@ -17,7 +17,7 @@ namespace WebReckrytingSystem.Pages.Admin
             _context = context;
         }
 
-        public SearchResult<Resume> Resumes { get; set; } = new();
+        public SearchResult<Models.Resume> Resumes { get; set; } = new();
 
         [BindProperty(SupportsGet = true)]
         public string? SearchEmail { get; set; }
@@ -58,7 +58,7 @@ namespace WebReckrytingSystem.Pages.Admin
                 .Take(PageSize)
                 .ToList();
 
-            Resumes = new SearchResult<Resume>
+            Resumes = new SearchResult<Models.Resume>
             {
                 Items = items,
                 TotalCount = totalCount,

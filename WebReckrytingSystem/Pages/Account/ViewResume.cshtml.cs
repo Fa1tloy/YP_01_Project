@@ -15,7 +15,7 @@ namespace WebReckrytingSystem.Pages.Account
             _resumeService = resumeService;
         }
 
-        public Resume? Resume { get; set; }
+        public Models.Resume? Resume { get; set; }
         public string UserFirstName { get; set; } = string.Empty;
         public bool IsOwner { get; set; }
 
