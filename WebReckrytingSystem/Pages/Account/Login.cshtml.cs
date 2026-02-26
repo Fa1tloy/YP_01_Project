@@ -1,117 +1,140 @@
+п»їusing Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Security.Claims;
 using WebReckrytingSystem.Models;
 using WebReckrytingSystem.Services;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Security.Claims;
+using Microsoft.Extensions.Logging;
 
 namespace WebReckrytingSystem.Pages.Account
 {
     public class LoginModel : PageModel
     {
         private readonly UserService _userService;
+        private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(UserService userService)
+        public LoginModel(UserService userService, ILogger<LoginModel> logger)
         {
-            _userService = userService;
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [BindProperty]
         public LoginViewModel LoginData { get; set; } = new();
 
-        public string? ErrorMessage { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public string? ReturnUrl { get; set; }
 
-        public void OnGet()
+        public string? ErrorMessage { get; set; }
+        public string? SuccessMessage { get; set; }
+
+        public void OnGet(string? returnUrl = null)
         {
+            ReturnUrl = returnUrl;
+
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                _logger.LogInformation("вњ… РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СѓР¶Рµ Р°СѓС‚РµРЅС‚РёС„РёС†РёСЂРѕРІР°РЅ, СЂРµРґРёСЂРµРєС‚ РЅР° РґР°С€Р±РѕСЂРґ");
+                RedirectToDashboard(User.FindFirst(ClaimTypes.Role)?.Value);
+            }
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("вљ пёЏ РњРѕРґРµР»СЊ РЅРµ РІР°Р»РёРґРЅР°: {@Errors}", ModelState.Values.SelectMany(v => v.Errors));
                 return Page();
             }
 
             try
             {
-                var result = _userService.AuthenticateUser(
-                    LoginData.Email,
-                    LoginData.Password
-                );
+                _logger.LogInformation("рџ”ђ РџРѕРїС‹С‚РєР° РІС…РѕРґР°: {Email}", LoginData.Email);
+
+                var result = _userService.AuthenticateUser(LoginData.Email, LoginData.Password);
 
                 if (result.IsSuccess && result.Data != null)
                 {
-                    // Создаем claims для аутентификации
-                    var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Email, result.Data.Email),
-                new Claim(ClaimTypes.GivenName, result.Data.FirstName),
-                new Claim(ClaimTypes.Surname, result.Data.LastName),
-                new Claim(ClaimTypes.Role, result.Data.Role)
-            };
+                    var user = result.Data;
 
-                    var claimsIdentity = new ClaimsIdentity(
-                        claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    // РџСЂРѕРІРµСЂРєР° Р±Р»РѕРєРёСЂРѕРІРєРё
+                    if (user.Role == "blocked")
+                    {
+                        _logger.LogWarning("рџљ« РџРѕРїС‹С‚РєР° РІС…РѕРґР° Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅРЅРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ: {Email}", user.Email);
+                        ErrorMessage = "Р’Р°С€ Р°РєРєР°СѓРЅС‚ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ. РћР±СЂР°С‚РёС‚РµСЃСЊ РІ РїРѕРґРґРµСЂР¶РєСѓ.";
+                        return Page();
+                    }
+
+                    // РЎРѕР·РґР°РµРј claims
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Email, user.Email),
+                        new Claim(ClaimTypes.GivenName, user.FirstName),
+                        new Claim(ClaimTypes.Surname, user.LastName),
+                        new Claim(ClaimTypes.Role, user.Role),
+                        new Claim("FullName", $"{user.FirstName} {user.LastName}")
+                    };
+
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
                     var authProperties = new AuthenticationProperties
                     {
-                        IsPersistent = LoginData.RememberMe
+                        IsPersistent = LoginData.RememberMe,
+                        ExpiresUtc = LoginData.RememberMe ? DateTimeOffset.UtcNow.AddDays(30) : DateTimeOffset.UtcNow.AddHours(8),
+                        AllowRefresh = true
                     };
-
-                    if (LoginData.RememberMe)
-                    {
-                        // Кука на 30 дней при "Запомнить меня"
-                        authProperties.ExpiresUtc = DateTimeOffset.UtcNow.AddDays(30);
-                        authProperties.IsPersistent = true;
-                    }
-                    else
-                    {
-                        // Обычная сессионная кука (истекает при закрытии браузера)
-                        authProperties.IsPersistent  = false;
-                    }
 
                     await HttpContext.SignInAsync(
                         CookieAuthenticationDefaults.AuthenticationScheme,
                         new ClaimsPrincipal(claimsIdentity),
                         authProperties);
 
-                    return RedirectToDashboard(result.Data.Role);
+                    _logger.LogInformation("вњ… РЈСЃРїРµС€РЅС‹Р№ РІС…РѕРґ: {Email} ({Role})", user.Email, user.Role);
+
+                    // РћС‡РёСЃС‚РєР° РєСЌС€Р°, С‡С‚РѕР±С‹ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РІРёРґРµР» Р°РєС‚СѓР°Р»СЊРЅС‹Рµ РґР°РЅРЅС‹Рµ
+                    Response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
+                    Response.Headers.Add("Pragma", "no-cache");
+                    Response.Headers.Add("Expires", "0");
+
+                    return RedirectToDashboard(user.Role);
                 }
                 else
                 {
-                    // Устанавливаем сообщение об ошибке
-                    ErrorMessage = result.Message;
-
-                    // Сохраняем email для удобства пользователя
-                    // Очищаем только пароль
-                    LoginData.Password = string.Empty;
-
+                    _logger.LogWarning("вќЊ РќРµРІРµСЂРЅС‹Р№ email РёР»Рё РїР°СЂРѕР»СЊ: {Email}", LoginData.Email);
+                    ErrorMessage = "РќРµРІРµСЂРЅС‹Р№ email РёР»Рё РїР°СЂРѕР»СЊ";
+                    LoginData.Password = string.Empty; // РћС‡РёС‰Р°РµРј РїР°СЂРѕР»СЊ
                     return Page();
                 }
             }
             catch (Exception ex)
             {
-                // Обработка непредвиденных ошибок
-                ErrorMessage = "Произошла ошибка при входе. Пожалуйста, попробуйте позже.";
-
-                // Логируем для разработчика
-                Console.WriteLine($"Ошибка в Login: {ex.Message}");
-
+                _logger.LogError(ex, "вќЊ РћС€РёР±РєР° Р°СѓС‚РµРЅС‚РёС„РёРєР°С†РёРё: {Email}", LoginData.Email);
+                ErrorMessage = "РџСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР° РїСЂРё РІС…РѕРґРµ. РџРѕРїСЂРѕР±СѓР№С‚Рµ РїРѕР·Р¶Рµ.";
                 LoginData.Password = string.Empty;
                 return Page();
             }
         }
 
-        private IActionResult RedirectToDashboard(string role)
+        private IActionResult RedirectToDashboard(string? role)
         {
-            return role switch
+            var targetUrl = role switch
             {
-                "job_seeker" => RedirectToPage("/Account/JobSeekerDashboard"),
-                "employer" => RedirectToPage("/Account/EmployerDashboard"),
-                "admin" => RedirectToPage("/Admin/Index"),  
-                _ => RedirectToPage("/Index")
+                "job_seeker" => Url.Page("/Account/JobSeekerDashboard"),
+                "employer" => Url.Page("/Account/EmployerDashboard"),
+                "admin" => Url.Page("/Admin/Index"),
+                _ => Url.Page("/Index")
             };
+
+            // Р•СЃР»Рё Р±С‹Р» ReturnUrl - РІРѕР·РІСЂР°С‰Р°РµРј С‚СѓРґР°
+            if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+            {
+                _logger.LogInformation("рџ”„ Р РµРґРёСЂРµРєС‚ РЅР° РёСЃС…РѕРґРЅСѓСЋ СЃС‚СЂР°РЅРёС†Сѓ: {ReturnUrl}", ReturnUrl);
+                return Redirect(ReturnUrl);
+            }
+
+            _logger.LogInformation("рџ”„ Р РµРґРёСЂРµРєС‚ РЅР° РґР°С€Р±РѕСЂРґ: {Role}", role);
+            return Redirect(targetUrl);
         }
     }
 }

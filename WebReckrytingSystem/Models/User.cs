@@ -22,6 +22,11 @@ namespace WebReckrytingSystem.Models
 
         [Required]
         public  string Role { get; set; }
+        // === ДОБАВЛЯЕМ СВЯЗЬ С КОМПАНИЕЙ ===
+        public string? CompanyName { get; set; }
+
+        // === НАВИГАЦИОННОЕ СВОЙСТВО ===
+        public Company? Company { get; set; }
         // Константы для ролей
         public const string ROLE_JOB_SEEKER = "job_seeker";
         public const string ROLE_EMPLOYER = "employer";

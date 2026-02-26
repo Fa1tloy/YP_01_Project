@@ -1,64 +1,259 @@
 ﻿@page
 @model WebReckrytingSystem.Pages.Account.LoginModel
 @{
-    ViewData["Title"] = "Вход";
+    ViewData["Title"] = "Вход - Твоя Карьера";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-4">
-            <div class="card shadow-lg border-0" style="background: rgba(255,255,255,.85); backdrop-filter: blur(10px);">
-                <div class="card-body p-5">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-sign-in-alt fa-3x text-primary mb-3"></i>
-                        <h2 class="fw-bold">Вход</h2>
-                        <p class="text-muted">Добро пожаловать обратно!</p>
+<div class="login-page">
+    <div class="login-container">
+        <div class="login-card">
+            <!-- ЛЕВАЯ ЧАСТЬ: ФОРМА -->
+            <div class="login-form-section">
+                <div class="brand">
+                    <img src="~/images/logo.png" alt="Твоя Карьера" class="brand-logo" />
+                    <h2 class="brand-name">Твоя Карьера</h2>
+                    <p class="brand-tagline">Войдите в свой аккаунт</p>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        @Model.ErrorMessage
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <form method="post" id="loginForm" class="needs-validation" novalidate>
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group mb-4">
+                        <label asp-for="LoginData.Email" class="form-label">
+                            <i class="fas fa-envelope me-2"></i>Email
+                        </label>
+                        <input asp-for="LoginData.Email" class="form-control form-control-lg"
+                               placeholder="you@example.com" required autofocus />
+                        <span asp-validation-for="LoginData.Email" class="text-danger small"></span>
                     </div>
 
-                    <form method="post" id="loginForm" novalidate>
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-pill"></div>
-
-                        <div class="mb-3">
-                            <label asp-for="LoginData.Email" class="form-label fw-600"><i class="fas fa-envelope me-1"></i> Email</label>
-                            <input asp-for="LoginData.Email" class="form-control rounded-pill" placeholder="you@example.com" />
-                            <span asp-validation-for="LoginData.Email" class="text-danger small"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="LoginData.Password" class="form-label fw-600"><i class="fas fa-lock me-1"></i> Пароль</label>
-                            <input asp-for="LoginData.Password" type="password" class="form-control rounded-pill" placeholder="Пароль" />
-                            <span asp-validation-for="LoginData.Password" class="text-danger small"></span>
-                        </div>
-
-                        <div class="mb-3 form-check">
-                            <input asp-for="LoginData.RememberMe" class="form-check-input" />
-                            <label asp-for="LoginData.RememberMe" class="form-check-label"> Запомнить меня</label>
-                        </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5">
-                                <i class="fas fa-sign-in-alt me-2"></i>Войти
+                    <div class="form-group mb-4">
+                        <label asp-for="LoginData.Password" class="form-label">
+                            <i class="fas fa-lock me-2"></i>Пароль
+                        </label>
+                        <div class="input-group">
+                            <input asp-for="LoginData.Password" class="form-control form-control-lg"
+                                   placeholder="Минимум 8 символов" required />
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                <i class="fas fa-eye"></i>
                             </button>
                         </div>
+                        <span asp-validation-for="LoginData.Password" class="text-danger small"></span>
+                    </div>
 
-                        <div class="text-center mt-4">
-                            <p class="mb-0">Нет аккаунта? <a href="/Account/Register" class="text-decoration-none">Создать</a></p>
+                    <div class="form-group mb-4 d-flex justify-content-between align-items-center">
+                        <div class="form-check">
+                            <input asp-for="LoginData.RememberMe" class="form-check-input" />
+                            <label asp-for="LoginData.RememberMe" class="form-check-label">
+                                Запомнить меня
+                            </label>
                         </div>
-                    </form>
+                        <a href="#" class="text-muted small">Забыли пароль?</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mb-4">
+                        <i class="fas fa-sign-in-alt me-2"></i>Войти
+                    </button>
+
+                    <div class="text-center">
+                        <p class="mb-0">
+                            Нет аккаунта?
+                            <a asp-page="/Account/Register" class="fw-bold">
+                                Зарегистрироваться
+                            </a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ПРАВАЯ ЧАСТЬ: ИНФОРМАЦИЯ -->
+            <div class="login-info-section">
+                <div class="info-content">
+                    <h3 class="mb-4">
+                        <i class="fas fa-rocket text-primary me-2"></i>
+                        Быстрый старт карьеры
+                    </h3>
+                    <ul class="feature-list">
+                        <li class="mb-3">
+                            <i class="fas fa-check-circle text-success me-3"></i>
+                            <span>Доступ к тысячам вакансий</span>
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-check-circle text-success me-3"></i>
+                            <span>Только проверенные компании</span>
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-check-circle text-success me-3"></i>
+                            <span>Безопасная связь с работодателями</span>
+                        </li>
+                    </ul>
+
+                    <div class="stats mt-5">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="stat-number">10K+</div>
+                                <div class="stat-label">Вакансий</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-number">500+</div>
+                                <div class="stat-label">Компаний</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-number">95%</div>
+                                <div class="stat-label">Успешных наймов</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+@section Styles {
+    <style>
+        .login-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .login-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 600px;
+        }
+
+        .login-form-section {
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-info-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .brand-logo {
+            height: 50px;
+            margin-bottom: 1rem;
+        }
+
+        .brand-name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-tagline {
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+            .feature-list li {
+                display: flex;
+                align-items: center;
+                padding: 0.5rem 0;
+            }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        @@media (max-width: 768px) {
+            .login-card
+
+        {
+            grid-template-columns: 1fr;
+        }
+
+        .login-info-section {
+            display: none;
+        }
+
+        }
+
+        #togglePassword {
+            cursor: pointer;
+        }
+    </style>
+}
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        // toast
-        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-        {
-                <text>showToast('@Html.Raw(Model.ErrorMessage)', 'error');</text>
-        }
+        // Переключатель видимости пароля
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.querySelector('input[name="LoginData.Password"]');
+            const icon = this.querySelector('i');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // Автоочистка ошибок
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
     </script>
 }

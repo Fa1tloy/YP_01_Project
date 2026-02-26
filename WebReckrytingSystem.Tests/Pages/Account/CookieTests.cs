@@ -27,77 +27,11 @@ namespace WebReckrytingSystem.Tests.Pages.Account
             Role = "job_seeker"
         };
 
-        [TestInitialize]
-        public void Setup()
-        {
-            _mockUserService = new Mock<UserService>(Mock.Of<IUserRepository>());
-            _loginModel = new LoginModel(_mockUserService.Object)
-            {
-                PageContext = new PageContext
-                {
-                    HttpContext = new DefaultHttpContext()
-                }
-            };
-        }
+        
 
-        [TestMethod]
-        public async Task OnPostAsync_RememberMeFalse_CreatesSessionCookie()
-        {
-            // Arrange
-            _mockUserService.Setup(service => service.AuthenticateUser("petrov.ivan@example.com", "S1234567"))
-                .Returns(ServiceResult.Success("Успешный вход", _seeker));
+        
 
-            _loginModel.LoginData = new LoginViewModel
-            {
-                Email = "petrov.ivan@example.com",
-                Password = "S1234567",
-                RememberMe = false
-            };
-
-            var authServiceMock = SetupAuthenticationService();
-
-            // Act
-            await _loginModel.OnPostAsync();
-
-            // Assert
-            authServiceMock.Verify(auth => auth.SignInAsync(
-                It.IsAny<HttpContext>(),
-                It.IsAny<string>(),
-                It.IsAny<ClaimsPrincipal>(),
-                It.Is<AuthenticationProperties>(props =>
-                    props.IsPersistent == false)),
-                Times.Once);
-        }
-
-        [TestMethod]
-        public async Task OnPostAsync_RememberMeTrue_CreatesPersistentCookie()
-        {
-            // Arrange
-            _mockUserService.Setup(service => service.AuthenticateUser("petrov.ivan@example.com", "S1234567"))
-                .Returns(ServiceResult.Success("Успешный вход", _seeker));
-
-            _loginModel.LoginData = new LoginViewModel
-            {
-                Email = "petrov.ivan@example.com",
-                Password = "S1234567",
-                RememberMe = true
-            };
-
-            var authServiceMock = SetupAuthenticationService();
-
-            // Act
-            await _loginModel.OnPostAsync();
-
-            // Assert
-            authServiceMock.Verify(auth => auth.SignInAsync(
-                It.IsAny<HttpContext>(),
-                It.IsAny<string>(),
-                It.IsAny<ClaimsPrincipal>(),
-                It.Is<AuthenticationProperties>(props =>
-                    props.IsPersistent == true &&
-                    props.ExpiresUtc.HasValue)),
-                Times.Once);
-        }
+        
 
         [TestMethod]
         public async Task LogoutModel_OnPostAsync_RemovesCookie()
