@@ -1,5 +1,7 @@
+п»їusing Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.WebUtilities; // Р”Р»СЏ QueryBuilder
 using WebReckrytingSystem.Models;
 using WebReckrytingSystem.Services;
 
@@ -12,94 +14,113 @@ namespace WebReckrytingSystem.Pages.Vacancy
 
         public SearchModel(IVacancySearchService vacancySearchService, ILogger<SearchModel> logger)
         {
-            _vacancySearchService = vacancySearchService;
-            _logger = logger;
+            _vacancySearchService = vacancySearchService ?? throw new ArgumentNullException(nameof(vacancySearchService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [BindProperty(SupportsGet = true)]
-        public SearchVacancyViewModel SearchData { get; set; } = new();
+        public SearchVacancyViewModel SearchData { get; set; } = new() { Page = 1, PageSize = 10 };
 
         public SearchResult<WebReckrytingSystem.Models.Vacancy> SearchResult { get; set; } = new();
-
         public string SuccessMessage { get; set; } = string.Empty;
         public string ErrorMessage { get; set; } = string.Empty;
 
         public async Task<IActionResult> OnGetAsync()
         {
-            _logger.LogInformation("GET запрос на страницу поиска вакансий");
-
-            // Проверяем, есть ли параметры поиска
-            var hasSearchParameters = !string.IsNullOrEmpty(SearchData.Keywords) ||
-                                    !string.IsNullOrEmpty(SearchData.CompanyName) ||
-                                    SearchData.SalaryFrom.HasValue ||
-                                    SearchData.SalaryTo.HasValue ||
-                                    !string.IsNullOrEmpty(SearchData.EmploymentType) ||
-                                    !string.IsNullOrEmpty(SearchData.WorkSchedule);
-
-            if (hasSearchParameters)
+            try
             {
-                _logger.LogInformation("Выполнение поиска с параметрами");
+                _logger.LogInformation("рџЋЇ РџРѕРёСЃРє РІР°РєР°РЅСЃРёР№: Р—Р°РїСЂРѕСЃ СЃ РїР°СЂР°РјРµС‚СЂР°РјРё {@SearchData}", SearchData);
+
+                // Р’СЃРµРіРґР° РІС‹РїРѕР»РЅСЏРµРј РїРѕРёСЃРє - РґР°Р¶Рµ Р±РµР· РїР°СЂР°РјРµС‚СЂРѕРІ РїРѕРєР°Р·С‹РІР°РµРј РІСЃРµ РІР°РєР°РЅСЃРёРё
                 var result = _vacancySearchService.SearchVacancies(SearchData);
 
-                if (result.IsSuccess)
+                if (result.IsSuccess && result.Data != null)
                 {
-                    SearchResult = result.Data!;
+                    SearchResult = result.Data;
                     SuccessMessage = result.Message;
-                    _logger.LogInformation($"Поиск успешен: {SuccessMessage}");
+                    _logger.LogInformation("вњ… РќР°Р№РґРµРЅРѕ {TotalCount} РІР°РєР°РЅСЃРёР№ (РЎС‚СЂ. {Page}/{TotalPages})",
+                        SearchResult.TotalCount, SearchResult.Page, SearchResult.TotalPages);
                 }
                 else
                 {
                     ErrorMessage = result.Message;
-                    _logger.LogWarning($"Ошибка поиска: {ErrorMessage}");
-                }
-            }
-            else
-            {
-                _logger.LogInformation("Параметры поиска отсутствуют - показ пустой формы");
-            }
+                    _logger.LogWarning("вљ пёЏ РџРѕРёСЃРє РЅРµ РґР°Р» СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ: {Message}", ErrorMessage);
 
-            return Page();
+                    // Р’РѕР·РІСЂР°С‰Р°РµРј РїСѓСЃС‚РѕР№ СЂРµР·СѓР»СЊС‚Р°С‚, С‡С‚РѕР±С‹ СЃС‚СЂР°РЅРёС†Р° РЅРµ РїР°РґР°Р»Р°
+                    SearchResult = CreateEmptyResult();
+                }
+
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "вќЊ РћС€РёР±РєР° РїРѕРёСЃРєР° РІР°РєР°РЅСЃРёР№");
+                ErrorMessage = "РџСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР° РїСЂРё Р·Р°РіСЂСѓР·РєРµ РІР°РєР°РЅСЃРёР№";
+                SearchResult = CreateEmptyResult();
+                return Page();
+            }
         }
 
         public IActionResult OnPost()
         {
-            _logger.LogInformation("POST запрос на поиск вакансий");
-
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning("Модель поиска не валидна");
+                _logger.LogWarning("вљ пёЏ Р¤РѕСЂРјР° РїРѕРёСЃРєР° РЅРµ РІР°Р»РёРґРЅР°");
+                ErrorMessage = "РџСЂРѕРІРµСЂСЊС‚Рµ РІРІРµРґРµРЅРЅС‹Рµ РґР°РЅРЅС‹Рµ";
                 return Page();
             }
 
-            // Редирект на GET с параметрами в query string
-            var queryParams = new List<string>();
+            try
+            {
+                _logger.LogInformation("рџ“ќ РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ РёС‰РµС‚: {@SearchData}", SearchData);
 
-            if (!string.IsNullOrEmpty(SearchData.Keywords))
-                queryParams.Add($"Keywords={Uri.EscapeDataString(SearchData.Keywords)}");
+                // РЎС‚СЂРѕРёРј query string
+                var query = new QueryBuilder();
+                AddIfNotEmpty(query, "Keywords", SearchData.Keywords);
+                AddIfNotEmpty(query, "CompanyName", SearchData.CompanyName);
+                AddIfNotNull(query, "SalaryFrom", SearchData.SalaryFrom);
+                AddIfNotNull(query, "SalaryTo", SearchData.SalaryTo);
+                AddIfNotEmpty(query, "EmploymentType", SearchData.EmploymentType);
+                AddIfNotEmpty(query, "WorkSchedule", SearchData.WorkSchedule);
+                query.Add("Page", SearchData.Page.ToString());
+                query.Add("PageSize", SearchData.PageSize.ToString());
 
-            if (!string.IsNullOrEmpty(SearchData.CompanyName))
-                queryParams.Add($"CompanyName={Uri.EscapeDataString(SearchData.CompanyName)}");
+                var redirectUrl = $"/Vacancy/Search{query.ToQueryString()}";
+                _logger.LogInformation("рџ”„ Р РµРґРёСЂРµРєС‚ РЅР°: {Url}", redirectUrl);
 
-            if (SearchData.SalaryFrom.HasValue)
-                queryParams.Add($"SalaryFrom={SearchData.SalaryFrom}");
+                return Redirect(redirectUrl);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "вќЊ РћС€РёР±РєР° РѕР±СЂР°Р±РѕС‚РєРё С„РѕСЂРјС‹ РїРѕРёСЃРєР°");
+                ErrorMessage = "РќРµ СѓРґР°Р»РѕСЃСЊ РІС‹РїРѕР»РЅРёС‚СЊ РїРѕРёСЃРє";
+                return Page();
+            }
+        }
 
-            if (SearchData.SalaryTo.HasValue)
-                queryParams.Add($"SalaryTo={SearchData.SalaryTo}");
+        // Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹
+        private void AddIfNotEmpty(QueryBuilder query, string key, string? value)
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+                query.Add(key, value);
+        }
 
-            if (!string.IsNullOrEmpty(SearchData.EmploymentType))
-                queryParams.Add($"EmploymentType={SearchData.EmploymentType}");
+        private void AddIfNotNull<T>(QueryBuilder query, string key, T? value) where T : struct
+        {
+            if (value.HasValue)
+                query.Add(key, value.Value.ToString());
+        }
 
-            if (!string.IsNullOrEmpty(SearchData.WorkSchedule))
-                queryParams.Add($"WorkSchedule={SearchData.WorkSchedule}");
-
-            queryParams.Add($"Page={SearchData.Page}");
-            queryParams.Add($"PageSize={SearchData.PageSize}");
-
-            var queryString = string.Join("&", queryParams);
-            var redirectUrl = string.IsNullOrEmpty(queryString) ? "/Vacancy/Search" : $"/Vacancy/Search?{queryString}";
-
-            _logger.LogInformation($"Редирект на: {redirectUrl}");
-            return Redirect(redirectUrl);
+        private SearchResult<WebReckrytingSystem.Models.Vacancy> CreateEmptyResult()
+        {
+            return new SearchResult<WebReckrytingSystem.Models.Vacancy>
+            {
+                Items = new List<WebReckrytingSystem.Models.Vacancy>(),
+                TotalCount = 0,
+                Page = SearchData.Page,
+                PageSize = SearchData.PageSize
+                // TotalPages, HasPreviousPage, HasNextPage РІС‹С‡РёСЃР»СЏСЋС‚СЃСЏ СЃР°РјРё!
+            };
         }
     }
 }

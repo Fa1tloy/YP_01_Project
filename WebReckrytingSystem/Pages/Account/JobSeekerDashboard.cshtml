@@ -1,110 +1,447 @@
 ﻿@page
+@using WebReckrytingSystem.Helpers
 @model WebReckrytingSystem.Pages.Account.JobSeekerDashboardModel
 @{
-    ViewData["Title"] = "Личный кабинет соискателя";
+    ViewData["Title"] = "Мой кабинет - Твоя Карьера";
 }
 
-<div class="container mt-5">
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card shadow-lg border-0 text-center" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff;">
-                <div class="card-body py-5">
-                    <i class="fas fa-user-graduate fa-3x mb-3"></i>
-                    <h4>@Model.UserFirstName</h4>
-                    <p class="mb-0">Соискатель</p>
+<div class="dashboard-container">
+    <!-- HERO-БАННЕР -->
+    <div class="dashboard-header">
+        <div class="user-info">
+            <img src="~/images/avatar-placeholder.png" alt="Avatar" class="user-avatar" />
+            <div>
+                <h1>Привет, <span class="gradient-text">@Model.UserFirstName</span>!</h1>
+                <p class="text-muted mb-0">Соискатель</p>
+                <p class="text-muted small">@User.FindFirst(ClaimTypes.Email)?.Value</p>
+            </div>
+        </div>
+        <div class="quick-actions">
+            @if (!Model.HasResume)
+            {
+                <a href="/Account/CreateResume" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>Создать резюме
+                </a>
+            }
+            else
+            {
+                <a href="/Account/ViewResume" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-eye me-2"></i>Моё резюме
+                </a>
+                <a href="/Vacancy/Search" class="btn btn-success">
+                    <i class="fas fa-search me-2"></i>Найти работу
+                </a>
+            }
+        </div>
+    </div>
+
+    <!-- СТАТИСТИКА КАРТОЧКАМИ -->
+    <div class="stats-row mb-5">
+        <div class="stat-card">
+            <div class="stat-icon views">
+                <i class="fas fa-eye"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">@Model.TotalViews</div>
+                <div class="stat-label">Всего просмотров</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon applications">
+                <i class="fas fa-paper-plane"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">@Model.TotalApplications</div>
+                <div class="stat-label">Откликов</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon saved">
+                <i class="fas fa-bookmark"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">@Model.SavedVacanciesCount</div>
+                <div class="stat-label">Сохранено</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon week">
+                <i class="fas fa-calendar-week"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">@Model.WeekViews</div>
+                <div class="stat-label">За неделю</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ГРАФИКИ -->
+    <div class="charts-row mb-5">
+        <div class="chart-card">
+            <h4 class="chart-title">
+                <i class="fas fa-chart-line me-2"></i>Активность за неделю
+            </h4>
+            <canvas id="activityChart" height="100"></canvas>
+        </div>
+        <div class="chart-card">
+            <h4 class="chart-title">
+                <i class="fas fa-chart-pie me-2"></i>Доля действий
+            </h4>
+            <canvas id="pieChart" height="100"></canvas>
+        </div>
+    </div>
+
+    <!-- РЕКОМЕНДОВАННЫЕ ВАКАНСИИ -->
+    <div class="recommendations-section mb-5">
+        <h3 class="section-title mb-4">
+            <i class="fas fa-magic me-2"></i>Рекомендованные вакансии
+        </h3>
+        <div class="row g-4" id="recommendedVacancies">
+            <div class="col-12 text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Загрузка рекомендаций...</span>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <div class="card shadow-sm mt-4">
-                <div class="card-body">
-                    <h6 class="fw-bold mb-3">Быстрые действия</h6>
-                    <div class="d-grid gap-2">
-                        @if (Model.HasResume)
-                        {
-                            <a href="/Account/ViewResume" class="btn btn-outline-primary rounded-pill">
-                                <i class="fas fa-eye me-2"></i>Просмотреть резюме
-                            </a>
-                            <a href="/Account/EditResume" class="btn btn-outline-primary rounded-pill">
-                                <i class="fas fa-edit me-2"></i>Редактировать
-                            </a>
-                        }
-                        else
-                        {
-                            <a href="/Account/CreateResume" class="btn btn-primary rounded-pill">
-                                <i class="fas fa-plus me-2"></i>Создать резюме
-                            </a>
-                        }
-                        <a href="/Vacancy/Search" class="btn btn-outline-primary rounded-pill">
-                            <i class="fas fa-search me-2"></i>Найти вакансии
-                        </a>
+    <!-- СОХРАНЕННЫЕ ВАКАНСИИ -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-600">
+                <i class="fas fa-bookmark me-2 text-warning"></i>Сохраненные вакансии
+            </h5>
+            <a href="/Vacancy/Saved" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-list me-1"></i>Все сохраненные
+            </a>
+        </div>
+        <div class="card-body">
+            <div id="savedVacanciesList">
+                <div class="text-center py-3">
+                    <div class="spinner-border text-primary spinner-border-sm" role="status">
+                        <span class="visually-hidden">Загрузка...</span>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col-md-8">
-            <!-- Прогресс-бар профиля -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body d-flex align-items-center">
-                    <div class="flex-grow-1">
-                        <h5 class="mb-1">Профиль заполнен на <strong>@(Model.HasResume ? "100" : "50")%</strong></h5>
-                        <div class="progress" style="height: 10px; border-radius: 1rem;">
-                            <div class="progress-bar bg-gradient-success" style="width: @(Model.HasResume ? 100 : 50)%; border-radius: 1rem;"></div>
-                        </div>
+    <!-- МОИ ОТКЛИКИ -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-600">
+                <i class="fas fa-paper-plane me-2 text-success"></i>Мои отклики
+            </h5>
+            <a href="/Account/Applications" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-list me-1"></i>Все отклики
+            </a>
+        </div>
+        <div class="card-body">
+            <div id="jobApplicationsList">
+                <div class="text-center py-3">
+                    <div class="spinner-border text-primary spinner-border-sm" role="status">
+                        <span class="visually-hidden">Загрузка...</span>
                     </div>
-                    <i class="fas fa-chart-line fa-2x text-success ms-3"></i>
-                </div>
-            </div>
-
-            <!-- Статистика -->
-            <div class="row g-4 text-center mb-4">
-                <div class="col-4">
-                    <div class="card shadow-sm border-0">
-                        <div class="card-body">
-                            <div class="display-6 fw-bold text-primary">0</div>
-                            <div class="text-muted">Откликов</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-4">
-                    <div class="card shadow-sm border-0">
-                        <div class="card-body">
-                            <div class="display-6 fw-bold text-success">0</div>
-                            <div class="text-muted">Приглашений</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-4">
-                    <div class="card shadow-sm border-0">
-                        <div class="card-body">
-                            <div class="display-6 fw-bold text-info">@(Model.HasResume ? "1" : "0")</div>
-                            <div class="text-muted">Резюме</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Резюме-виджет -->
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-600">Моё резюме</h5>
-                    <span class="badge bg-@(Model.HasResume ? "success" : "secondary") rounded-pill">@(Model.HasResume ? "Готово" : "Не создано")</span>
-                </div>
-                <div class="card-body">
-                    @if (Model.HasResume)
-                    {
-                        <p class="text-success mb-3"><i class="fas fa-check-circle me-2"></i>Резюме опубликовано и видно работодателям</p>
-                        <a asp-page="/Account/ViewResume" class="btn btn-primary rounded-pill">Просмотреть резюме</a>
-                    }
-                    else
-                    {
-                        <p class="text-muted mb-3">Создайте резюме, чтобы начать поиск работы</p>
-                        <a asp-page="/Account/CreateResume" class="btn btn-primary rounded-pill">
-                            <i class="fas fa-plus me-2"></i>Создать резюме
-                        </a>
-                    }
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Styles {
+    <style>
+        .dashboard-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 80px;
+        }
+
+        .dashboard-header {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #667eea;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.views { background: rgba(102, 126, 234, 0.1); color: #667eea; }
+        .stat-icon.applications { background: rgba(40, 167, 69, 0.1); color: #28a745; }
+        .stat-icon.saved { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
+        .stat-icon.week { background: rgba(23, 162, 184, 0.1); color: #17a2b8; }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #212529;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .charts-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .recommendations-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #212529;
+        }
+
+        .vacancy-card {
+            border-radius: 15px;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            transition: transform 0.2s ease;
+        }
+
+        .vacancy-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        @@media (max-width: 992px) {
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .quick-actions {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // График активности за неделю
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        const weekData = @Json.Serialize(Model.WeekData.Select(d => new {
+            date = d.Date.ToString("dd.MM"),
+            views = d.ProfileViews,
+            apps = d.ApplicationsSent,
+            saved = d.SavedVacancies
+        }));
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: weekData.map(d => d.date),
+                datasets: [{
+                    label: 'Просмотры профиля',
+                    data: weekData.map(d => d.views),
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'Отклики',
+                    data: weekData.map(d => d.apps),
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Круговая диаграмма
+        const ptx = document.getElementById('pieChart').getContext('2d');
+        new Chart(ptx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Просмотры', 'Отклики', 'Сохранено'],
+                datasets: [{
+                    data: [@Model.TotalViews, @Model.TotalApplications, @Model.SavedVacanciesCount],
+                    backgroundColor: ['#667eea', '#28a745', '#ffc107']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // Загрузка рекомендаций
+        fetch('/Account/JobSeekerDashboard?handler=VacancyRecommendations')
+            .then(r => r.json())
+            .then(data => {
+                const container = document.getElementById('recommendedVacancies');
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div class="col-12 text-center text-muted">Нет рекомендаций</div>';
+                    return;
+                }
+                container.innerHTML = data.map(v => `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="vacancy-card">
+                            <h5>${v.title}</h5>
+                            <p class="text-primary mb-2">${v.companyName}</p>
+                            <p class="text-success fw-600">${v.salary}</p>
+                            <p class="small text-muted">${v.description}</p>
+                            <div class="d-flex gap-2 mb-3">
+                                <span class="badge bg-secondary">${v.employmentType}</span>
+                                <span class="badge bg-secondary">${v.workSchedule}</span>
+                            </div>
+                            <a href="${v.url}" class="btn btn-sm btn-primary w-100">Подробнее</a>
+                        </div>
+                    </div>
+                `).join('');
+            })
+            .catch(err => {
+                document.getElementById('recommendedVacancies').innerHTML = 
+                    '<div class="col-12 text-center text-muted">Ошибка загрузки рекомендаций</div>';
+            });
+
+        // Загрузка сохраненных вакансий
+        fetch('/Account/JobSeekerDashboard?handler=SavedVacanciesList')
+            .then(r => r.json())
+            .then(data => {
+                const container = document.getElementById('savedVacanciesList');
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center py-3">Нет сохраненных вакансий</p>';
+                    return;
+                }
+                container.innerHTML = data.map(v => `
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <div>
+                            <h6 class="mb-0">${v.title}</h6>
+                            <small class="text-muted">${v.companyName}</small>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted">${v.savedAt}</small>
+                            <a href="${v.url}" class="btn btn-sm btn-outline-primary ms-2">Открыть</a>
+                        </div>
+                    </div>
+                `).join('');
+            });
+
+        // Загрузка откликов
+        fetch('/Account/JobSeekerDashboard?handler=JobApplicationsList')
+            .then(r => r.json())
+            .then(data => {
+                const container = document.getElementById('jobApplicationsList');
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center py-3">Нет откликов</p>';
+                    return;
+                }
+                container.innerHTML = data.map(a => `
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <div>
+                            <h6 class="mb-0">${a.title}</h6>
+                            <small class="text-muted">${a.companyName}</small>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-secondary">${a.status}</span><br>
+                            <small class="text-muted">${a.appliedAt}</small>
+                        </div>
+                    </div>
+                `).join('');
+            });
+    </script>
+}

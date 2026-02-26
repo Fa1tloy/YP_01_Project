@@ -40,23 +40,7 @@ namespace WebReckrytingSystem.Tests.Services
             Role = "employer"
         };
 
-        [TestInitialize]
-        public void Setup()
-        {
-            _mockUserRepository = new Mock<IUserRepository>();
-
-            // Настройка mock репозитория с несколькими пользователями
-            _mockUserRepository.Setup(repo => repo.FindByEmail("petrov.ivan@example.com"))
-                .Returns(_seeker1);
-            _mockUserRepository.Setup(repo => repo.FindByEmail("sidorova.maria@example.com"))
-                .Returns(_seeker2);
-            _mockUserRepository.Setup(repo => repo.FindByEmail("hr@techcompany.ru"))
-                .Returns(_employer1);
-            _mockUserRepository.Setup(repo => repo.FindByEmail("nonexistent@example.com"))
-                .Returns((User)null);
-
-            _userService = new UserService(_mockUserRepository.Object);
-        }
+       
 
         [TestMethod]
         public void AuthenticateUser_ValidCredentialsSeeker1_ReturnsSuccess()

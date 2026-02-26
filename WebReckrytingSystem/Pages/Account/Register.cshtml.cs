@@ -1,20 +1,25 @@
+п»їusing Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Security.Claims;
+using WebReckrytingSystem.Data;
 using WebReckrytingSystem.Models;
 using WebReckrytingSystem.Services;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Security.Claims;
 
 namespace WebReckrytingSystem.Pages.Account
 {
     public class RegisterModel : PageModel
     {
         private readonly UserService _userService;
+        private readonly IUserRepository _userRepository;
+        private readonly ILogger<RegisterModel> _logger;
 
-        public RegisterModel(UserService userService)
+        public RegisterModel(UserService userService, IUserRepository userRepository, ILogger<RegisterModel> logger)
         {
             _userService = userService;
+            _userRepository = userRepository;
+            _logger = logger;
         }
 
         [BindProperty]
@@ -34,7 +39,7 @@ namespace WebReckrytingSystem.Pages.Account
         {
             if (!ModelState.IsValid)
             {
-                // Показываем ошибки валидации модели
+                _logger.LogWarning("вљ пёЏ Р¤РѕСЂРјР° СЂРµРіРёСЃС‚СЂР°С†РёРё РЅРµ РІР°Р»РёРґРЅР°");
                 return Page();
             }
 
@@ -43,28 +48,36 @@ namespace WebReckrytingSystem.Pages.Account
                 RegisterData.Password,
                 RegisterData.FirstName,
                 RegisterData.LastName,
-                RegisterData.Role
+                RegisterData.Role,
+                RegisterData.CompanyName
             );
 
             if (result.IsSuccess)
             {
-                // Автоматический вход после регистрации
+                _logger.LogInformation("вњ… РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ {Email} СѓСЃРїРµС€РЅРѕ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ", RegisterData.Email);
+
+                // РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРёР№ РІС…РѕРґ РїРѕСЃР»Рµ СЂРµРіРёСЃС‚СЂР°С†РёРё
                 await SignInUser(result.Data!);
 
-                // Редирект в соответствующий кабинет
+                // Р РµРґРёСЂРµРєС‚ РЅР° РґР°С€Р±РѕСЂРґ
                 return RedirectToDashboard(RegisterData.Role);
             }
             else
             {
-                // Добавляем понятное сообщение об ошибке
+                _logger.LogWarning("вљ пёЏ РћС€РёР±РєР° СЂРµРіРёСЃС‚СЂР°С†РёРё {Email}: {Message}", RegisterData.Email, result.Message);
                 ModelState.AddModelError("", result.Message);
-
-                // Сохраняем введенные данные (кроме пароля) для удобства пользователя
                 RegisterData.Password = string.Empty;
                 RegisterData.ConfirmPassword = string.Empty;
-
                 return Page();
             }
+        }
+
+        // AJAX РїСЂРѕРІРµСЂРєР° email
+        public IActionResult OnPostCheckEmail([FromBody] string email)
+        {
+            _logger.LogInformation("рџ“§ РџСЂРѕРІРµСЂРєР° email: {Email}", email);
+            var user = _userRepository.FindByEmail(email);
+            return new JsonResult(new { exists = user != null });
         }
 
         private async Task SignInUser(User user)
@@ -77,18 +90,13 @@ namespace WebReckrytingSystem.Pages.Account
                 new Claim(ClaimTypes.Role, user.Role)
             };
 
-            var claimsIdentity = new ClaimsIdentity(
-                claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-            var authProperties = new AuthenticationProperties
-            {
-                IsPersistent = false
-            };
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity),
-                authProperties);
+                new AuthenticationProperties { IsPersistent = false }
+            );
         }
 
         private IActionResult RedirectToDashboard(string role)
