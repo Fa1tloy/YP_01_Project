@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MySqlConnector;
 using WebReckrytingSystem.Models;
 using WebReckrytingSystem.Services;
 using WebReckrytingSystem.Data;
@@ -42,6 +43,8 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
+EnsureDatabaseCreated(app);
+
 // 6. Конвейер HTTP
 if (!app.Environment.IsDevelopment())
 {
@@ -60,3 +63,32 @@ app.MapRazorPages();
 app.MapControllers();
 
 app.Run();
+
+static void EnsureDatabaseCreated(WebApplication app)
+{
+    using var scope = app.Services.CreateScope();
+    var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    var connectionString = config.GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException("Connection string 'DefaultConnection' is not configured.");
+
+    var csBuilder = new MySqlConnectionStringBuilder(connectionString);
+    var databaseName = csBuilder.Database;
+
+    if (!string.IsNullOrWhiteSpace(databaseName))
+    {
+        var serverConnectionBuilder = new MySqlConnectionStringBuilder(connectionString)
+        {
+            Database = string.Empty
+        };
+
+        using var serverConnection = new MySqlConnection(serverConnectionBuilder.ConnectionString);
+        serverConnection.Open();
+
+        using var command = serverConnection.CreateCommand();
+        command.CommandText = $"CREATE DATABASE IF NOT EXISTS `{databaseName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
+        command.ExecuteNonQuery();
+    }
+
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.EnsureCreated();
+}
