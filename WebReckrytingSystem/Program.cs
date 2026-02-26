@@ -91,5 +91,5 @@ static void EnsureDatabaseCreated(WebApplication app)
 
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     dbContext.Database.EnsureCreated();
-    dbContext.Database.ExecuteSqlRaw("ALTER TABLE IF EXISTS `users` ADD COLUMN IF NOT EXISTS `company_name` varchar(255) NULL;");
+    
 }
