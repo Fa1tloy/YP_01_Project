@@ -1,0 +1,65 @@
+@page "{companyName}/{title}"
+@model WebReckrytingSystem.Pages.Vacancy.DetailsModel
+@{
+    ViewData["Title"] = Model.Vacancy is null ? "Вакансия" : Model.Vacancy.Title;
+}
+
+<div class="container py-5 mt-5">
+    @if (Model.Vacancy is null)
+    {
+        <div class="alert alert-warning">Вакансия не найдена.</div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4 p-lg-5">
+                <div class="d-flex gap-3 align-items-start mb-3">
+                    <img src="@(string.IsNullOrWhiteSpace(Model.Vacancy.Company?.LogoUrl) ? "/images/favicon.ico" : Model.Vacancy.Company.LogoUrl)"
+                         alt="Логотип @Model.Vacancy.CompanyName"
+                         style="width:64px;height:64px;object-fit:cover;border-radius:14px;" />
+                    <div>
+                        <h1 class="h3 mb-1">@Model.Vacancy.Title</h1>
+                        <p class="text-muted mb-0">@Model.Vacancy.CompanyName</p>
+                    </div>
+                </div>
+
+                <div class="mb-3 text-success fw-semibold">
+                    @if (Model.Vacancy.SalaryFrom.HasValue && Model.Vacancy.SalaryTo.HasValue)
+                    {
+                        @:@Model.Vacancy.SalaryFrom.Value.ToString("N0") - @Model.Vacancy.SalaryTo.Value.ToString("N0") ₽
+                    }
+                    else if (Model.Vacancy.SalaryFrom.HasValue)
+                    {
+                        @:от @Model.Vacancy.SalaryFrom.Value.ToString("N0") ₽
+                    }
+                    else
+                    {
+                        @:Зарплата не указана
+                    }
+                </div>
+
+                <h2 class="h5">Полное описание</h2>
+                <p class="mb-4">@Model.Vacancy.Description</p>
+
+                <h2 class="h5">Требования</h2>
+                <p class="mb-4">@Model.Vacancy.Requirements</p>
+
+                <h2 class="h5">Контакты</h2>
+                <p class="mb-1">Email: @Model.Vacancy.AuthorEmail</p>
+                <p class="mb-4">
+                    Сайт компании:
+                    @if (!string.IsNullOrWhiteSpace(Model.Vacancy.Company?.Website))
+                    {
+                        <a href="@Model.Vacancy.Company.Website" target="_blank" rel="noopener noreferrer">@Model.Vacancy.Company.Website</a>
+                    }
+                    else
+                    {
+                        <span class="text-muted">не указан</span>
+                    }
+                </p>
+
+                <a href="mailto:@Model.Vacancy.AuthorEmail?subject=Отклик на вакансию @Model.Vacancy.Title" class="btn btn-primary">Откликнуться</a>
+            </div>
+        </div>
+    }
+</div>
