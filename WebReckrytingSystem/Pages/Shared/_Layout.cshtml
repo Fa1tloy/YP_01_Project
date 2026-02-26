@@ -35,6 +35,9 @@
         var defaultSearchMode = isEmployer ? "resumes" : "vacancies";
         var searchUrl = isEmployer ? "/Resume/Search" : "/Vacancy/Search";
         var searchPlaceholder = isEmployer ? "Найти резюме по навыкам или должности" : "Найти вакансию по ключевым словам";
+
+        var currentPage = ViewContext.RouteData.Values["page"]?.ToString();
+        var showNavbarSearch = currentPage == "/Vacancy/Search" || currentPage == "/Resume/Search";
     }
 
     <header>
@@ -58,21 +61,24 @@
                     else
                     {
                         <div class="navbar-auth-content w-100 d-lg-flex align-items-center justify-content-between gap-3">
-                            <div class="navbar-search-block">
-                                <div class="search-mode-switcher">
-                                    <button type="button" class="search-mode-btn @(defaultSearchMode == "vacancies" ? "active" : "")" data-search-mode="vacancies">Вакансии</button>
-                                    <button type="button" class="search-mode-btn @(defaultSearchMode == "resumes" ? "active" : "")" data-search-mode="resumes">Резюме</button>
+                            @if (showNavbarSearch)
+                            {
+                                <div class="navbar-search-block">
+                                    <div class="search-mode-switcher">
+                                        <button type="button" class="search-mode-btn @(defaultSearchMode == "vacancies" ? "active" : "")" data-search-mode="vacancies">Вакансии</button>
+                                        <button type="button" class="search-mode-btn @(defaultSearchMode == "resumes" ? "active" : "")" data-search-mode="resumes">Резюме</button>
+                                    </div>
+                                    <form id="navbarSearchForm" method="get" action="@searchUrl" class="navbar-search-form">
+                                        <input id="navbarSearchInput"
+                                               type="text"
+                                               class="form-control"
+                                               name="Keywords"
+                                               placeholder="@searchPlaceholder"
+                                               autocomplete="off" />
+                                        <button type="submit" class="btn btn-login">Поиск</button>
+                                    </form>
                                 </div>
-                                <form id="navbarSearchForm" method="get" action="@searchUrl" class="navbar-search-form">
-                                    <input id="navbarSearchInput"
-                                           type="text"
-                                           class="form-control"
-                                           name="Keywords"
-                                           placeholder="@searchPlaceholder"
-                                           autocomplete="off" />
-                                    <button type="submit" class="btn btn-login">Поиск</button>
-                                </form>
-                            </div>
+                            }
 
                             <ul class="navbar-nav align-items-lg-center ms-lg-3">
                                 <li class="nav-item"><a class="nav-link" href="@profileUrl">Личный кабинет</a></li>
