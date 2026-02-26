@@ -23,10 +23,27 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
+    @{
+        var isAuthenticated = User.Identity?.IsAuthenticated == true;
+        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
+        var isEmployer = userRole == "employer";
+        var isAdmin = userRole == "admin";
+
+        var logoUrl = isEmployer ? "/Resume/Search" : "/Vacancy/Search";
+        var profileUrl = isEmployer ? "/Account/EmployerDashboard" : isAdmin ? "/Admin/Index" : "/Account/JobSeekerDashboard";
+        var defaultSearchMode = isEmployer ? "resumes" : "vacancies";
+        var searchUrl = isEmployer ? "/Resume/Search" : "/Vacancy/Search";
+        var searchPlaceholder = isEmployer ? "Найти резюме по навыкам или должности" : "Найти вакансию по ключевым словам";
+
+        var currentPage = ViewContext.RouteData.Values["page"]?.ToString();
+        var showNavbarSearch = currentPage == "/Vacancy/Search" || currentPage == "/Resume/Search";
+    }
+
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
             <div class="container">
-                <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
+                <a class="navbar-brand fw-bold d-flex align-items-center" href="@logoUrl">
                     <span class="logo-text">Твоя Карьера</span>
                 </a>
 
@@ -35,31 +52,59 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav mx-auto">
-                        <li class="nav-item">
-                            <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString() == "/Index" ? "active" : "")" href="/">Главная</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Vacancy/Search">Поиск вакансий</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Account/Register">Регистрация</a>
-                        </li>
-                    </ul>
-
-                    <div class="navbar-nav">
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <span class="nav-item nav-link text-dark">Привет, @User.FindFirst(ClaimTypes.GivenName)?.Value!</span>
-                            <form method="post" asp-page="/Account/Logout" class="nav-item">
-                                <button type="submit" class="btn btn-login">Выйти</button>
-                            </form>
-                        }
-                        else
-                        {
+                    @if (!isAuthenticated)
+                    {
+                        <div class="ms-auto">
                             <a href="/Account/Login" class="btn btn-login">Войти</a>
-                        }
-                    </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="navbar-auth-content w-100 d-lg-flex align-items-center justify-content-between gap-3">
+                            @if (showNavbarSearch)
+                            {
+                                <div class="navbar-search-block">
+                                    <div class="search-mode-switcher">
+                                        <button type="button" class="search-mode-btn @(defaultSearchMode == "vacancies" ? "active" : "")" data-search-mode="vacancies">Вакансии</button>
+                                        <button type="button" class="search-mode-btn @(defaultSearchMode == "resumes" ? "active" : "")" data-search-mode="resumes">Резюме</button>
+                                    </div>
+                                    <form id="navbarSearchForm" method="get" action="@searchUrl" class="navbar-search-form">
+                                        <input id="navbarSearchInput"
+                                               type="text"
+                                               class="form-control"
+                                               name="Keywords"
+                                               placeholder="@searchPlaceholder"
+                                               autocomplete="off" />
+                                        <button type="submit" class="btn btn-login">Поиск</button>
+                                    </form>
+                                </div>
+                            }
+
+                            <ul class="navbar-nav align-items-lg-center ms-lg-3">
+                                <li class="nav-item"><a class="nav-link" href="@profileUrl">Личный кабинет</a></li>
+                                <li class="nav-item"><a class="nav-link" href="@searchUrl">Поиск</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#" title="Уведомления">🔔</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#" title="Чаты">💬</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#" title="Избранное">⭐</a></li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        @User.FindFirst(ClaimTypes.GivenName)?.Value
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                                        <li>
+                                            <a class="dropdown-item" href="@(isEmployer ? "/Company/Settings" : profileUrl)">Настройки</a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form method="post" asp-page="/Account/Logout">
+                                                <button type="submit" class="dropdown-item">Выход</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    }
                 </div>
             </div>
         </nav>
@@ -137,6 +182,36 @@
     @await RenderSectionAsync("Scripts", required: false)
 
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const switchButtons = document.querySelectorAll('.search-mode-btn');
+            const searchForm = document.getElementById('navbarSearchForm');
+            const searchInput = document.getElementById('navbarSearchInput');
+
+            if (!switchButtons.length || !searchForm || !searchInput) {
+                return;
+            }
+
+            const applySearchMode = (mode) => {
+                const isResumeMode = mode === 'resumes';
+                searchForm.action = isResumeMode ? '/Resume/Search' : '/Vacancy/Search';
+                searchInput.name = isResumeMode ? 'SearchQuery' : 'Keywords';
+                searchInput.placeholder = isResumeMode
+                    ? 'Найти резюме по навыкам или должности'
+                    : 'Найти вакансию по ключевым словам';
+
+                switchButtons.forEach((button) => {
+                    button.classList.toggle('active', button.dataset.searchMode === mode);
+                });
+            };
+
+            switchButtons.forEach((button) => {
+                button.addEventListener('click', () => applySearchMode(button.dataset.searchMode));
+            });
+
+            const activeButton = document.querySelector('.search-mode-btn.active');
+            applySearchMode(activeButton?.dataset.searchMode ?? 'vacancies');
+        });
+
         // Активация toasts
         function showToast(message, type = 'success') {
             const toast = new bootstrap.Toast(document.getElementById('liveToast'));

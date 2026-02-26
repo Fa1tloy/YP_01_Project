@@ -1,0 +1,51 @@
+@page
+@model WebReckrytingSystem.Pages.Resume.SearchModel
+@{
+    ViewData["Title"] = "Поиск резюме";
+}
+
+<div class="container py-5 mt-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h1 class="h3 mb-4">Поиск резюме</h1>
+
+            <form method="get" class="row g-3 mb-4">
+                <div class="col-md-9">
+                    <input asp-for="SearchQuery" class="form-control" placeholder="Навыки, должность или email" />
+                </div>
+                <div class="col-md-3 d-grid">
+                    <button type="submit" class="btn btn-primary">Найти</button>
+                </div>
+            </form>
+
+            @if (Model.Resumes.Any())
+            {
+                <div class="list-group">
+                    @foreach (var resume in Model.Resumes)
+                    {
+                        <div class="list-group-item py-3">
+                            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                                <div>
+                                    <h5 class="mb-1">@resume.DesiredPosition</h5>
+                                    <div class="text-muted small">@resume.UserEmail</div>
+                                    @if (!string.IsNullOrWhiteSpace(resume.Skills))
+                                    {
+                                        <div class="small mt-2">Навыки: @resume.Skills</div>
+                                    }
+                                </div>
+                                @if (resume.SalaryExpectations.HasValue)
+                                {
+                                    <span class="badge bg-success">@resume.SalaryExpectations.Value.ToString("N0") ₽</span>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-muted">Опубликованные резюме не найдены.</div>
+            }
+        </div>
+    </div>
+</div>
