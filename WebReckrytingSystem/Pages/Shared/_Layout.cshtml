@@ -30,13 +30,19 @@
         var isEmployer = userRole == "employer";
         var isAdmin = userRole == "admin";
 
+        var currentPage = ViewContext.RouteData.Values["page"]?.ToString();
         var logoUrl = isEmployer ? "/Resume/Search" : "/Vacancy/Search";
         var profileUrl = isEmployer ? "/Account/EmployerDashboard" : isAdmin ? "/Admin/Index" : "/Account/JobSeekerDashboard";
-        var defaultSearchMode = isEmployer ? "resumes" : "vacancies";
+        var defaultSearchMode = currentPage == "/Resume/Search"
+            ? "resumes"
+            : currentPage == "/Vacancy/Search"
+                ? "vacancies"
+                : isEmployer
+                    ? "resumes"
+                    : "vacancies";
         var searchUrl = isEmployer ? "/Resume/Search" : "/Vacancy/Search";
         var searchPlaceholder = isEmployer ? "Найти резюме по навыкам или должности" : "Найти вакансию по ключевым словам";
 
-        var currentPage = ViewContext.RouteData.Values["page"]?.ToString();
         var showNavbarSearch = currentPage == "/Vacancy/Search" || currentPage == "/Resume/Search";
     }
 
@@ -205,7 +211,15 @@
             };
 
             switchButtons.forEach((button) => {
-                button.addEventListener('click', () => applySearchMode(button.dataset.searchMode));
+                button.addEventListener('click', () => {
+                    const mode = button.dataset.searchMode;
+                    applySearchMode(mode);
+
+                    const targetPage = mode === 'resumes' ? '/Resume/Search' : '/Vacancy/Search';
+                    if (window.location.pathname !== targetPage) {
+                        window.location.href = targetPage;
+                    }
+                });
             });
 
             const activeButton = document.querySelector('.search-mode-btn.active');

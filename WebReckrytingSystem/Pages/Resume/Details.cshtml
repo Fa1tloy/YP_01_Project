@@ -1,0 +1,30 @@
+@page "{userEmail}"
+@model WebReckrytingSystem.Pages.Resume.DetailsModel
+@{
+    ViewData["Title"] = "Резюме";
+}
+
+<div class="container py-5 mt-5">
+    @if (Model.Resume is null)
+    {
+        <div class="alert alert-warning">Резюме не найдено.</div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h1 class="h4 mb-1">@Model.Resume.User?.LastName @Model.Resume.User?.FirstName</h1>
+                <p class="text-muted">@Model.Resume.UserEmail</p>
+
+                <h2 class="h5">Специальность</h2>
+                <p>@Model.Resume.DesiredPosition</p>
+
+                <h2 class="h5">Навыки</h2>
+                <p>@(string.IsNullOrWhiteSpace(Model.Resume.Skills) ? "Не указаны" : Model.Resume.Skills)</p>
+
+                <h2 class="h5">Ожидаемая зарплата</h2>
+                <p>@(Model.Resume.SalaryExpectations.HasValue ? $"{Model.Resume.SalaryExpectations.Value:N0} ₽" : "Не указана")</p>
+            </div>
+        </div>
+    }
+</div>
