@@ -1,87 +1,43 @@
-﻿@page
+@page
 @model WebReckrytingSystem.Pages.Vacancy.SearchModel
 @{
     ViewData["Title"] = "Поиск вакансий";
 }
 
-<!-- ВСЕ НА ОДНОЙ СТРАНИЦЕ -->
 <div class="container-fluid px-0">
-    <!-- HERO БАННЕР ПОИСКА -->
     <section class="search-hero py-5 bg-primary text-white text-center">
         <div class="container">
-            <h1 class="display-4 fw-bold mb-3">
-                <i class="fas fa-search me-2"></i>Найдите работу мечты
-            </h1>
-            <p class="lead opacity-75">Более 2,000 актуальных вакансий от проверенных компаний</p>
+            <h1 class="display-5 fw-bold mb-3"><i class="fas fa-search me-2"></i>Поиск вакансий</h1>
+            <p class="lead opacity-75 mb-0">Подберите подходящую вакансию по фильтрам и ключевым словам</p>
         </div>
     </section>
 
-    <!-- КОНТЕЙНЕР ПОИСКА -->
-    <div class="container mt-4">
-        <div class="row">
-            <!-- САЙДБАР С ФИЛЬТРАМИ (ЛЕВАЯ ЧАСТЬ) -->
-            <div class="col-md-3 mb-4">
-                <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
-                    <div class="card-header bg-white border-0">
-                        <h5 class="fw-bold mb-0">
-                            <i class="fas fa-filter me-2 text-primary"></i>Фильтры
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <form method="get" id="searchForm" novalidate>
-                            <!-- Ключевые слова -->
+    <div class="container my-4">
+        <form method="get" id="searchForm" class="mb-4">
+            <div class="row g-2 align-items-end">
+                <div class="col-lg-10">
+                    <label asp-for="SearchData.Keywords" class="form-label fw-semibold">Строка поиска</label>
+                    <input asp-for="SearchData.Keywords" class="form-control" placeholder="Например: C#, стажер, тестировщик" />
+                </div>
+                <div class="col-lg-2 d-grid">
+                    <button type="submit" class="btn btn-primary fw-semibold">Найти</button>
+                </div>
+            </div>
+
+            <div class="row g-4 mt-1">
+                <div class="col-lg-4 col-xl-3">
+                    <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+                        <div class="card-header bg-white fw-bold">Фильтры</div>
+                        <div class="card-body">
                             <div class="mb-3">
-                                <label asp-for="SearchData.Keywords" class="form-label fw-600">Ключевые слова</label>
-                                <input asp-for="SearchData.Keywords"
-                                       class="form-control rounded-pill"
-                                       placeholder="C#, ASP.NET, SQL"
-                                       id="keywordsInput">
+                                <label class="form-label">Регион</label>
+                                <input name="Region" class="form-control" placeholder="Москва, СПб" value="@Request.Query["Region"]" />
                             </div>
 
-                            <!-- Компания -->
                             <div class="mb-3">
-                                <label asp-for="SearchData.CompanyName" class="form-label fw-600">Компания</label>
-                                <input asp-for="SearchData.CompanyName"
-                                       class="form-control rounded-pill"
-                                       placeholder="Название компании">
-                            </div>
-
-                            <!-- Зарплата от -->
-                            <div class="mb-3">
-                                <label asp-for="SearchData.SalaryFrom" class="form-label fw-600">Зарплата от</label>
-                                <input asp-for="SearchData.SalaryFrom"
-                                       type="number"
-                                       class="form-control rounded-pill"
-                                       placeholder="100000" min="0">
-                            </div>
-
-                            <!-- Зарплата до -->
-                            <div class="mb-3">
-                                <label asp-for="SearchData.SalaryTo" class="form-label fw-600">Зарплата до</label>
-                                <input asp-for="SearchData.SalaryTo"
-                                       type="number"
-                                       class="form-control rounded-pill"
-                                       placeholder="200000" min="0">
-                            </div>
-
-                            <!-- Тип занятости -->
-                            <div class="mb-3">
-                                <label asp-for="SearchData.EmploymentType" class="form-label fw-600">Тип занятости</label>
-                                <select asp-for="SearchData.EmploymentType" class="form-select rounded-pill">
-                                    <option value="">Любой тип</option>
-                                    <option value="full">Полная занятость</option>
-                                    <option value="part">Частичная</option>
-                                    <option value="project">Проектная</option>
-                                    <option value="internship">Стажировка</option>
-                                    <option value="volunteer">Волонтерство</option>
-                                </select>
-                            </div>
-
-                            <!-- График работы -->
-                            <div class="mb-4">
-                                <label asp-for="SearchData.WorkSchedule" class="form-label fw-600">График работы</label>
-                                <select asp-for="SearchData.WorkSchedule" class="form-select rounded-pill">
-                                    <option value="">Любой график</option>
+                                <label asp-for="SearchData.WorkSchedule" class="form-label">График работы</label>
+                                <select asp-for="SearchData.WorkSchedule" class="form-select">
+                                    <option value="">Любой</option>
                                     <option value="full_day">Полный день</option>
                                     <option value="shifts">Сменный</option>
                                     <option value="flexible">Гибкий</option>
@@ -90,261 +46,149 @@
                                 </select>
                             </div>
 
-                            <!-- Скрытые поля пагинации -->
-                            <input type="hidden" asp-for="SearchData.Page" value="1" id="pageInput">
-                            <input type="hidden" asp-for="SearchData.PageSize" value="10" id="pageSizeInput">
+                            <div class="mb-3">
+                                <label class="form-label">Рабочие часы в день</label>
+                                <input name="WorkHoursPerDay" type="number" class="form-control" min="1" max="24" value="@Request.Query["WorkHoursPerDay"]" />
+                            </div>
 
-                            <!-- Кнопка поиска -->
-                            <button type="submit" class="btn btn-primary w-100 rounded-pill fw-600">
-                                <i class="fas fa-search me-2"></i>Найти вакансии
-                            </button>
+                            <div class="mb-3">
+                                <label class="form-label">Формат работы</label>
+                                <select name="WorkFormat" class="form-select">
+                                    <option value="">Любой</option>
+                                    <option>на месте работодателя</option>
+                                    <option>удалённая</option>
+                                    <option>разъездная</option>
+                                    <option>гибрид</option>
+                                </select>
+                            </div>
 
-                            <!-- Сброс фильтров -->
-                            <a href="/Vacancy/Search" class="btn btn-outline-secondary w-100 rounded-pill mt-2">
-                                <i class="fas fa-times me-2"></i>Сбросить
-                            </a>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- РЕЗУЛЬТАТЫ ПОИСКА (ПРАВАЯ ЧАСТЬ) -->
-            <div class="col-md-9">
-                <!-- СТАТИСТИКА -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-600">
-                        <span id="resultCount">@Model.SearchResult.TotalCount</span> вакансий
-                    </h5>
-                    <div class="btn-group">
-                        <button class="btn btn-sm btn-outline-secondary active" data-view="grid">
-                            <i class="fas fa-th-large"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-secondary" data-view="list">
-                            <i class="fas fa-list"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- СКЕЛЕТОН ПРИ ЗАГРУЗКЕ -->
-                <div id="loadingSkeleton" class="d-none">
-                    @for (int i = 0; i < 5; i++)
-                    {
-                        <div class="card shadow-sm mb-3 p-3 border-0">
-                            <div class="d-flex align-items-center">
-                                <div class="skeleton rounded-circle me-3" style="width: 60px; height: 60px;"></div>
-                                <div class="flex-grow-1">
-                                    <div class="skeleton mb-2" style="height: 20px; width: 60%;"></div>
-                                    <div class="skeleton mb-2" style="height: 15px; width: 40%;"></div>
-                                    <div class="skeleton" style="height: 15px; width: 80%;"></div>
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <label asp-for="SearchData.SalaryFrom" class="form-label">Доход от</label>
+                                    <input asp-for="SearchData.SalaryFrom" type="number" class="form-control" min="0" />
+                                </div>
+                                <div class="col-6">
+                                    <label asp-for="SearchData.SalaryTo" class="form-label">Доход до</label>
+                                    <input asp-for="SearchData.SalaryTo" type="number" class="form-control" min="0" />
                                 </div>
                             </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Период дохода</label>
+                                <select name="IncomePeriod" class="form-select">
+                                    <option value="">Любой</option>
+                                    <option>месяц</option>
+                                    <option>час</option>
+                                    <option>смена</option>
+                                    <option>услуга</option>
+                                    <option>вахта</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Частота выплат</label>
+                                <select name="PaymentFrequency" class="form-select">
+                                    <option value="">Любая</option>
+                                    <option>еженедельно</option>
+                                    <option>2 раза в месяц</option>
+                                    <option>ежемесячно</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="SearchData.CompanyName" class="form-label">Название компании</label>
+                                <input asp-for="SearchData.CompanyName" class="form-control" placeholder="Начните вводить название" />
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Специальность</label>
+                                <select name="Specialty" class="form-select">
+                                    <option value="">Любая</option>
+                                    <option>Информационные системы и программирование</option>
+                                    <option>Сетевое и системное администрирование</option>
+                                    <option>Экономика и бухгалтерский учет</option>
+                                    <option>Дизайн</option>
+                                    <option>Маркетинг</option>
+                                </select>
+                            </div>
+
+                            <input type="hidden" asp-for="SearchData.Page" value="1" />
+                            <input type="hidden" asp-for="SearchData.PageSize" value="10" />
+
+                            <button type="submit" class="btn btn-primary w-100">Найти</button>
+                            <a asp-page="/Vacancy/Search" class="btn btn-outline-secondary w-100 mt-2">Сбросить</a>
                         </div>
-                    }
+                    </div>
                 </div>
 
-                <!-- РЕЗУЛЬТАТЫ ПОИСКА -->
-                <div id="searchResults">
+                <div class="col-lg-8 col-xl-9">
+                    <h2 class="h5 mb-3">Карточки вакансий (@Model.SearchResult.TotalCount)</h2>
+
                     @if (Model.SearchResult.Items.Any())
                     {
-                        <div class="row g-4" id="vacancyGrid">
+                        <div class="row g-3">
                             @foreach (var vacancy in Model.SearchResult.Items)
                             {
-                                <div class="col-md-6 vacancy-card">
-                                    <div class="card shadow-sm border-0 h-100 hover-card">
-                                        <div class="card-body">
-                                            <!-- Заголовок -->
-                                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                                <h5 class="card-title fw-600">@vacancy.Title</h5>
-                                                <span class="badge bg-light text-dark">@GetEmploymentTypeDisplay(vacancy.EmploymentType)</span>
+                                <div class="col-xl-6">
+                                    <div class="card h-100 shadow-sm border-0">
+                                        <div class="card-body d-flex flex-column">
+                                            <div class="d-flex align-items-start gap-3 mb-2">
+                                                <img src="@(string.IsNullOrWhiteSpace(vacancy.Company?.LogoUrl) ? "/images/favicon.ico" : vacancy.Company.LogoUrl)"
+                                                     alt="Логотип @vacancy.CompanyName"
+                                                     style="width:48px;height:48px;object-fit:cover;border-radius:10px;" />
+                                                <div>
+                                                    <h3 class="h6 mb-1">@vacancy.Title</h3>
+                                                    <div class="text-muted small">@vacancy.CompanyName</div>
+                                                </div>
                                             </div>
 
-                                            <!-- Компания -->
-                                            <p class="text-primary mb-2">
-                                                <i class="fas fa-building me-1"></i>@vacancy.CompanyName
-                                            </p>
-
-                                            <!-- Описание -->
-                                            <p class="card-text text-muted small">@Truncate(vacancy.Description, 120)</p>
-
-                                            <!-- Зарплата -->
-                                            <div class="mb-2">
+                                            <div class="fw-semibold text-success mb-2">
                                                 @if (vacancy.SalaryFrom.HasValue && vacancy.SalaryTo.HasValue)
                                                 {
-                                                    <span class="text-success fw-600">
-                                                        @vacancy.SalaryFrom.Value.ToString("N0") – @vacancy.SalaryTo.Value.ToString("N0") ₽
-                                                    </span>
+                                                    @:@vacancy.SalaryFrom.Value.ToString("N0") - @vacancy.SalaryTo.Value.ToString("N0") ₽
                                                 }
                                                 else if (vacancy.SalaryFrom.HasValue)
                                                 {
-                                                    <span class="text-success fw-600">
-                                                        от @vacancy.SalaryFrom.Value.ToString("N0") ₽
-                                                    </span>
+                                                    @:от @vacancy.SalaryFrom.Value.ToString("N0") ₽
                                                 }
                                                 else
                                                 {
-                                                    <span class="text-muted">Зарплата не указана</span>
+                                                    @:З/п не указана
                                                 }
                                             </div>
 
-                                            <!-- Метки -->
-                                            <div class="d-flex gap-2 flex-wrap mb-3">
-                                                <span class="badge bg-secondary">@GetWorkScheduleDisplay(vacancy.WorkSchedule)</span>
-                                                @if (vacancy.Company?.Verified == true)
-                                                {
-                                                    <span class="badge bg-success">
-                                                        <i class="fas fa-check-circle"></i> Проверено
-                                                    </span>
-                                                }
-                                            </div>
+                                            <p class="text-muted small flex-grow-1">@Truncate(vacancy.Description, 170)</p>
 
-                                            <!-- Кнопка отклика -->
-                                            <div class="d-grid">
-                                                <a href="/Vacancy/Details/@Uri.EscapeDataString(vacancy.CompanyName)/@Uri.EscapeDataString(vacancy.Title)"
-                                                   class="btn btn-primary rounded-pill">
-                                                    <i class="fas fa-eye me-2"></i>Подробнее
-                                                </a>
+                                            <div class="d-flex gap-2 mt-auto">
+                                                <a class="btn btn-outline-primary flex-fill"
+                                                   asp-page="/Vacancy/Details"
+                                                   asp-route-companyName="@vacancy.CompanyName"
+                                                   asp-route-title="@vacancy.Title">Открыть</a>
+                                                <a class="btn btn-primary flex-fill"
+                                                   asp-page="/Vacancy/Details"
+                                                   asp-route-companyName="@vacancy.CompanyName"
+                                                   asp-route-title="@vacancy.Title">Откликнуться</a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             }
                         </div>
-
-                        <!-- ПАГИНАЦИЯ -->
-                        <nav aria-label="Page navigation" class="mt-5">
-                            <ul class="pagination justify-content-center" id="pagination">
-                                @if (Model.SearchResult.HasPreviousPage)
-                                {
-                                    <li class="page-item">
-                                        <button class="page-link" onclick="loadPage(@Model.SearchResult.Page - 1)"
-                                                data-page="@(Model.SearchResult.Page - 1)">
-                                            Назад
-                                        </button>
-                                    </li>
-                                }
-
-                                @for (int i = 1; i <= Model.SearchResult.TotalPages; i++)
-                                {
-                                    <li class="page-item @(i == Model.SearchResult.Page ? "active" : "")">
-                                        <button class="page-link" onclick="loadPage(@i)" data-page="@i">@i</button>
-                                    </li>
-                                }
-
-                                @if (Model.SearchResult.HasNextPage)
-                                {
-                                    <li class="page-item">
-                                        <button class="page-link" onclick="loadPage(@Model.SearchResult.Page + 1)"
-                                                data-page="@(Model.SearchResult.Page + 1)">
-                                            Вперед
-                                        </button>
-                                    </li>
-                                }
-                            </ul>
-                        </nav>
                     }
                     else
                     {
-                        <!-- ПУСТОЙ РЕЗУЛЬТАТ -->
-                        <div class="text-center py-5" id="emptyResult">
-                            <i class="fas fa-search fa-4x text-muted mb-3"></i>
-                            <h5>Вакансии не найдены</h5>
-                            <p class="text-muted">Попробуйте изменить параметры поиска</p>
-                            <button onclick="resetSearch()" class="btn btn-outline-primary rounded-pill">
-                                <i class="fas fa-redo me-2"></i>Сбросить фильтры
-                            </button>
-                        </div>
+                        <div class="alert alert-light border">Вакансии не найдены.</div>
                     }
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        // Функция загрузки данных через AJAX
-        async function loadPage(page) {
-            event.preventDefault();
-
-            // Показываем скелетон
-            $('#loadingSkeleton').removeClass('d-none');
-            $('#searchResults').hide();
-
-            // Собираем данные формы
-            const formData = $('#searchForm').serializeArray();
-            formData.push({ name: 'SearchData.Page', value: page });
-
-            try {
-                const response = await fetch('/Vacancy/Search', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: $.param(formData)
-                });
-
-                const html = await response.text();
-
-                // Обновляем результаты
-                $('#searchResults').html(html);
-                $('#loadingSkeleton').addClass('d-none');
-                $('#searchResults').fadeIn();
-
-                // Обновляем адресную строку
-                history.pushState({}, '', `/Vacancy/Search?${$.param(formData)}`);
-
-            } catch (error) {
-                console.error('Ошибка поиска:', error);
-                $('#loadingSkeleton').addClass('d-none');
-                $('#searchResults').show();
-            }
-        }
-
-        // Отправка формы без перезагрузки
-        $('#searchForm').on('submit', function(e) {
-            e.preventDefault();
-            loadPage(1);
-        });
-
-        // Сброс поиска
-        function resetSearch() {
-            $('#searchForm')[0].reset();
-            loadPage(1);
-        }
-    </script>
-}
-
 @functions {
-    string GetEmploymentTypeDisplay(string employmentType)
-    {
-        return employmentType switch
-        {
-            "full" => "Полная",
-            "part" => "Частичная",
-            "project" => "Проектная",
-            "internship" => "Стажировка",
-            "volunteer" => "Волонтёрство",
-            _ => employmentType
-        };
-    }
-
-    string GetWorkScheduleDisplay(string workSchedule)
-    {
-        return workSchedule switch
-        {
-            "full_day" => "Полный день",
-            "shifts" => "Сменный",
-            "flexible" => "Гибкий",
-            "remote" => "Удалёнка",
-            "shift_work" => "Вахта",
-            _ => workSchedule
-        };
-    }
-
     string Truncate(string text, int maxLength)
     {
-        if (string.IsNullOrEmpty(text)) return "";
+        if (string.IsNullOrWhiteSpace(text)) return string.Empty;
         return text.Length <= maxLength ? text : text[..maxLength] + "...";
     }
 }

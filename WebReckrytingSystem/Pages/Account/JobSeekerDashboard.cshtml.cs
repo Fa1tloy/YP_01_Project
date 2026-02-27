@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using WebReckrytingSystem.Data;
 using WebReckrytingSystem.Helpers;
 using WebReckrytingSystem.Models;
 using WebReckrytingSystem.Services;
@@ -20,7 +19,7 @@ namespace WebReckrytingSystem.Pages.Account
     [Authorize(Roles = "job_seeker")]
     public class JobSeekerDashboardModel : PageModel
     {
-        private readonly ApplicationDbContext _context;
+        private readonly WebReckrytingSystem.Models.ApplicationDbContext _context;
         private readonly IResumeService _resumeService;
         private readonly IVacancySearchService _vacancySearchService;
         private readonly ILogger<JobSeekerDashboardModel> _logger;
@@ -61,7 +60,7 @@ namespace WebReckrytingSystem.Pages.Account
         }
 
         public JobSeekerDashboardModel(
-            ApplicationDbContext context,
+            WebReckrytingSystem.Models.ApplicationDbContext context,
             IResumeService resumeService,
             IVacancySearchService vacancySearchService,
             ILogger<JobSeekerDashboardModel> logger)
@@ -106,7 +105,7 @@ namespace WebReckrytingSystem.Pages.Account
         {
             try
             {
-                TotalApplications = _context.JobApplications.Count(a => a.StudentEmail == userEmail);
+                TotalApplications = _context.Set<JobApplication>().Count(a => a.StudentEmail == userEmail);
                 TotalViews = _context.ResumeViews.Count(v => v.ResumeEmail == userEmail);
                 SavedVacanciesCount = _context.SavedVacancies.Count(s => s.StudentEmail == userEmail);
 
@@ -178,7 +177,7 @@ namespace WebReckrytingSystem.Pages.Account
         {
             try
             {
-                var applications = _context.JobApplications
+                var applications = _context.Set<JobApplication>()
                     .Where(a => a.StudentEmail == userEmail)
                     .OrderByDescending(a => a.AppliedAt)
                     .Take(10)
@@ -355,7 +354,7 @@ namespace WebReckrytingSystem.Pages.Account
                 if (string.IsNullOrEmpty(userEmail))
                     return Unauthorized();
 
-                var applications = _context.JobApplications
+                var applications = _context.Set<JobApplication>()
                     .Where(a => a.StudentEmail == userEmail)
                     .OrderByDescending(a => a.AppliedAt)
                     .Take(10)
