@@ -27,7 +27,7 @@ namespace WebReckrytingSystem.Pages.Account
 
         // Основная информация
         public string UserFirstName { get; set; } = string.Empty;
-        public Resume? UserResume { get; set; }
+        public Models.Resume? UserResume { get; set; }
         public bool HasResume { get; set; }
 
         // Статистика
