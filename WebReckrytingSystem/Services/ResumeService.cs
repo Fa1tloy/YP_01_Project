@@ -30,7 +30,17 @@ namespace WebReckrytingSystem.Services
                 {
                     UserEmail = userEmail,
                     DesiredPosition = model.DesiredPosition.Trim(),
+                    City = model.City.Trim(),
+                    BusinessTripReadiness = model.BusinessTripReadiness,
+                    SearchStatus = model.SearchStatus,
+                    Age = model.Age,
+                    EmploymentType = model.EmploymentType,
+                    WorkSchedule = model.WorkSchedule,
+                    Specialty = model.Specialty.Trim(),
+                    Gender = model.Gender,
                     SalaryExpectations = model.SalaryExpectations,
+                    HasCar = model.HasCar,
+                    DriverLicenseCategory = string.IsNullOrWhiteSpace(model.DriverLicenseCategory) ? null : model.DriverLicenseCategory.Trim(),
                     ExperienceDescription = FormatExperienceDescription(model),
                     EducationDescription = FormatEducationDescription(model),
                     Skills = string.Join(", ", model.Skills.Select(s => s.Trim()).Distinct()),
@@ -60,7 +70,17 @@ namespace WebReckrytingSystem.Services
             try
             {
                 existingResume.DesiredPosition = model.DesiredPosition.Trim();
+                existingResume.City = model.City.Trim();
+                existingResume.BusinessTripReadiness = model.BusinessTripReadiness;
+                existingResume.SearchStatus = model.SearchStatus;
+                existingResume.Age = model.Age;
+                existingResume.EmploymentType = model.EmploymentType;
+                existingResume.WorkSchedule = model.WorkSchedule;
+                existingResume.Specialty = model.Specialty.Trim();
+                existingResume.Gender = model.Gender;
                 existingResume.SalaryExpectations = model.SalaryExpectations;
+                existingResume.HasCar = model.HasCar;
+                existingResume.DriverLicenseCategory = string.IsNullOrWhiteSpace(model.DriverLicenseCategory) ? null : model.DriverLicenseCategory.Trim();
                 existingResume.ExperienceDescription = FormatExperienceDescription(model);
                 existingResume.EducationDescription = FormatEducationDescription(model);
                 existingResume.Skills = string.Join(", ", model.Skills.Select(s => s.Trim()).Distinct());
@@ -80,6 +100,9 @@ namespace WebReckrytingSystem.Services
         {
             if (model.GraduationYear > DateTime.Now.Year)
                 return ServiceResult.Error("Год окончания не может быть в будущем");
+
+            if (!model.Age.HasValue)
+                return ServiceResult.Error("Возраст обязателен");
 
             if (model.Skills.Count > 20)
                 return ServiceResult.Error("Слишком много навыков (максимум 20)");

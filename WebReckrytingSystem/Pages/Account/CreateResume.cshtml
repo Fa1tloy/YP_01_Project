@@ -32,6 +32,85 @@
                                 </div>
 
                                 <div class="mb-3">
+                                    <label asp-for="ResumeData.Specialty" class="form-label">Специальность *</label>
+                                    <input asp-for="ResumeData.Specialty" class="form-control" placeholder="Информационные системы и программирование" required />
+                                    <span asp-validation-for="ResumeData.Specialty" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="ResumeData.City" class="form-label">Город *</label>
+                                    <input asp-for="ResumeData.City" class="form-control" placeholder="Москва" required />
+                                    <span asp-validation-for="ResumeData.City" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="ResumeData.BusinessTripReadiness" class="form-label">Готовность к командировкам *</label>
+                                    <select asp-for="ResumeData.BusinessTripReadiness" class="form-select" required>
+                                        <option value="">Выберите вариант</option>
+                                        <option value="yes">Да</option>
+                                        <option value="no">Нет</option>
+                                        <option value="sometimes">Иногда</option>
+                                    </select>
+                                    <span asp-validation-for="ResumeData.BusinessTripReadiness" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="ResumeData.SearchStatus" class="form-label">Статус поиска *</label>
+                                    <select asp-for="ResumeData.SearchStatus" class="form-select" required>
+                                        <option value="">Выберите статус</option>
+                                        <option>активно ищет</option>
+                                        <option>рассматривает</option>
+                                        <option>не ищет</option>
+                                        <option>получил предложение</option>
+                                        <option>вышел на работу</option>
+                                    </select>
+                                    <span asp-validation-for="ResumeData.SearchStatus" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="ResumeData.Age" class="form-label">Возраст *</label>
+                                    <input asp-for="ResumeData.Age" type="number" class="form-control" min="14" max="100" placeholder="22" required />
+                                    <span asp-validation-for="ResumeData.Age" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="ResumeData.EmploymentType" class="form-label">Тип занятости *</label>
+                                    <select asp-for="ResumeData.EmploymentType" class="form-select" required>
+                                        <option value="">Выберите тип занятости</option>
+                                        <option>полная занятость</option>
+                                        <option>частичная занятость</option>
+                                        <option>проектная</option>
+                                        <option>волонтерство</option>
+                                        <option>стажировка</option>
+                                    </select>
+                                    <span asp-validation-for="ResumeData.EmploymentType" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="ResumeData.WorkSchedule" class="form-label">График работы *</label>
+                                    <select asp-for="ResumeData.WorkSchedule" class="form-select" required>
+                                        <option value="">Выберите график</option>
+                                        <option>полный день</option>
+                                        <option>сменный график</option>
+                                        <option>гибкий график</option>
+                                        <option>удаленная работа</option>
+                                        <option>вахтовый метод</option>
+                                    </select>
+                                    <span asp-validation-for="ResumeData.WorkSchedule" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="ResumeData.Gender" class="form-label">Пол *</label>
+                                    <select asp-for="ResumeData.Gender" class="form-select" required>
+                                        <option value="">Выберите пол</option>
+                                        <option>мужской</option>
+                                        <option>женский</option>
+                                    </select>
+                                    <span asp-validation-for="ResumeData.Gender" class="text-danger"></span>
+                                </div>
+
+
+                                <div class="mb-3">
                                     <label asp-for="ResumeData.ExperienceYears" class="form-label">Опыт работы (лет)</label>
                                     <input asp-for="ResumeData.ExperienceYears" type="number" class="form-control" min="0" max="60" placeholder="3" />
                                     <span asp-validation-for="ResumeData.ExperienceYears" class="text-danger"></span>
@@ -70,6 +149,21 @@
                                     <label asp-for="ResumeData.GraduationYear" class="form-label">Год окончания</label>
                                     <input asp-for="ResumeData.GraduationYear" type="number" class="form-control" min="1900" max="2025" placeholder="2023" />
                                     <span asp-validation-for="ResumeData.GraduationYear" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="ResumeData.HasCar" class="form-label">Наличие автомобиля</label>
+                                    <select asp-for="ResumeData.HasCar" class="form-select">
+                                        <option value="false">Нет</option>
+                                        <option value="true">Есть</option>
+                                    </select>
+                                    <span asp-validation-for="ResumeData.HasCar" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="ResumeData.DriverLicenseCategory" class="form-label">Категория прав</label>
+                                    <input asp-for="ResumeData.DriverLicenseCategory" class="form-control" placeholder="B" />
+                                    <span asp-validation-for="ResumeData.DriverLicenseCategory" class="text-danger"></span>
                                 </div>
 
                                 <!-- Практики -->

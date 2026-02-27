@@ -16,11 +16,29 @@
                 <h1 class="h4 mb-1">@Model.Resume.User?.LastName @Model.Resume.User?.FirstName</h1>
                 <p class="text-muted">@Model.Resume.UserEmail</p>
 
-                <h2 class="h5">Специальность</h2>
+                <h2 class="h5">Желаемая должность</h2>
                 <p>@Model.Resume.DesiredPosition</p>
+
+                <h2 class="h5">Специальность</h2>
+                <p>@Model.Resume.Specialty</p>
+
+                <h2 class="h5">Город</h2>
+                <p>@Model.Resume.City</p>
+
+                <h2 class="h5">Параметры занятости</h2>
+                <p>Тип занятости: @Model.Resume.EmploymentType<br/>График: @Model.Resume.WorkSchedule</p>
+
+                <h2 class="h5">Статус кандидата</h2>
+                <p>Статус поиска: @Model.Resume.SearchStatus<br/>Готовность к командировкам: @Model.Resume.BusinessTripReadiness</p>
+
+                <h2 class="h5">Личные данные</h2>
+                <p>Возраст: @(Model.Resume.Age?.ToString() ?? "Не указан")<br/>Пол: @Model.Resume.Gender</p>
 
                 <h2 class="h5">Навыки</h2>
                 <p>@(string.IsNullOrWhiteSpace(Model.Resume.Skills) ? "Не указаны" : Model.Resume.Skills)</p>
+
+                <h2 class="h5">Автомобиль и права</h2>
+                <p>Автомобиль: @(Model.Resume.HasCar ? "Есть" : "Нет")<br/>Категория прав: @(string.IsNullOrWhiteSpace(Model.Resume.DriverLicenseCategory) ? "Не указана" : Model.Resume.DriverLicenseCategory)</p>
 
                 <h2 class="h5">Ожидаемая зарплата</h2>
                 <p>@(Model.Resume.SalaryExpectations.HasValue ? $"{Model.Resume.SalaryExpectations.Value:N0} ₽" : "Не указана")</p>

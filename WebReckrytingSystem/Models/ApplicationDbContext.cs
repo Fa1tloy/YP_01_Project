@@ -67,6 +67,16 @@ namespace WebReckrytingSystem.Models
                 entity.HasKey(e => e.UserEmail);
                 entity.Property(e => e.UserEmail).HasColumnName("user_email").HasMaxLength(255);
                 entity.Property(e => e.DesiredPosition).HasColumnName("desired_position").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.City).HasColumnName("city").HasMaxLength(100).IsRequired();
+                entity.Property(e => e.BusinessTripReadiness).HasColumnName("business_trip_readiness").HasMaxLength(20).IsRequired();
+                entity.Property(e => e.SearchStatus).HasColumnName("search_status").HasMaxLength(50).IsRequired();
+                entity.Property(e => e.Age).HasColumnName("age");
+                entity.Property(e => e.EmploymentType).HasColumnName("employment_type").HasMaxLength(50).IsRequired();
+                entity.Property(e => e.WorkSchedule).HasColumnName("work_schedule").HasMaxLength(50).IsRequired();
+                entity.Property(e => e.Specialty).HasColumnName("specialty").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.Gender).HasColumnName("gender").HasMaxLength(20).IsRequired();
+                entity.Property(e => e.HasCar).HasColumnName("has_car").HasDefaultValue(false);
+                entity.Property(e => e.DriverLicenseCategory).HasColumnName("driver_license_category").HasMaxLength(20).IsRequired(false);
                 entity.Property(e => e.ExperienceDescription).HasColumnName("experience_description");
                 entity.Property(e => e.EducationDescription).HasColumnName("education_description");
                 entity.Property(e => e.Skills).HasColumnName("skills");
