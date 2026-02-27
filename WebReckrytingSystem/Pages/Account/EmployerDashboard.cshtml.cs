@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using WebReckrytingSystem.Data;
 using WebReckrytingSystem.Helpers;
 using WebReckrytingSystem.Models;
 using WebReckrytingSystem.Services;
@@ -15,8 +14,8 @@ using WebReckrytingSystem.Services;
 namespace WebReckrytingSystem.Pages.Account
 {
     /// <summary>
-    /// PageModel для личного кабинета работодателя
-    /// </summary>
+        private readonly WebReckrytingSystem.Models.ApplicationDbContext _context;
+            WebReckrytingSystem.Models.ApplicationDbContext context,
     [Authorize(Roles = "employer")]
     public class EmployerDashboardModel : PageModel
     {
@@ -24,30 +23,30 @@ namespace WebReckrytingSystem.Pages.Account
         private readonly IVacancyService _vacancyService;
         private readonly ILogger<EmployerDashboardModel> _logger;
 
-        // Основная информация
+        // ГЋГ±Г­Г®ГўГ­Г Гї ГЁГ­ГґГ®Г°Г¬Г Г¶ГЁГї
         public string UserFirstName { get; set; } = string.Empty;
         public string UserEmail { get; set; } = string.Empty;
 
-        // Статистика
+        // Г‘ГІГ ГІГЁГ±ГІГЁГЄГ 
         public int TotalVacancies { get; set; }
         public int ActiveVacancies { get; set; }
         public int TotalResponses { get; set; }
         public int NewResponses { get; set; }
         public int ViewsThisWeek { get; set; }
 
-        // Данные для отображения
+        // Г„Г Г­Г­Г»ГҐ Г¤Г«Гї Г®ГІГ®ГЎГ°Г Г¦ГҐГ­ГЁГї
         public List<VacancyWithStats> Vacancies { get; set; } = new();
         public List<ApplicationDto> RecentApplications { get; set; } = new();
         public List<DailyAnalytic> WeekData { get; set; } = new();
 
-        // DTO для вакансии со статистикой
+        // DTO Г¤Г«Гї ГўГ ГЄГ Г­Г±ГЁГЁ Г±Г® Г±ГІГ ГІГЁГ±ГІГЁГЄГ®Г©
         public class VacancyWithStats
         {
             public Models.Vacancy Vacancy { get; set; }
             public int ResponseCount { get; set; }
         }
 
-        // DTO для откликов
+        // DTO Г¤Г«Гї Г®ГІГЄГ«ГЁГЄГ®Гў
         public class ApplicationDto
         {
             public string VacancyTitle { get; set; } = string.Empty;
@@ -76,14 +75,14 @@ namespace WebReckrytingSystem.Pages.Account
                 var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
                 if (string.IsNullOrEmpty(userEmail))
                 {
-                    _logger.LogWarning("Доступ без email");
+                    _logger.LogWarning("Г„Г®Г±ГІГіГЇ ГЎГҐГ§ email");
                     return RedirectToPage("/Account/Login");
                 }
 
-                _logger.LogInformation("Загрузка дашборда работодателя для {Email}", userEmail);
+                _logger.LogInformation("Г‡Г ГЈГ°ГіГ§ГЄГ  Г¤Г ГёГЎГ®Г°Г¤Г  Г°Г ГЎГ®ГІГ®Г¤Г ГІГҐГ«Гї Г¤Г«Гї {Email}", userEmail);
 
                 UserEmail = userEmail;
-                UserFirstName = User.FindFirst(ClaimTypes.GivenName)?.Value ?? "Работодатель";
+                UserFirstName = User.FindFirst(ClaimTypes.GivenName)?.Value ?? "ГђГ ГЎГ®ГІГ®Г¤Г ГІГҐГ«Гј";
 
                 LoadStatistics(userEmail);
                 LoadVacanciesWithStats(userEmail);
@@ -93,7 +92,7 @@ namespace WebReckrytingSystem.Pages.Account
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка загрузки дашборда работодателя");
+                _logger.LogError(ex, "ГЋГёГЁГЎГЄГ  Г§Г ГЈГ°ГіГ§ГЄГЁ Г¤Г ГёГЎГ®Г°Г¤Г  Г°Г ГЎГ®ГІГ®Г¤Г ГІГҐГ«Гї");
                 return RedirectToPage("/Error");
             }
         }
@@ -102,35 +101,35 @@ namespace WebReckrytingSystem.Pages.Account
         {
             try
             {
-                // Всего вакансий
+                // Г‚Г±ГҐГЈГ® ГўГ ГЄГ Г­Г±ГЁГ©
                 TotalVacancies = _context.Vacancies.Count(v => v.AuthorEmail == userEmail);
 
-                // Активные вакансии
+                // ГЂГЄГІГЁГўГ­Г»ГҐ ГўГ ГЄГ Г­Г±ГЁГЁ
                 ActiveVacancies = TotalVacancies;
 
-                // Получаем компании работодателя
+                // ГЏГ®Г«ГіГ·Г ГҐГ¬ ГЄГ®Г¬ГЇГ Г­ГЁГЁ Г°Г ГЎГ®ГІГ®Г¤Г ГІГҐГ«Гї
                 var companyNames = _context.Vacancies
                     .Where(v => v.AuthorEmail == userEmail)
                     .Select(v => v.CompanyName)
                     .Distinct()
                     .ToList();
 
-                // Всего откликов по вакансиям этих компаний
+                // Г‚Г±ГҐГЈГ® Г®ГІГЄГ«ГЁГЄГ®Гў ГЇГ® ГўГ ГЄГ Г­Г±ГЁГїГ¬ ГЅГІГЁГµ ГЄГ®Г¬ГЇГ Г­ГЁГ©
                 TotalResponses = _context.JobApplications
                     .Count(a => companyNames.Contains(a.VacancyCompanyName));
 
-                // Новые отклики (за последнюю неделю)
+                // ГЌГ®ГўГ»ГҐ Г®ГІГЄГ«ГЁГЄГЁ (Г§Г  ГЇГ®Г±Г«ГҐГ¤Г­ГѕГѕ Г­ГҐГ¤ГҐГ«Гѕ)
                 var weekAgo = DateTime.Now.AddDays(-7);
                 NewResponses = _context.JobApplications
                     .Count(a => companyNames.Contains(a.VacancyCompanyName) && a.AppliedAt >= weekAgo);
 
                 _logger.LogInformation(
-                    "Статистика загружена: Вакансий={TotalVacancies}, Откликов={TotalResponses}, Новых={NewResponses}",
+                    "Г‘ГІГ ГІГЁГ±ГІГЁГЄГ  Г§Г ГЈГ°ГіГ¦ГҐГ­Г : Г‚Г ГЄГ Г­Г±ГЁГ©={TotalVacancies}, ГЋГІГЄГ«ГЁГЄГ®Гў={TotalResponses}, ГЌГ®ГўГ»Гµ={NewResponses}",
                     TotalVacancies, TotalResponses, NewResponses);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка загрузки статистики для {Email}", userEmail);
+                _logger.LogError(ex, "ГЋГёГЁГЎГЄГ  Г§Г ГЈГ°ГіГ§ГЄГЁ Г±ГІГ ГІГЁГ±ГІГЁГЄГЁ Г¤Г«Гї {Email}", userEmail);
             }
         }
 
@@ -153,12 +152,12 @@ namespace WebReckrytingSystem.Pages.Account
                     });
                 }
 
-                _logger.LogInformation("Загружено {Count} вакансий со статистикой для {Email}",
+                _logger.LogInformation("Г‡Г ГЈГ°ГіГ¦ГҐГ­Г® {Count} ГўГ ГЄГ Г­Г±ГЁГ© Г±Г® Г±ГІГ ГІГЁГ±ГІГЁГЄГ®Г© Г¤Г«Гї {Email}",
                     Vacancies.Count, userEmail);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка загрузки вакансий для {Email}", userEmail);
+                _logger.LogError(ex, "ГЋГёГЁГЎГЄГ  Г§Г ГЈГ°ГіГ§ГЄГЁ ГўГ ГЄГ Г­Г±ГЁГ© Г¤Г«Гї {Email}", userEmail);
                 Vacancies = new List<VacancyWithStats>();
             }
         }
@@ -167,14 +166,14 @@ namespace WebReckrytingSystem.Pages.Account
         {
             try
             {
-                // Получаем компании работодателя
+                // ГЏГ®Г«ГіГ·Г ГҐГ¬ ГЄГ®Г¬ГЇГ Г­ГЁГЁ Г°Г ГЎГ®ГІГ®Г¤Г ГІГҐГ«Гї
                 var companyNames = _context.Vacancies
                     .Where(v => v.AuthorEmail == userEmail)
                     .Select(v => v.CompanyName)
                     .Distinct()
                     .ToList();
 
-                // Получаем отклики по вакансиям этих компаний
+                // ГЏГ®Г«ГіГ·Г ГҐГ¬ Г®ГІГЄГ«ГЁГЄГЁ ГЇГ® ГўГ ГЄГ Г­Г±ГЁГїГ¬ ГЅГІГЁГµ ГЄГ®Г¬ГЇГ Г­ГЁГ©
                 var applications = _context.JobApplications
                     .Where(a => companyNames.Contains(a.VacancyCompanyName))
                     .OrderByDescending(a => a.AppliedAt)
@@ -184,10 +183,10 @@ namespace WebReckrytingSystem.Pages.Account
                 RecentApplications = new List<ApplicationDto>();
                 foreach (var app in applications)
                 {
-                    // Получаем информацию о студенте
+                    // ГЏГ®Г«ГіГ·Г ГҐГ¬ ГЁГ­ГґГ®Г°Г¬Г Г¶ГЁГѕ Г® Г±ГІГіГ¤ГҐГ­ГІГҐ
                     var student = _context.Users.FirstOrDefault(u => u.Email == app.StudentEmail);
 
-                    // Получаем информацию о вакансии
+                    // ГЏГ®Г«ГіГ·Г ГҐГ¬ ГЁГ­ГґГ®Г°Г¬Г Г¶ГЁГѕ Г® ГўГ ГЄГ Г­Г±ГЁГЁ
                     var vacancy = _context.Vacancies.FirstOrDefault(v =>
                         v.CompanyName == app.VacancyCompanyName && v.Title == app.VacancyTitle);
 
@@ -206,18 +205,18 @@ namespace WebReckrytingSystem.Pages.Account
                     }
                 }
 
-                _logger.LogInformation("Загружено {Count} откликов для {Email}",
+                _logger.LogInformation("Г‡Г ГЈГ°ГіГ¦ГҐГ­Г® {Count} Г®ГІГЄГ«ГЁГЄГ®Гў Г¤Г«Гї {Email}",
                     RecentApplications.Count, userEmail);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка загрузки откликов для {Email}", userEmail);
+                _logger.LogError(ex, "ГЋГёГЁГЎГЄГ  Г§Г ГЈГ°ГіГ§ГЄГЁ Г®ГІГЄГ«ГЁГЄГ®Гў Г¤Г«Гї {Email}", userEmail);
                 RecentApplications = new List<ApplicationDto>();
             }
         }
 
         /// <summary>
-        /// AJAX-метод для получения данных графика
+        /// AJAX-Г¬ГҐГІГ®Г¤ Г¤Г«Гї ГЇГ®Г«ГіГ·ГҐГ­ГЁГї Г¤Г Г­Г­Г»Гµ ГЈГ°Г ГґГЁГЄГ 
         /// </summary>
         public IActionResult OnGetChartData()
         {
@@ -238,7 +237,7 @@ namespace WebReckrytingSystem.Pages.Account
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка получения данных графика");
+                _logger.LogError(ex, "ГЋГёГЁГЎГЄГ  ГЇГ®Г«ГіГ·ГҐГ­ГЁГї Г¤Г Г­Г­Г»Гµ ГЈГ°Г ГґГЁГЄГ ");
                 return new JsonResult(new List<object>());
             }
         }

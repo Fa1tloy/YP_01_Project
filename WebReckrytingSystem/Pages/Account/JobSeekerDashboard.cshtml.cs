@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using WebReckrytingSystem.Data;
 using WebReckrytingSystem.Helpers;
 using WebReckrytingSystem.Models;
 using WebReckrytingSystem.Services;
@@ -20,7 +19,7 @@ namespace WebReckrytingSystem.Pages.Account
     [Authorize(Roles = "job_seeker")]
     public class JobSeekerDashboardModel : PageModel
     {
-        private readonly ApplicationDbContext _context;
+        private readonly WebReckrytingSystem.Models.ApplicationDbContext _context;
         private readonly IResumeService _resumeService;
         private readonly IVacancySearchService _vacancySearchService;
         private readonly ILogger<JobSeekerDashboardModel> _logger;
@@ -61,7 +60,7 @@ namespace WebReckrytingSystem.Pages.Account
         }
 
         public JobSeekerDashboardModel(
-            ApplicationDbContext context,
+            WebReckrytingSystem.Models.ApplicationDbContext context,
             IResumeService resumeService,
             IVacancySearchService vacancySearchService,
             ILogger<JobSeekerDashboardModel> logger)
