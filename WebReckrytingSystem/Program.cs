@@ -91,5 +91,47 @@ static void EnsureDatabaseCreated(WebApplication app)
 
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     dbContext.Database.EnsureCreated();
-    
+
+    EnsureSchemaColumns(connectionString);
+}
+
+static void EnsureSchemaColumns(string connectionString)
+{
+    using var connection = new MySqlConnection(connectionString);
+    connection.Open();
+
+    EnsureColumnExists(connection, "users", "company_name", "VARCHAR(255) NULL");
+
+    EnsureColumnExists(connection, "resumes", "city", "VARCHAR(100) NOT NULL DEFAULT ''");
+    EnsureColumnExists(connection, "resumes", "business_trip_readiness", "VARCHAR(20) NOT NULL DEFAULT ''");
+    EnsureColumnExists(connection, "resumes", "search_status", "VARCHAR(50) NOT NULL DEFAULT ''");
+    EnsureColumnExists(connection, "resumes", "age", "INT NULL");
+    EnsureColumnExists(connection, "resumes", "employment_type", "VARCHAR(50) NOT NULL DEFAULT ''");
+    EnsureColumnExists(connection, "resumes", "work_schedule", "VARCHAR(50) NOT NULL DEFAULT ''");
+    EnsureColumnExists(connection, "resumes", "specialty", "VARCHAR(255) NOT NULL DEFAULT ''");
+    EnsureColumnExists(connection, "resumes", "gender", "VARCHAR(20) NOT NULL DEFAULT ''");
+    EnsureColumnExists(connection, "resumes", "has_car", "TINYINT(1) NOT NULL DEFAULT 0");
+    EnsureColumnExists(connection, "resumes", "driver_license_category", "VARCHAR(20) NULL");
+}
+
+static void EnsureColumnExists(MySqlConnection connection, string tableName, string columnName, string columnDefinition)
+{
+    using var existsCommand = connection.CreateCommand();
+    existsCommand.CommandText = @"SELECT COUNT(*)
+                                 FROM information_schema.columns
+                                 WHERE table_schema = DATABASE()
+                                   AND table_name = @tableName
+                                   AND column_name = @columnName;";
+    existsCommand.Parameters.AddWithValue("@tableName", tableName);
+    existsCommand.Parameters.AddWithValue("@columnName", columnName);
+
+    var exists = Convert.ToInt32(existsCommand.ExecuteScalar()) > 0;
+    if (exists)
+    {
+        return;
+    }
+
+    using var alterCommand = connection.CreateCommand();
+    alterCommand.CommandText = $"ALTER TABLE `{tableName}` ADD COLUMN `{columnName}` {columnDefinition};";
+    alterCommand.ExecuteNonQuery();
 }
