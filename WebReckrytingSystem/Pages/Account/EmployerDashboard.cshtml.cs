@@ -14,8 +14,8 @@ using WebReckrytingSystem.Services;
 namespace WebReckrytingSystem.Pages.Account
 {
     /// <summary>
-        private readonly WebReckrytingSystem.Models.ApplicationDbContext _context;
-            WebReckrytingSystem.Models.ApplicationDbContext context,
+    /// PageModel для личного кабинета работодателя
+    /// </summary>
     [Authorize(Roles = "employer")]
     public class EmployerDashboardModel : PageModel
     {
@@ -115,12 +115,12 @@ namespace WebReckrytingSystem.Pages.Account
                     .ToList();
 
                 // Âñåãî îòêëèêîâ ïî âàêàíñèÿì ýòèõ êîìïàíèé
-                TotalResponses = _context.JobApplications
+                TotalResponses = _context.Set<JobApplication>()
                     .Count(a => companyNames.Contains(a.VacancyCompanyName));
 
                 // Íîâûå îòêëèêè (çà ïîñëåäíþþ íåäåëþ)
                 var weekAgo = DateTime.Now.AddDays(-7);
-                NewResponses = _context.JobApplications
+                NewResponses = _context.Set<JobApplication>()
                     .Count(a => companyNames.Contains(a.VacancyCompanyName) && a.AppliedAt >= weekAgo);
 
                 _logger.LogInformation(
@@ -142,7 +142,7 @@ namespace WebReckrytingSystem.Pages.Account
                 Vacancies = new List<VacancyWithStats>();
                 foreach (var vacancy in baseVacancies)
                 {
-                    var responseCount = _context.JobApplications
+                    var responseCount = _context.Set<JobApplication>()
                         .Count(a => a.VacancyCompanyName == vacancy.CompanyName && a.VacancyTitle == vacancy.Title);
 
                     Vacancies.Add(new VacancyWithStats
@@ -174,7 +174,7 @@ namespace WebReckrytingSystem.Pages.Account
                     .ToList();
 
                 // Ïîëó÷àåì îòêëèêè ïî âàêàíñèÿì ýòèõ êîìïàíèé
-                var applications = _context.JobApplications
+                var applications = _context.Set<JobApplication>()
                     .Where(a => companyNames.Contains(a.VacancyCompanyName))
                     .OrderByDescending(a => a.AppliedAt)
                     .Take(10)
