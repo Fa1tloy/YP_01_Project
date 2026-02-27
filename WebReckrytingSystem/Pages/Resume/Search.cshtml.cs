@@ -80,7 +80,7 @@ namespace WebReckrytingSystem.Pages.Resume
 
             if (!string.IsNullOrWhiteSpace(Specialty))
             {
-                query = query.Where(r => r.DesiredPosition.Contains(Specialty));
+                query = query.Where(r => r.Specialty != null && r.Specialty.Contains(Specialty));
             }
 
             if (!string.IsNullOrWhiteSpace(Skills))
@@ -96,6 +96,57 @@ namespace WebReckrytingSystem.Pages.Resume
             if (SalaryExpectationsTo.HasValue)
             {
                 query = query.Where(r => r.SalaryExpectations.HasValue && r.SalaryExpectations <= SalaryExpectationsTo);
+            }
+
+            if (!string.IsNullOrWhiteSpace(City))
+            {
+                query = query.Where(r => r.City != null && r.City.Contains(City));
+            }
+
+            if (!string.IsNullOrWhiteSpace(BusinessTripReadiness))
+            {
+                query = query.Where(r => r.BusinessTripReadiness == BusinessTripReadiness);
+            }
+
+            if (!string.IsNullOrWhiteSpace(SearchStatus))
+            {
+                query = query.Where(r => r.SearchStatus == SearchStatus);
+            }
+
+            if (AgeFrom.HasValue)
+            {
+                query = query.Where(r => r.Age.HasValue && r.Age >= AgeFrom);
+            }
+
+            if (AgeTo.HasValue)
+            {
+                query = query.Where(r => r.Age.HasValue && r.Age <= AgeTo);
+            }
+
+            if (!string.IsNullOrWhiteSpace(EmploymentType))
+            {
+                query = query.Where(r => r.EmploymentType == EmploymentType);
+            }
+
+            if (!string.IsNullOrWhiteSpace(WorkSchedule))
+            {
+                query = query.Where(r => r.WorkSchedule == WorkSchedule);
+            }
+
+            if (!string.IsNullOrWhiteSpace(Gender))
+            {
+                query = query.Where(r => r.Gender == Gender);
+            }
+
+            if (!string.IsNullOrWhiteSpace(HasCar))
+            {
+                var hasCar = HasCar == "yes";
+                query = query.Where(r => r.HasCar.HasValue && r.HasCar == hasCar);
+            }
+
+            if (!string.IsNullOrWhiteSpace(DriverLicenseCategory))
+            {
+                query = query.Where(r => r.DriverLicenseCategory == DriverLicenseCategory);
             }
 
             Resumes = await query

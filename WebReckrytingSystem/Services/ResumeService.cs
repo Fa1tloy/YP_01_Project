@@ -31,6 +31,16 @@ namespace WebReckrytingSystem.Services
                     UserEmail = userEmail,
                     DesiredPosition = model.DesiredPosition.Trim(),
                     SalaryExpectations = model.SalaryExpectations,
+                    City = model.City?.Trim(),
+                    Age = model.Age,
+                    Gender = model.Gender,
+                    BusinessTripReadiness = model.BusinessTripReadiness,
+                    SearchStatus = model.SearchStatus,
+                    EmploymentType = model.EmploymentType,
+                    WorkSchedule = model.WorkSchedule,
+                    Specialty = model.Specialty?.Trim(),
+                    HasCar = model.HasCar,
+                    DriverLicenseCategory = model.DriverLicenseCategory?.Trim(),
                     ExperienceDescription = FormatExperienceDescription(model),
                     EducationDescription = FormatEducationDescription(model),
                     Skills = string.Join(", ", model.Skills.Select(s => s.Trim()).Distinct()),
@@ -61,6 +71,16 @@ namespace WebReckrytingSystem.Services
             {
                 existingResume.DesiredPosition = model.DesiredPosition.Trim();
                 existingResume.SalaryExpectations = model.SalaryExpectations;
+                existingResume.City = model.City?.Trim();
+                existingResume.Age = model.Age;
+                existingResume.Gender = model.Gender;
+                existingResume.BusinessTripReadiness = model.BusinessTripReadiness;
+                existingResume.SearchStatus = model.SearchStatus;
+                existingResume.EmploymentType = model.EmploymentType;
+                existingResume.WorkSchedule = model.WorkSchedule;
+                existingResume.Specialty = model.Specialty?.Trim();
+                existingResume.HasCar = model.HasCar;
+                existingResume.DriverLicenseCategory = model.DriverLicenseCategory?.Trim();
                 existingResume.ExperienceDescription = FormatExperienceDescription(model);
                 existingResume.EducationDescription = FormatEducationDescription(model);
                 existingResume.Skills = string.Join(", ", model.Skills.Select(s => s.Trim()).Distinct());

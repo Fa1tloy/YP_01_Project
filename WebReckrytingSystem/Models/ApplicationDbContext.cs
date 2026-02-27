@@ -71,6 +71,16 @@ namespace WebReckrytingSystem.Models
                 entity.Property(e => e.EducationDescription).HasColumnName("education_description");
                 entity.Property(e => e.Skills).HasColumnName("skills");
                 entity.Property(e => e.SalaryExpectations).HasColumnName("salary_expectations");
+                entity.Property(e => e.City).HasColumnName("city").HasMaxLength(100);
+                entity.Property(e => e.Age).HasColumnName("age");
+                entity.Property(e => e.Gender).HasColumnName("gender").HasMaxLength(50);
+                entity.Property(e => e.BusinessTripReadiness).HasColumnName("business_trip_readiness").HasMaxLength(100);
+                entity.Property(e => e.SearchStatus).HasColumnName("search_status").HasMaxLength(100);
+                entity.Property(e => e.EmploymentType).HasColumnName("employment_type").HasMaxLength(100);
+                entity.Property(e => e.WorkSchedule).HasColumnName("work_schedule").HasMaxLength(100);
+                entity.Property(e => e.Specialty).HasColumnName("specialty").HasMaxLength(255);
+                entity.Property(e => e.HasCar).HasColumnName("has_car");
+                entity.Property(e => e.DriverLicenseCategory).HasColumnName("driver_license_category").HasMaxLength(10);
                 entity.Property(e => e.IsPublished).HasColumnName("is_published").HasDefaultValue(false);
                 entity.Property(e => e.PracticesJson).HasColumnName("practices_json").HasColumnType("text");
 
