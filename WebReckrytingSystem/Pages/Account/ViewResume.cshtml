@@ -41,6 +41,27 @@
                     </div>
                 </div>
 
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-transparent">
+                        <h5 class="mb-0"><i class="fas fa-id-card me-2 text-primary"></i>Профиль кандидата</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6"><strong>Специальность:</strong> @Model.Resume.Specialty</div>
+                            <div class="col-md-6"><strong>Город:</strong> @Model.Resume.City</div>
+                            <div class="col-md-6"><strong>Возраст:</strong> @(Model.Resume.Age?.ToString() ?? "Не указан")</div>
+                            <div class="col-md-6"><strong>Пол:</strong> @Model.Resume.Gender</div>
+                            <div class="col-md-6"><strong>Готовность к командировкам:</strong> @Model.Resume.BusinessTripReadiness</div>
+                            <div class="col-md-6"><strong>Статус поиска:</strong> @Model.Resume.SearchStatus</div>
+                            <div class="col-md-6"><strong>Тип занятости:</strong> @Model.Resume.EmploymentType</div>
+                            <div class="col-md-6"><strong>График работы:</strong> @Model.Resume.WorkSchedule</div>
+                            <div class="col-md-6"><strong>Автомобиль:</strong> @(Model.Resume.HasCar ? "Есть" : "Нет")</div>
+                            <div class="col-md-6"><strong>Категория прав:</strong> @(string.IsNullOrWhiteSpace(Model.Resume.DriverLicenseCategory) ? "Не указана" : Model.Resume.DriverLicenseCategory)</div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Опыт -->
                 @if (!string.IsNullOrEmpty(Model.Resume.ExperienceDescription))
                 {

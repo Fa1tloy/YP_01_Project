@@ -9,9 +9,56 @@ namespace WebReckrytingSystem.Models
         [Display(Name = "Желаемая должность")]
         public string DesiredPosition { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "Город обязателен для заполнения")]
+        [StringLength(100, ErrorMessage = "Город не должен превышать 100 символов")]
+        [Display(Name = "Город")]
+        public string City { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Укажите готовность к командировкам")]
+        [StringLength(20)]
+        [Display(Name = "Готовность к командировкам")]
+        public string BusinessTripReadiness { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Укажите статус поиска")]
+        [StringLength(50)]
+        [Display(Name = "Статус поиска")]
+        public string SearchStatus { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Возраст обязателен для заполнения")]
+        [Range(14, 100, ErrorMessage = "Возраст должен быть в диапазоне от 14 до 100")]
+        [Display(Name = "Возраст")]
+        public int? Age { get; set; }
+
+        [Required(ErrorMessage = "Укажите тип занятости")]
+        [StringLength(50)]
+        [Display(Name = "Тип занятости")]
+        public string EmploymentType { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Укажите график работы")]
+        [StringLength(50)]
+        [Display(Name = "График работы")]
+        public string WorkSchedule { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Специальность обязательна для заполнения")]
+        [StringLength(255, ErrorMessage = "Специальность не должна превышать 255 символов")]
+        [Display(Name = "Специальность")]
+        public string Specialty { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Укажите пол")]
+        [StringLength(20)]
+        [Display(Name = "Пол")]
+        public string Gender { get; set; } = string.Empty;
+
         [Range(0, 9999999, ErrorMessage = "Зарплата должна быть в диапазоне от 0 до 9 999 999")]
         [Display(Name = "Зарплатные ожидания")]
         public int? SalaryExpectations { get; set; }
+
+        [Display(Name = "Наличие автомобиля")]
+        public bool HasCar { get; set; }
+
+        [StringLength(20, ErrorMessage = "Категория прав не должна превышать 20 символов")]
+        [Display(Name = "Категория прав")]
+        public string? DriverLicenseCategory { get; set; }
 
         [Display(Name = "Опыт работы (лет)")]
         [Range(0, 60, ErrorMessage = "Опыт работы не может быть отрицательным или больше 60 лет")]

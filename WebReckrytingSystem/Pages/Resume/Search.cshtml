@@ -139,7 +139,9 @@
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title mb-1">@resume.User?.LastName @resume.User?.FirstName</h5>
                                 <div class="text-muted small mb-2">@resume.UserEmail</div>
-                                <div class="fw-semibold mb-2">@resume.DesiredPosition</div>
+                                <div class="fw-semibold mb-1">@resume.DesiredPosition</div>
+                                <div class="small text-muted mb-2">@resume.Specialty · @resume.City</div>
+                                <p class="small text-muted mb-2">@resume.EmploymentType, @resume.WorkSchedule</p>
                                 <p class="small text-muted flex-grow-1">@(string.IsNullOrWhiteSpace(resume.Skills) ? "Навыки не указаны" : $"Навыки: {resume.Skills}")</p>
 
                                 <div class="mb-3">
