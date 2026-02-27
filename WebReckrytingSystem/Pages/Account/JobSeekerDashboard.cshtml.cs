@@ -105,7 +105,7 @@ namespace WebReckrytingSystem.Pages.Account
         {
             try
             {
-                TotalApplications = _context.JobApplications.Count(a => a.StudentEmail == userEmail);
+                TotalApplications = _context.Set<JobApplication>().Count(a => a.StudentEmail == userEmail);
                 TotalViews = _context.ResumeViews.Count(v => v.ResumeEmail == userEmail);
                 SavedVacanciesCount = _context.SavedVacancies.Count(s => s.StudentEmail == userEmail);
 
@@ -177,7 +177,7 @@ namespace WebReckrytingSystem.Pages.Account
         {
             try
             {
-                var applications = _context.JobApplications
+                var applications = _context.Set<JobApplication>()
                     .Where(a => a.StudentEmail == userEmail)
                     .OrderByDescending(a => a.AppliedAt)
                     .Take(10)
@@ -354,7 +354,7 @@ namespace WebReckrytingSystem.Pages.Account
                 if (string.IsNullOrEmpty(userEmail))
                     return Unauthorized();
 
-                var applications = _context.JobApplications
+                var applications = _context.Set<JobApplication>()
                     .Where(a => a.StudentEmail == userEmail)
                     .OrderByDescending(a => a.AppliedAt)
                     .Take(10)
