@@ -14,8 +14,8 @@ using WebReckrytingSystem.Services;
 namespace WebReckrytingSystem.Pages.Account
 {
     /// <summary>
-        private readonly WebReckrytingSystem.Models.ApplicationDbContext _context;
-            WebReckrytingSystem.Models.ApplicationDbContext context,
+    /// PageModel для личного кабинета работодателя
+    /// </summary>
     [Authorize(Roles = "employer")]
     public class EmployerDashboardModel : PageModel
     {
