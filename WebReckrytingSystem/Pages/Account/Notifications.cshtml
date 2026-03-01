@@ -1,0 +1,29 @@
+@page
+@model WebReckrytingSystem.Pages.Account.NotificationsModel
+@{
+    ViewData["Title"] = "Уведомления";
+}
+
+<div class="container py-5 mt-5">
+    <h1 class="h3 mb-4">Уведомления</h1>
+
+    @if (!Model.Items.Any())
+    {
+        <div class="alert alert-light border">У вас пока нет уведомлений.</div>
+    }
+    else
+    {
+        <div class="list-group shadow-sm">
+            @foreach (var item in Model.Items)
+            {
+                <a href="@(string.IsNullOrWhiteSpace(item.Link) ? "#" : item.Link)" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between gap-3">
+                        <h5 class="mb-1">@item.Title</h5>
+                        <small class="text-muted">@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</small>
+                    </div>
+                    <p class="mb-0">@item.Message</p>
+                </a>
+            }
+        </div>
+    }
+</div>

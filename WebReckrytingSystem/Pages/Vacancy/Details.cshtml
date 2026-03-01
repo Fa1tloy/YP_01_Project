@@ -5,6 +5,11 @@
 }
 
 <div class="container py-5 mt-5">
+    @if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+    {
+        <div class="alert alert-info">@Model.StatusMessage</div>
+    }
+
     @if (Model.Vacancy is null)
     {
         <div class="alert alert-warning">Вакансия не найдена.</div>
@@ -58,7 +63,18 @@
                     }
                 </p>
 
-                <a href="mailto:@Model.Vacancy.AuthorEmail?subject=Отклик на вакансию @Model.Vacancy.Title" class="btn btn-primary">Откликнуться</a>
+                @if (User.Identity?.IsAuthenticated == true && User.IsInRole("job_seeker"))
+                {
+                    <form method="post" asp-page-handler="Apply">
+                        <input type="hidden" name="companyName" value="@Model.Vacancy.CompanyName" />
+                        <input type="hidden" name="title" value="@Model.Vacancy.Title" />
+                        <button type="submit" class="btn btn-primary">Откликнуться</button>
+                    </form>
+                }
+                else
+                {
+                    <a href="/Account/Login" class="btn btn-primary">Войти, чтобы откликнуться</a>
+                }
             </div>
         </div>
     }
