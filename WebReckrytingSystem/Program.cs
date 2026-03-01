@@ -26,7 +26,7 @@ builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 // 3. ВСЕ сервисы
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IVacancyService, VacancyService>();
-builder.Services.AddScoped<AdminService, AdminService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IVacancySearchService, VacancySearchService>();
 
 // 4. Авторизация и аутентификация
