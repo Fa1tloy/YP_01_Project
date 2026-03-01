@@ -161,19 +161,58 @@ namespace WebReckrytingSystem.Migrations
                         .HasColumnType("varchar(255)")
                         .HasColumnName("user_email");
 
+                    b.Property<int?>("Age")
+                        .HasColumnType("int")
+                        .HasColumnName("age");
+
+                    b.Property<string>("BusinessTripReadiness")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("business_trip_readiness");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("city");
+
                     b.Property<string>("DesiredPosition")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
                         .HasColumnName("desired_position");
 
+                    b.Property<string>("DriverLicenseCategory")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("driver_license_category");
+
                     b.Property<string>("EducationDescription")
                         .HasColumnType("longtext")
                         .HasColumnName("education_description");
 
+                    b.Property<string>("EmploymentType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("employment_type");
+
                     b.Property<string>("ExperienceDescription")
                         .HasColumnType("longtext")
                         .HasColumnName("experience_description");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("gender");
+
+                    b.Property<bool>("HasCar")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("has_car");
 
                     b.Property<bool>("IsPublished")
                         .ValueGeneratedOnAdd()
@@ -189,9 +228,27 @@ namespace WebReckrytingSystem.Migrations
                         .HasColumnType("int")
                         .HasColumnName("salary_expectations");
 
+                    b.Property<string>("SearchStatus")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("search_status");
+
                     b.Property<string>("Skills")
                         .HasColumnType("longtext")
                         .HasColumnName("skills");
+
+                    b.Property<string>("Specialty")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("specialty");
+
+                    b.Property<string>("WorkSchedule")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("work_schedule");
 
                     b.HasKey("UserEmail");
 
