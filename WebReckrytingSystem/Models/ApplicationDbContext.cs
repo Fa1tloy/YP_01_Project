@@ -24,6 +24,8 @@ namespace WebReckrytingSystem.Models
         public DbSet<JobApplication> JobApplications { get; set; }
         public DbSet<SavedVacancy> SavedVacancies { get; set; }
         public DbSet<DailyAnalytic> DailyAnalytics { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
 
         // Для миграций — строка подключения, если опции не переданы
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -175,6 +177,34 @@ namespace WebReckrytingSystem.Models
                 entity.Property(e => e.ApplicationsSent).HasColumnName("applications_sent").HasDefaultValue(0);
                 entity.Property(e => e.SavedVacancies).HasColumnName("saved_vacancies").HasDefaultValue(0);
                 entity.HasIndex(e => new { e.UserEmail, e.Date }).IsUnique();
+            });
+
+            // Конфигурация Notification
+            modelBuilder.Entity<Notification>().ToTable("notifications", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.RecipientEmail).HasColumnName("recipient_email").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.SenderEmail).HasColumnName("sender_email").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.Title).HasColumnName("title").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.Message).HasColumnName("message").IsRequired();
+                entity.Property(e => e.Link).HasColumnName("link").HasMaxLength(500);
+                entity.Property(e => e.IsRead).HasColumnName("is_read").HasDefaultValue(false);
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+            });
+
+            // Конфигурация ChatMessage
+            modelBuilder.Entity<ChatMessage>().ToTable("chat_messages", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<ChatMessage>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.SenderEmail).HasColumnName("sender_email").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.RecipientEmail).HasColumnName("recipient_email").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.Message).HasColumnName("message").IsRequired();
+                entity.Property(e => e.VacancyCompanyName).HasColumnName("vacancy_company_name").HasMaxLength(255);
+                entity.Property(e => e.VacancyTitle).HasColumnName("vacancy_title").HasMaxLength(255);
+                entity.Property(e => e.SentAt).HasColumnName("sent_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.IsRead).HasColumnName("is_read").HasDefaultValue(false);
             });
         }
     }

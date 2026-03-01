@@ -1,0 +1,76 @@
+@page
+@model WebReckrytingSystem.Pages.Account.ChatModel
+@{
+    ViewData["Title"] = "Чаты";
+}
+
+<div class="container py-5 mt-5">
+    <h1 class="h3 mb-4">Чаты</h1>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="list-group shadow-sm">
+                @if (!Model.Conversations.Any())
+                {
+                    <div class="list-group-item text-muted">Пока нет активных чатов.</div>
+                }
+                else
+                {
+                    @foreach (var convo in Model.Conversations)
+                    {
+                        var isActive = Model.Peer == convo.PeerEmail && Model.CompanyName == convo.VacancyCompanyName && Model.Title == convo.VacancyTitle;
+                        <a class="list-group-item list-group-item-action @(isActive ? "active" : "")"
+                           asp-page="/Account/Chat"
+                           asp-route-peer="@convo.PeerEmail"
+                           asp-route-companyName="@convo.VacancyCompanyName"
+                           asp-route-title="@convo.VacancyTitle">
+                            <div class="fw-semibold">@convo.PeerEmail</div>
+                            <div class="small">@convo.VacancyTitle</div>
+                            <div class="small text-muted text-truncate">@convo.LastMessage</div>
+                        </a>
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <div class="fw-semibold">@(Model.Peer ?? "Выберите чат")</div>
+                    @if (!string.IsNullOrWhiteSpace(Model.Title))
+                    {
+                        <div class="small text-muted">Вакансия: @Model.Title</div>
+                    }
+                </div>
+                <div class="card-body" style="max-height: 450px; overflow-y: auto;">
+                    @if (!Model.Messages.Any())
+                    {
+                        <p class="text-muted mb-0">Сообщений пока нет.</p>
+                    }
+                    else
+                    {
+                        @foreach (var message in Model.Messages)
+                        {
+                            var isMine = message.SenderEmail == Model.CurrentUserEmail;
+                            <div class="d-flex mb-3 @(isMine ? "justify-content-end" : "justify-content-start")">
+                                <div class="p-2 rounded @(isMine ? "bg-primary text-white" : "bg-light")" style="max-width: 75%;">
+                                    <div>@message.Message</div>
+                                    <div class="small @(isMine ? "text-white-50" : "text-muted")">@message.SentAt.ToLocalTime().ToString("dd.MM HH:mm")</div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+                <div class="card-footer bg-white">
+                    <form method="post" asp-page-handler="Send" class="d-flex gap-2">
+                        <input type="hidden" asp-for="Peer" />
+                        <input type="hidden" asp-for="CompanyName" />
+                        <input type="hidden" asp-for="Title" />
+                        <input asp-for="MessageText" class="form-control" placeholder="Введите сообщение..." />
+                        <button type="submit" class="btn btn-primary" disabled="@(string.IsNullOrWhiteSpace(Model.Peer))">Отправить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

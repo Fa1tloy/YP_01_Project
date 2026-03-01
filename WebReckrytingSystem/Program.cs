@@ -100,6 +100,26 @@ static void EnsureSchemaColumns(string connectionString)
     using var connection = new MySqlConnection(connectionString);
     connection.Open();
 
+    EnsureTableExists(connection, "notifications", @"`id` INT NOT NULL AUTO_INCREMENT,
+`recipient_email` VARCHAR(255) NOT NULL,
+`sender_email` VARCHAR(255) NOT NULL,
+`title` VARCHAR(255) NOT NULL,
+`message` TEXT NOT NULL,
+`link` VARCHAR(500) NULL,
+`is_read` TINYINT(1) NOT NULL DEFAULT 0,
+`created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+PRIMARY KEY (`id`)" );
+
+    EnsureTableExists(connection, "chat_messages", @"`id` INT NOT NULL AUTO_INCREMENT,
+`sender_email` VARCHAR(255) NOT NULL,
+`recipient_email` VARCHAR(255) NOT NULL,
+`message` TEXT NOT NULL,
+`vacancy_company_name` VARCHAR(255) NULL,
+`vacancy_title` VARCHAR(255) NULL,
+`sent_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+`is_read` TINYINT(1) NOT NULL DEFAULT 0,
+PRIMARY KEY (`id`)" );
+
     EnsureColumnExists(connection, "users", "company_name", "VARCHAR(255) NULL");
 
     EnsureColumnExists(connection, "resumes", "city", "VARCHAR(100) NOT NULL DEFAULT ''");
@@ -112,6 +132,13 @@ static void EnsureSchemaColumns(string connectionString)
     EnsureColumnExists(connection, "resumes", "gender", "VARCHAR(20) NOT NULL DEFAULT ''");
     EnsureColumnExists(connection, "resumes", "has_car", "TINYINT(1) NOT NULL DEFAULT 0");
     EnsureColumnExists(connection, "resumes", "driver_license_category", "VARCHAR(20) NULL");
+}
+
+static void EnsureTableExists(MySqlConnection connection, string tableName, string tableDefinition)
+{
+    using var command = connection.CreateCommand();
+    command.CommandText = $"CREATE TABLE IF NOT EXISTS `{tableName}` ({tableDefinition}) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
+    command.ExecuteNonQuery();
 }
 
 static void EnsureColumnExists(MySqlConnection connection, string tableName, string columnName, string columnDefinition)
