@@ -71,6 +71,7 @@ namespace WebReckrytingSystem.Services
                 var vacancy = new Vacancy
                 {
                     CompanyName = model.CompanyName.Trim(),
+                    Region = model.Region.Trim(),
                     Title = model.Title.Trim(),
                     Description = model.Description.Trim(),
                     Requirements = model.Requirements.Trim(),
@@ -78,6 +79,11 @@ namespace WebReckrytingSystem.Services
                     SalaryTo = model.SalaryTo,
                     EmploymentType = model.EmploymentType,
                     WorkSchedule = model.WorkSchedule,
+                    WorkHoursPerDay = model.WorkHoursPerDay,
+                    WorkFormat = model.WorkFormat.Trim(),
+                    SalaryPeriod = model.SalaryPeriod.Trim(),
+                    PaymentFrequency = model.PaymentFrequency.Trim(),
+                    Specialty = model.Specialty.Trim(),
                     AuthorEmail = authorEmail
                 };
 
@@ -117,13 +123,25 @@ namespace WebReckrytingSystem.Services
             }
 
             // Валидация типов
-            var validEmploymentTypes = new[] { "full", "part", "project", "internship", "volunteer" };
+            var validEmploymentTypes = new[] { "full", "part", "project", "internship" };
             if (!validEmploymentTypes.Contains(model.EmploymentType))
                 return ServiceResult.Error("Недопустимый тип занятости");
 
             var validWorkSchedules = new[] { "full_day", "shifts", "flexible", "remote", "shift_work" };
+            var validWorkFormats = new[] { "office", "remote", "hybrid" };
+            var validSalaryPeriods = new[] { "month", "hour", "shift", "service", "rotation" };
+            var validPaymentFrequencies = new[] { "weekly", "biweekly", "monthly", "after_shift", "contract" };
             if (!validWorkSchedules.Contains(model.WorkSchedule))
                 return ServiceResult.Error("Недопустимый график работы");
+
+            if (!string.IsNullOrWhiteSpace(model.WorkFormat) && !validWorkFormats.Contains(model.WorkFormat))
+                return ServiceResult.Error("Недопустимый формат работы");
+
+            if (!string.IsNullOrWhiteSpace(model.SalaryPeriod) && !validSalaryPeriods.Contains(model.SalaryPeriod))
+                return ServiceResult.Error("Недопустимый период дохода");
+
+            if (!string.IsNullOrWhiteSpace(model.PaymentFrequency) && !validPaymentFrequencies.Contains(model.PaymentFrequency))
+                return ServiceResult.Error("Недопустимая частота выплат");
 
             return ServiceResult.Success("Валидация пройдена");
         }
@@ -188,6 +206,7 @@ namespace WebReckrytingSystem.Services
             {
                 // 7. Обновление вакансии
                 existingVacancy.CompanyName = model.CompanyName.Trim();
+                existingVacancy.Region = model.Region.Trim();
                 existingVacancy.Title = model.Title.Trim();
                 existingVacancy.Description = model.Description.Trim();
                 existingVacancy.Requirements = model.Requirements.Trim();
@@ -195,6 +214,11 @@ namespace WebReckrytingSystem.Services
                 existingVacancy.SalaryTo = model.SalaryTo;
                 existingVacancy.EmploymentType = model.EmploymentType;
                 existingVacancy.WorkSchedule = model.WorkSchedule;
+                existingVacancy.WorkHoursPerDay = model.WorkHoursPerDay;
+                existingVacancy.WorkFormat = model.WorkFormat.Trim();
+                existingVacancy.SalaryPeriod = model.SalaryPeriod.Trim();
+                existingVacancy.PaymentFrequency = model.PaymentFrequency.Trim();
+                existingVacancy.Specialty = model.Specialty.Trim();
 
                 _logger.LogInformation("Сохранение обновленной вакансии в репозиторий");
                 var updatedVacancy = _vacancyRepository.Update(existingVacancy);

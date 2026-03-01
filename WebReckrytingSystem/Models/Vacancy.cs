@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace WebReckrytingSystem.Models
 {
@@ -8,6 +7,9 @@ namespace WebReckrytingSystem.Models
         [Required]
         [StringLength(255)]
         public string CompanyName { get; set; } = string.Empty;
+
+        [StringLength(100)]
+        public string Region { get; set; } = string.Empty;
 
         [Required]
         [StringLength(255)]
@@ -29,11 +31,24 @@ namespace WebReckrytingSystem.Models
         [Required]
         public string WorkSchedule { get; set; } = string.Empty;
 
+        public int? WorkHoursPerDay { get; set; }
+
+        [StringLength(50)]
+        public string WorkFormat { get; set; } = string.Empty;
+
+        [StringLength(20)]
+        public string SalaryPeriod { get; set; } = string.Empty;
+
+        [StringLength(50)]
+        public string PaymentFrequency { get; set; } = string.Empty;
+
+        [StringLength(255)]
+        public string Specialty { get; set; } = string.Empty;
+
         [Required]
         [EmailAddress]
         public string AuthorEmail { get; set; } = string.Empty;
 
-        // Навигационные свойства
         public Company Company { get; set; } = null!;
         public User Author { get; set; } = null!;
     }

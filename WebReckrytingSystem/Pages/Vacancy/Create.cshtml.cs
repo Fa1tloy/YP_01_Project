@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
-using WebReckrytingSystem.Data;
 using WebReckrytingSystem.Models;
 using WebReckrytingSystem.Services;
 using Microsoft.Extensions.Logging;
@@ -19,10 +18,23 @@ namespace WebReckrytingSystem.Pages.Vacancy
         [BindProperty]
         public CreateVacancyViewModel VacancyData { get; set; } = new();
 
-        public string UserCompanyName { get; set; } = string.Empty;
-        public bool HasCompany { get; set; }
+        public List<string> CompanySuggestions { get; set; } = new();
 
-        // ✅ ДОБАВЛЕНЫ отсутствующие свойства
+        public IReadOnlyList<string> Specialties { get; } = new List<string>
+        {
+            "Информационные системы и программирование",
+            "Сетевое и системное администрирование",
+            "Экономика и бухгалтерский учет",
+            "Банковское дело",
+            "Дизайн",
+            "Маркетинг",
+            "Юриспруденция",
+            "Техническое обслуживание и ремонт автотранспорта",
+            "Строительство и эксплуатация зданий и сооружений",
+            "Электромонтер",
+            "Туризм и гостеприимство"
+        };
+
         public string? SuccessMessage { get; set; }
         public string? ErrorMessage { get; set; }
 
@@ -42,26 +54,20 @@ namespace WebReckrytingSystem.Pages.Vacancy
             if (string.IsNullOrEmpty(userEmail))
                 return RedirectToPage("/Account/Login");
 
-            var user = _context.Users
-                .FirstOrDefault(u => u.Email == userEmail);
-
-            if (user?.CompanyName != null)
+            var user = _context.Users.FirstOrDefault(u => u.Email == userEmail);
+            if (!string.IsNullOrWhiteSpace(user?.CompanyName))
             {
-                UserCompanyName = user.CompanyName;
                 VacancyData.CompanyName = user.CompanyName;
-                HasCompany = true;
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Сначала создайте компанию в настройках профиля";
-                return RedirectToPage("/Company/Settings");
             }
 
+            LoadSuggestions();
             return Page();
         }
 
         public IActionResult OnPost()
         {
+            LoadSuggestions();
+
             if (!ModelState.IsValid)
             {
                 return Page();
@@ -71,28 +77,18 @@ namespace WebReckrytingSystem.Pages.Vacancy
             if (string.IsNullOrEmpty(userEmail))
                 return RedirectToPage("/Account/Login");
 
-            var user = _context.Users.FirstOrDefault(u => u.Email == userEmail);
-            if (user?.CompanyName != VacancyData.CompanyName)
-            {
-                ModelState.AddModelError("", "Вы можете создавать вакансии только от своей компании");
-                return Page();
-            }
-
             try
             {
                 var result = _vacancyService.CreateVacancy(userEmail, VacancyData);
 
                 if (result.IsSuccess)
                 {
-                    // ✅ Используем TempData для передачи сообщений
                     TempData["SuccessMessage"] = "Вакансия успешно создана и опубликована!";
                     return RedirectToPage("/Account/EmployerDashboard");
                 }
-                else
-                {
-                    ErrorMessage = result.Message;
-                    return Page();
-                }
+
+                ErrorMessage = result.Message;
+                return Page();
             }
             catch (Exception ex)
             {
@@ -100,6 +96,14 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 ErrorMessage = "Произошла ошибка при создании вакансии";
                 return Page();
             }
+        }
+
+        private void LoadSuggestions()
+        {
+            CompanySuggestions = _context.Companies
+                .Select(c => c.Name)
+                .OrderBy(n => n)
+                .ToList();
         }
     }
 }
