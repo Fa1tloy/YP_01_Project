@@ -86,7 +86,7 @@ namespace WebReckrytingSystem.Pages.Account
             return RedirectToPage("/Account/ViewResume");
         }
 
-        private static CreateResumeViewModel MapResumeToViewModel(Resume resume)
+        private static CreateResumeViewModel MapResumeToViewModel(Models.Resume resume)
         {
             var viewModel = new CreateResumeViewModel
             {

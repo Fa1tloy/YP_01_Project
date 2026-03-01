@@ -12,7 +12,7 @@ using WebReckrytingSystem.Models;
 namespace WebReckrytingSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260301132430_initialcreate")]
+    [Migration("20260301191017_initialcreate")]
     partial class initialcreate
     {
         /// <inheritdoc />
@@ -417,6 +417,18 @@ namespace WebReckrytingSystem.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("employment_type");
 
+                    b.Property<string>("PaymentFrequency")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("payment_frequency");
+
+                    b.Property<string>("Region")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("region");
+
                     b.Property<string>("Requirements")
                         .IsRequired()
                         .HasColumnType("longtext")
@@ -426,9 +438,31 @@ namespace WebReckrytingSystem.Migrations
                         .HasColumnType("int")
                         .HasColumnName("salary_from");
 
+                    b.Property<string>("SalaryPeriod")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("salary_period");
+
                     b.Property<int?>("SalaryTo")
                         .HasColumnType("int")
                         .HasColumnName("salary_to");
+
+                    b.Property<string>("Specialty")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("specialty");
+
+                    b.Property<string>("WorkFormat")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("work_format");
+
+                    b.Property<int?>("WorkHoursPerDay")
+                        .HasColumnType("int")
+                        .HasColumnName("work_hours_per_day");
 
                     b.Property<string>("WorkSchedule")
                         .IsRequired()

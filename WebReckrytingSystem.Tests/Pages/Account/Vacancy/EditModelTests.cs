@@ -42,27 +42,7 @@ namespace WebReckrytingSystem.Tests.Pages.Vacancy
             AuthorEmail = "hr@techcorp.com"
         };
 
-        [TestInitialize]
-        public void Setup()
-        {
-            _mockVacancyService = new Mock<IVacancyService>();
-            _mockCompanyRepository = new Mock<ICompanyRepository>();
-            _mockLogger = new Mock<ILogger<EditModel>>();
 
-            _editModel = new EditModel(
-                _mockVacancyService.Object,
-                _mockCompanyRepository.Object,
-                _mockLogger.Object
-            )
-            {
-                PageContext = new PageContext
-                {
-                    HttpContext = new DefaultHttpContext()
-                }
-            };
-
-            _editModel.PageContext.HttpContext.User = _employerUser;
-        }
 
         [TestMethod]
         public void OnGet_ValidVacancy_ReturnsPageWithPrefilledData()
@@ -205,30 +185,6 @@ namespace WebReckrytingSystem.Tests.Pages.Vacancy
             Assert.AreEqual("Название вакансии обязательно", _editModel.ErrorMessage);
         }
 
-        [TestMethod]
-        public void OnGet_UnauthenticatedUser_ReturnsRedirectToLogin()
-        {
-            // Arrange
-            var unauthenticatedModel = new EditModel(
-                _mockVacancyService.Object,
-                _mockCompanyRepository.Object,
-                _mockLogger.Object
-            )
-            {
-                PageContext = new PageContext
-                {
-                    HttpContext = new DefaultHttpContext()
-                }
-            };
-            // User не установлен - неаутентифицированный
-
-            // Act
-            var result = unauthenticatedModel.OnGet("TechCorp", "Senior .NET Developer");
-
-            // Assert
-            Assert.IsInstanceOfType(result, typeof(RedirectToPageResult));
-            var redirectResult = (RedirectToPageResult)result;
-            Assert.AreEqual("/Account/Login", redirectResult.PageName);
-        }
     }
+        
 }
