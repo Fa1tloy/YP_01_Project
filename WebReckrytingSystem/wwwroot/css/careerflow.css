@@ -18,6 +18,22 @@ body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     color: var(--text-dark);
     overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+img,
+.table,
+.card,
+.form-control,
+.btn,
+.dropdown-menu {
+    max-width: 100%;
 }
 
 /* ===== HERO SECTION ===== */
@@ -88,6 +104,7 @@ body {
 .navbar-search-form {
     display: flex;
     gap: 0.5rem;
+    align-items: stretch;
 }
 
 .navbar-search-form .form-control {
@@ -109,6 +126,10 @@ body {
     padding: 1rem 0;
 }
 
+.navbar .container {
+    align-items: flex-start;
+}
+
 .navbar-brand .logo-text {
     font-size: 1.8rem;
     font-weight: 800;
@@ -123,6 +144,7 @@ body {
     font-weight: 500;
     margin: 0 1rem;
     transition: var(--transition);
+    white-space: nowrap;
 }
 
     .navbar-nav .nav-link:hover {
@@ -152,7 +174,7 @@ body {
 }
 
 .hero-title {
-    font-size: 3.5rem;
+    font-size: clamp(2rem, 4vw, 3.5rem);
     font-weight: 800;
     margin-bottom: 1rem;
     color: white;
@@ -160,7 +182,7 @@ body {
 }
 
 .hero-subtitle {
-    font-size: 1.5rem;
+    font-size: clamp(1rem, 2.4vw, 1.5rem);
     font-weight: 300;
     margin-bottom: 2rem;
     opacity: 0.9;
@@ -335,6 +357,7 @@ body {
 .footer {
     background: #2c3e50;
     color: white;
+    margin-top: auto;
 }
 
     .footer h5, .footer h6 {
@@ -378,6 +401,11 @@ body {
 
     .navbar-nav .nav-link {
         margin: 0.5rem 0;
+    }
+
+    .hero-section {
+        min-height: auto;
+        padding: 110px 0 70px;
     }
 }
 /* ===== LOGO STYLES ===== */
@@ -477,15 +505,49 @@ body {
 
 @media (max-width: 991px) {
     .navbar-auth-content {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .navbar-auth-content {
         margin-top: 0.8rem;
     }
 
     .navbar-search-block {
         max-width: 100%;
         margin-bottom: 0.75rem;
+        width: 100%;
     }
 
     .navbar-nav .nav-link {
         margin: 0.2rem 0;
+    }
+
+    .navbar-search-form {
+        flex-wrap: wrap;
+    }
+
+    .navbar-search-form .form-control,
+    .navbar-search-form .btn {
+        width: 100%;
+    }
+
+    .search-mode-switcher {
+        flex-wrap: wrap;
+    }
+
+    .search-mode-btn {
+        flex: 1 1 calc(50% - 0.4rem);
+        text-align: center;
+    }
+
+    .navbar-nav {
+        width: 100%;
+        align-items: flex-start !important;
+    }
+
+    .navbar-nav .dropdown-menu {
+        position: static;
+        width: 100%;
     }
 }
