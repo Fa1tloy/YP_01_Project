@@ -133,8 +133,8 @@ namespace WebReckrytingSystem.Services
                 return ServiceResult<User>.Error("Неверный email или пароль");
             }
 
-            // Проверка пароля
-            if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            // Проверка пароля (поддержка legacy-аккаунтов с паролем без хеша)
+            if (!VerifyPassword(password, user.PasswordHash, email))
             {
                 _logger.LogWarning("⚠️ Неверный пароль для {Email}", email);
                 return ServiceResult<User>.Error("Неверный email или пароль");
@@ -154,6 +154,28 @@ namespace WebReckrytingSystem.Services
 
             string pattern = @"^[^\s@]+@[^\s@]+\.[^\s@]+$";
             return Regex.IsMatch(email, pattern);
+        }
+
+        private bool VerifyPassword(string password, string passwordHash, string email)
+        {
+            if (string.IsNullOrWhiteSpace(passwordHash))
+            {
+                return false;
+            }
+
+            try
+            {
+                return BCrypt.Net.BCrypt.Verify(password, passwordHash);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex,
+                    "⚠️ Для пользователя {Email} хранится пароль в legacy-формате. Используем временную совместимость.",
+                    email);
+
+                // Совместимость со старой БД, где пароль мог храниться в открытом виде
+                return string.Equals(password, passwordHash, StringComparison.Ordinal);
+            }
         }
     }
 }

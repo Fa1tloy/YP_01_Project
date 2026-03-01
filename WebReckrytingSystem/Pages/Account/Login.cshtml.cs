@@ -29,15 +29,17 @@ namespace WebReckrytingSystem.Pages.Account
         public string? ErrorMessage { get; set; }
         public string? SuccessMessage { get; set; }
 
-        public void OnGet(string? returnUrl = null)
+        public IActionResult OnGet(string? returnUrl = null)
         {
             ReturnUrl = returnUrl;
 
             if (User.Identity?.IsAuthenticated == true)
             {
                 _logger.LogInformation("✅ Пользователь уже аутентифицирован, редирект на дашборд");
-                RedirectToDashboard(User.FindFirst(ClaimTypes.Role)?.Value);
+                return RedirectToDashboard(User.FindFirst(ClaimTypes.Role)?.Value);
             }
+
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -93,9 +95,9 @@ namespace WebReckrytingSystem.Pages.Account
                     _logger.LogInformation("✅ Успешный вход: {Email} ({Role})", user.Email, user.Role);
 
                     // Очистка кэша, чтобы пользователь видел актуальные данные
-                    Response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
-                    Response.Headers.Add("Pragma", "no-cache");
-                    Response.Headers.Add("Expires", "0");
+                    Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+                    Response.Headers["Pragma"] = "no-cache";
+                    Response.Headers["Expires"] = "0";
 
                     return RedirectToDashboard(user.Role);
                 }
