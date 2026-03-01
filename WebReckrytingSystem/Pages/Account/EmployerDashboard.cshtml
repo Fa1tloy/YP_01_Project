@@ -5,7 +5,7 @@
     ViewData["Title"] = "Личный кабинет работодателя";
 }
 
-<div class="container-fluid mt-4">
+<div class="container-fluid dashboard-page">
     <!-- ЗАГОЛОВОК -->
     <div class="dashboard-header">
         <div class="user-info">
@@ -220,6 +220,10 @@
 
 @section Styles {
     <style>
+        .dashboard-page {
+            padding-top: 104px;
+        }
+
         .dashboard-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -253,6 +257,10 @@
         }
 
         @@media (max-width: 768px) {
+            .dashboard-page {
+                padding-top: 112px;
+            }
+
             .dashboard-header {
                 flex-direction: column;
                 text-align: center;
