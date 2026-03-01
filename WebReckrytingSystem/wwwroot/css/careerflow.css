@@ -410,8 +410,9 @@ img,
     }
 
     .hero-section {
+        margin-top: 0;
         min-height: auto;
-        padding: 110px 0 70px;
+        padding: 136px 0 70px;
     }
 }
 /* ===== LOGO STYLES ===== */
