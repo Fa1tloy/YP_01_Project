@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 using WebReckrytingSystem.Models;
 using WebReckrytingSystem.Services;
@@ -26,7 +26,8 @@ builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 // 3. ВСЕ сервисы
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IVacancyService, VacancyService>();
-builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<AdminService>();
+builder.Services.AddScoped<IAdminService>(sp => sp.GetRequiredService<AdminService>());
 builder.Services.AddScoped<IVacancySearchService, VacancySearchService>();
 
 // 4. Авторизация и аутентификация
