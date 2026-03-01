@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
-using WebReckrytingSystem.Data;
 using WebReckrytingSystem.Models;
 using WebReckrytingSystem.Services;
 
@@ -12,15 +11,16 @@ namespace WebReckrytingSystem.Pages.Vacancy
     public class EditModel : PageModel
     {
         private readonly IVacancyService _vacancyService;
-        private readonly ICompanyRepository _companyRepository;
+        private readonly ApplicationDbContext _context;
         private readonly ILogger<EditModel> _logger;
 
-        public EditModel(IVacancyService vacancyService,
-                        ICompanyRepository companyRepository,
-                        ILogger<EditModel> logger)
+        public EditModel(
+            IVacancyService vacancyService,
+            ApplicationDbContext context,
+            ILogger<EditModel> logger)
         {
             _vacancyService = vacancyService;
-            _companyRepository = companyRepository;
+            _context = context;
             _logger = logger;
         }
 
@@ -28,131 +28,122 @@ namespace WebReckrytingSystem.Pages.Vacancy
         public CreateVacancyViewModel VacancyData { get; set; } = new();
 
         public Models.Vacancy CurrentVacancy { get; set; } = null!;
-        public List<Models.Company> Companies { get; set; } = new();
+        public List<string> CompanySuggestions { get; set; } = new();
+
+        public IReadOnlyList<string> Specialties { get; } = new List<string>
+        {
+            "РРЅС„РѕСЂРјР°С†РёРѕРЅРЅС‹Рµ СЃРёСЃС‚РµРјС‹ Рё РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ",
+            "РЎРµС‚РµРІРѕРµ Рё СЃРёСЃС‚РµРјРЅРѕРµ Р°РґРјРёРЅРёСЃС‚СЂРёСЂРѕРІР°РЅРёРµ",
+            "Р­РєРѕРЅРѕРјРёРєР° Рё Р±СѓС…РіР°Р»С‚РµСЂСЃРєРёР№ СѓС‡РµС‚",
+            "Р‘Р°РЅРєРѕРІСЃРєРѕРµ РґРµР»Рѕ",
+            "Р”РёР·Р°Р№РЅ",
+            "РњР°СЂРєРµС‚РёРЅРі",
+            "Р®СЂРёСЃРїСЂСѓРґРµРЅС†РёСЏ",
+            "РўРµС…РЅРёС‡РµСЃРєРѕРµ РѕР±СЃР»СѓР¶РёРІР°РЅРёРµ Рё СЂРµРјРѕРЅС‚ Р°РІС‚РѕС‚СЂР°РЅСЃРїРѕСЂС‚Р°",
+            "РЎС‚СЂРѕРёС‚РµР»СЊСЃС‚РІРѕ Рё СЌРєСЃРїР»СѓР°С‚Р°С†РёСЏ Р·РґР°РЅРёР№ Рё СЃРѕРѕСЂСѓР¶РµРЅРёР№",
+            "Р­Р»РµРєС‚СЂРѕРјРѕРЅС‚РµСЂ",
+            "РўСѓСЂРёР·Рј Рё РіРѕСЃС‚РµРїСЂРёРёРјСЃС‚РІРѕ"
+        };
 
         public string? SuccessMessage { get; set; }
         public string? ErrorMessage { get; set; }
 
         public IActionResult OnGet(string companyName, string title)
         {
-            _logger.LogInformation($"GET запрос на редактирование вакансии: {companyName} - {title}");
+            _logger.LogInformation("GET request to edit vacancy: {Company} - {Title}", companyName, title);
 
-            // Получение email пользователя
             var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
             if (string.IsNullOrEmpty(userEmail))
             {
-                _logger.LogWarning("Пользователь не аутентифицирован");
+                _logger.LogWarning("Unauthorized user tried to access vacancy edit");
                 return RedirectToPage("/Account/Login");
             }
 
-            // Загрузка вакансии
             CurrentVacancy = _vacancyService.GetVacancy(companyName, title);
             if (CurrentVacancy == null)
             {
-                _logger.LogWarning($"Вакансия не найдена: {companyName} - {title}");
-                ErrorMessage = "Вакансия не найдена";
+                _logger.LogWarning("Vacancy not found: {Company} - {Title}", companyName, title);
+                ErrorMessage = "Р’Р°РєР°РЅСЃРёСЏ РЅРµ РЅР°Р№РґРµРЅР°";
+                LoadSuggestions();
                 return Page();
             }
 
-            // Проверка авторства
             if (CurrentVacancy.AuthorEmail != userEmail)
             {
-                _logger.LogWarning($"Попытка редактирования чужой вакансии. Автор: {CurrentVacancy.AuthorEmail}, Пользователь: {userEmail}");
+                _logger.LogWarning(
+                    "Attempt to edit vacancy by non-author. Author: {Author}, user: {User}",
+                    CurrentVacancy.AuthorEmail,
+                    userEmail);
                 return RedirectToPage("/AccessDenied");
             }
 
-            // Предзаполнение формы
             VacancyData.CompanyName = CurrentVacancy.CompanyName;
+            VacancyData.Region = CurrentVacancy.Region;
+            VacancyData.EmploymentType = CurrentVacancy.EmploymentType;
             VacancyData.Title = CurrentVacancy.Title;
             VacancyData.Description = CurrentVacancy.Description;
             VacancyData.Requirements = CurrentVacancy.Requirements;
+            VacancyData.WorkSchedule = CurrentVacancy.WorkSchedule;
+            VacancyData.WorkHoursPerDay = CurrentVacancy.WorkHoursPerDay;
+            VacancyData.WorkFormat = CurrentVacancy.WorkFormat;
             VacancyData.SalaryFrom = CurrentVacancy.SalaryFrom;
             VacancyData.SalaryTo = CurrentVacancy.SalaryTo;
-            VacancyData.EmploymentType = CurrentVacancy.EmploymentType;
-            VacancyData.WorkSchedule = CurrentVacancy.WorkSchedule;
+            VacancyData.SalaryPeriod = CurrentVacancy.SalaryPeriod;
+            VacancyData.PaymentFrequency = CurrentVacancy.PaymentFrequency;
+            VacancyData.Specialty = CurrentVacancy.Specialty;
 
-            // Загрузка компаний пользователя
-            LoadCompanies(userEmail);
-
-            _logger.LogInformation($"Форма редактирования загружена для вакансии: {CurrentVacancy.Title}");
+            LoadSuggestions();
             return Page();
         }
 
         public IActionResult OnPost(string companyName, string title)
         {
-            _logger.LogInformation($"POST запрос на обновление вакансии: {companyName} - {title}");
+            _logger.LogInformation("POST request to update vacancy: {Company} - {Title}", companyName, title);
+            LoadSuggestions();
 
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning("Модель не валидна");
-
-                // Перезагрузка данных для отображения формы
-                var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
-                if (!string.IsNullOrEmpty(userEmail))
-                {
-                    LoadCompanies(userEmail);
-                    CurrentVacancy = _vacancyService.GetVacancy(companyName, title) ?? new Models.Vacancy();
-                }
-
+                CurrentVacancy = _vacancyService.GetVacancy(companyName, title) ?? new Models.Vacancy();
                 return Page();
             }
 
-            var userEmailClaim = User.FindFirst(ClaimTypes.Email)?.Value;
-            if (string.IsNullOrEmpty(userEmailClaim))
+            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(userEmail))
             {
-                ErrorMessage = "Ошибка аутентификации";
-                _logger.LogError("Email пользователя не найден в claims");
+                ErrorMessage = "РћС€РёР±РєР° Р°РІС‚РѕСЂРёР·Р°С†РёРё";
+                _logger.LogWarning("No email claim while updating vacancy");
+                CurrentVacancy = _vacancyService.GetVacancy(companyName, title) ?? new Models.Vacancy();
                 return Page();
             }
 
             try
             {
-                _logger.LogInformation("Вызов VacancyService.UpdateVacancy");
-                var result = _vacancyService.UpdateVacancy(companyName, title, userEmailClaim, VacancyData);
-
+                var result = _vacancyService.UpdateVacancy(companyName, title, userEmail, VacancyData);
                 if (result.IsSuccess)
                 {
-                    _logger.LogInformation("Вакансия успешно обновлена");
-                    TempData["SuccessMessage"] = "Вакансия успешно обновлена!";
+                    TempData["SuccessMessage"] = "Р’Р°РєР°РЅСЃРёСЏ СѓСЃРїРµС€РЅРѕ РѕР±РЅРѕРІР»РµРЅР°!";
                     return RedirectToPage("/Account/EmployerDashboard");
                 }
-                else
-                {
-                    ErrorMessage = result.Message;
-                    _logger.LogWarning($"Ошибка обновления вакансии: {result.Message}");
 
-                    // Перезагрузка данных для отображения формы
-                    var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
-                    if (!string.IsNullOrEmpty(userEmail))
-                    {
-                        LoadCompanies(userEmail);
-                        CurrentVacancy = _vacancyService.GetVacancy(companyName, title) ?? new Models.Vacancy();
-                    }
-
-                    return Page();
-                }
+                ErrorMessage = result.Message;
+                CurrentVacancy = _vacancyService.GetVacancy(companyName, title) ?? new Models.Vacancy();
+                return Page();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Исключение при обновлении вакансии");
-                ErrorMessage = "Произошла ошибка при обновлении вакансии";
-
-                // Перезагрузка данных для отображения формы
-                var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
-                if (!string.IsNullOrEmpty(userEmail))
-                {
-                    LoadCompanies(userEmail);
-                    CurrentVacancy = _vacancyService.GetVacancy(companyName, title) ?? new Models.Vacancy();
-                }
-
+                _logger.LogError(ex, "Unexpected error while updating vacancy");
+                ErrorMessage = "РџСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР° РїСЂРё РѕР±РЅРѕРІР»РµРЅРёРё РІР°РєР°РЅСЃРёРё";
+                CurrentVacancy = _vacancyService.GetVacancy(companyName, title) ?? new Models.Vacancy();
                 return Page();
             }
         }
 
-        private void LoadCompanies(string userEmail)
+        private void LoadSuggestions()
         {
-            Companies = _companyRepository.GetUserCompanies(userEmail).ToList();
-            _logger.LogInformation($"Загружено компаний для пользователя {userEmail}: {Companies.Count}");
+            CompanySuggestions = _context.Companies
+                .Select(c => c.Name)
+                .OrderBy(n => n)
+                .ToList();
         }
     }
 }

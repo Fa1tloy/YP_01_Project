@@ -9,6 +9,10 @@ namespace WebReckrytingSystem.Models
         [Display(Name = "Название компании")]
         public string CompanyName { get; set; } = string.Empty;
 
+        [StringLength(100, ErrorMessage = "Регион не должен превышать 100 символов")]
+        [Display(Name = "Регион")]
+        public string Region { get; set; } = string.Empty;
+
         [Required(ErrorMessage = "Название вакансии обязательно")]
         [StringLength(255, ErrorMessage = "Название вакансии не должно превышать 255 символов")]
         [Display(Name = "Должность/название вакансии")]
@@ -24,8 +28,8 @@ namespace WebReckrytingSystem.Models
         [Display(Name = "Требования к кандидату")]
         public string Requirements { get; set; } = string.Empty;
 
-        [Range(0, 9999999, ErrorMessage = "Зарплата должна быть в диапазоне от 0 до 9 999 999")]
-        [Display(Name = "Зарплата от (руб.)")]
+        [Range(0, 9999999, ErrorMessage = "Доход должен быть в диапазоне от 0 до 9 999 999")]
+        [Display(Name = "Доход от (руб.)")]
         public int? SalaryFrom { get; set; }
 
         [Range(0, 9999999, ErrorMessage = "Зарплата должна быть в диапазоне от 0 до 9 999 999")]
@@ -39,5 +43,25 @@ namespace WebReckrytingSystem.Models
         [Required(ErrorMessage = "График работы обязателен")]
         [Display(Name = "График работы")]
         public string WorkSchedule { get; set; } = string.Empty;
+
+        [Range(1, 24, ErrorMessage = "Рабочие часы в день должны быть от 1 до 24")]
+        [Display(Name = "Рабочие часы в день")]
+        public int? WorkHoursPerDay { get; set; }
+
+        [Display(Name = "Формат работы")]
+        [StringLength(50)]
+        public string WorkFormat { get; set; } = string.Empty;
+
+        [Display(Name = "Период дохода")]
+        [StringLength(20)]
+        public string SalaryPeriod { get; set; } = string.Empty;
+
+        [Display(Name = "Частота выплат")]
+        [StringLength(50)]
+        public string PaymentFrequency { get; set; } = string.Empty;
+
+        [Display(Name = "Специальность")]
+        [StringLength(255)]
+        public string Specialty { get; set; } = string.Empty;
     }
 }

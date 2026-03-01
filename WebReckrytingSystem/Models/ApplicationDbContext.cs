@@ -109,6 +109,7 @@ namespace WebReckrytingSystem.Models
             {
                 entity.HasKey(v => new { v.CompanyName, v.Title });
                 entity.Property(e => e.CompanyName).HasColumnName("company_name").HasMaxLength(255);
+                entity.Property(e => e.Region).HasColumnName("region").HasMaxLength(100);
                 entity.Property(e => e.Title).HasColumnName("title").HasMaxLength(255);
                 entity.Property(e => e.Description).HasColumnName("description");
                 entity.Property(e => e.Requirements).HasColumnName("requirements");
@@ -116,6 +117,11 @@ namespace WebReckrytingSystem.Models
                 entity.Property(e => e.SalaryTo).HasColumnName("salary_to");
                 entity.Property(e => e.EmploymentType).HasColumnName("employment_type");
                 entity.Property(e => e.WorkSchedule).HasColumnName("work_schedule");
+                entity.Property(e => e.WorkHoursPerDay).HasColumnName("work_hours_per_day");
+                entity.Property(e => e.WorkFormat).HasColumnName("work_format").HasMaxLength(50);
+                entity.Property(e => e.SalaryPeriod).HasColumnName("salary_period").HasMaxLength(20);
+                entity.Property(e => e.PaymentFrequency).HasColumnName("payment_frequency").HasMaxLength(50);
+                entity.Property(e => e.Specialty).HasColumnName("specialty").HasMaxLength(255);
                 entity.Property(e => e.AuthorEmail).HasColumnName("author_email").HasMaxLength(255);
 
                 entity.HasOne(v => v.Company).WithMany(c => c.Vacancies).HasForeignKey(v => v.CompanyName).OnDelete(DeleteBehavior.Cascade);
