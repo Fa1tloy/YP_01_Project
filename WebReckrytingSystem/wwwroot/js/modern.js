@@ -11,11 +11,24 @@
 
     // спиннер на кнопки
     document.querySelectorAll('form').forEach(form => {
-        form.addEventListener('submit', () => {
+        form.addEventListener('submit', (event) => {
             const btn = form.querySelector('button[type="submit"]');
             if (!btn) return;
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Обработка...';
+
+            if (!btn.dataset.originalText) {
+                btn.dataset.originalText = btn.innerHTML;
+            }
+
+            setTimeout(() => {
+                if (event.defaultPrevented || !form.checkValidity()) {
+                    btn.disabled = false;
+                    btn.innerHTML = btn.dataset.originalText;
+                    return;
+                }
+
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Обработка...';
+            }, 0);
         });
     });
 
