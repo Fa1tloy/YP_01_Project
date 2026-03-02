@@ -1,0 +1,35 @@
+@page
+@model WebReckrytingSystem.Pages.Admin.VacancyDetailsModel
+@{
+    ViewData["Title"] = "Детали вакансии";
+    Layout = "_AdminLayout";
+}
+
+@if (Model.Vacancy == null)
+{
+    <div class="alert alert-warning">Вакансия не найдена.</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">@Model.Vacancy.Title</h5>
+            <span class="badge bg-secondary">@Model.Vacancy.CompanyName</span>
+        </div>
+        <div class="card-body">
+            <p><strong>Автор:</strong> @Model.Vacancy.AuthorEmail</p>
+            <p><strong>Регион:</strong> @Model.Vacancy.Region</p>
+            <p><strong>Занятость:</strong> @Model.Vacancy.EmploymentType</p>
+            <p><strong>График:</strong> @Model.Vacancy.WorkSchedule</p>
+            <p><strong>Описание:</strong><br/>@Model.Vacancy.Description</p>
+            <p><strong>Требования:</strong><br/>@Model.Vacancy.Requirements</p>
+
+            <div class="d-flex gap-2">
+                <a asp-page="/Admin/VacancyEdit" asp-route-companyName="@Model.Vacancy.CompanyName" asp-route-title="@Model.Vacancy.Title" class="btn btn-warning">
+                    <i class="fas fa-edit me-1"></i>Редактировать
+                </a>
+                <a asp-page="/Admin/Vacancies/Vacancies" class="btn btn-outline-secondary">Назад</a>
+            </div>
+        </div>
+    </div>
+}

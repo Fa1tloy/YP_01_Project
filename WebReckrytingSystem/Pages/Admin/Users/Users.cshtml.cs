@@ -34,17 +34,17 @@ namespace WebReckrytingSystem.Pages.Admin.Users
         {
             var query = _context.Users.AsQueryable();
 
-            // Применяем фильтры
+            // Apply filters
             if (!string.IsNullOrWhiteSpace(SearchEmail))
                 query = query.Where(u => u.Email.Contains(SearchEmail));
 
             if (!string.IsNullOrWhiteSpace(FilterRole))
                 query = query.Where(u => u.Role == FilterRole);
 
-            // Подсчет общего количества
+            // Total count
             var totalCount = query.Count();
 
-            // Применяем пагинацию
+            // Pagination
             var items = query
                 .Skip((Page - 1) * PageSize)
                 .Take(PageSize)
@@ -65,9 +65,22 @@ namespace WebReckrytingSystem.Pages.Admin.Users
             if (user == null)
                 return NotFound();
 
-            user.Role = user.Role == "blocked" ? "job_seeker" : "blocked";
-            await _context.SaveChangesAsync();
+            if (user.Role == "admin")
+            {
+                TempData["ErrorMessage"] = "РђРґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР° РЅРµР»СЊР·СЏ Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ.";
+                return RedirectToPage();
+            }
 
+            if (user.Role == "blocked")
+            {
+                user.Role = string.IsNullOrWhiteSpace(user.CompanyName) ? "job_seeker" : "employer";
+            }
+            else
+            {
+                user.Role = "blocked";
+            }
+
+            await _context.SaveChangesAsync();
             return RedirectToPage();
         }
     }

@@ -185,3 +185,19 @@ CREATE TABLE daily_analytics (
 ) ENGINE=InnoDB;
 
 CREATE INDEX idx_daily_analytics_user_email ON daily_analytics(user_email);
+
+-- ---------------------------------------------------------
+-- Базовые данные: заранее созданный администратор
+-- Логин:    admin@careerflow.local
+-- Пароль:   Admin123! (legacy-совместимый формат)
+-- Роль:     admin
+-- ---------------------------------------------------------
+INSERT INTO users (email, password_hash, first_name, last_name, role, company_name)
+VALUES (
+    'admin@careerflow.local',
+    'Admin123!',
+    'System',
+    'Administrator',
+    'admin',
+    NULL
+);

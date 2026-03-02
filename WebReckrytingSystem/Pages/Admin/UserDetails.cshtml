@@ -1,0 +1,23 @@
+@page
+@model WebReckrytingSystem.Pages.Admin.UserDetailsModel
+@{
+    ViewData["Title"] = "Пользователь";
+    Layout = "_AdminLayout";
+}
+
+@if (Model.UserData == null)
+{
+    <div class="alert alert-warning">Пользователь не найден.</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="card-header"><h5 class="mb-0">@Model.UserData.FirstName @Model.UserData.LastName</h5></div>
+        <div class="card-body">
+            <p><strong>Email:</strong> @Model.UserData.Email</p>
+            <p><strong>Роль:</strong> @Model.UserData.Role</p>
+            <p><strong>Компания:</strong> @(Model.UserData.CompanyName ?? "-")</p>
+            <a asp-page="/Admin/Users/Users" class="btn btn-outline-secondary">Назад</a>
+        </div>
+    </div>
+}
