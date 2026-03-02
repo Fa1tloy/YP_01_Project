@@ -1,0 +1,30 @@
+@page
+@model WebReckrytingSystem.Pages.Admin.ResumeDetailsModel
+@{
+    ViewData["Title"] = "Резюме";
+    Layout = "_AdminLayout";
+}
+
+@if (Model.Resume == null)
+{
+    <div class="alert alert-warning">Резюме не найдено.</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">@Model.Resume.DesiredPosition</h5>
+            <span class="badge bg-@(Model.Resume.IsPublished ? "success" : "secondary")">@(Model.Resume.IsPublished ? "Опубликовано" : "Черновик")</span>
+        </div>
+        <div class="card-body">
+            <p><strong>Email:</strong> @Model.Resume.UserEmail</p>
+            <p><strong>Навыки:</strong> @Model.Resume.Skills</p>
+            <p><strong>Опыт:</strong><br/>@Model.Resume.ExperienceDescription</p>
+            <p><strong>Образование:</strong><br/>@Model.Resume.EducationDescription</p>
+            <div class="d-flex gap-2">
+                <a asp-page="/Admin/ResumeEdit" asp-route-email="@Model.Resume.UserEmail" class="btn btn-warning">Редактировать</a>
+                <a asp-page="/Admin/Resumes" class="btn btn-outline-secondary">Назад</a>
+            </div>
+        </div>
+    </div>
+}

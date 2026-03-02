@@ -1,0 +1,31 @@
+@page
+@model WebReckrytingSystem.Pages.Admin.VacancyEditModel
+@{
+    ViewData["Title"] = "Редактирование вакансии";
+    Layout = "_AdminLayout";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header"><h5 class="mb-0">Редактирование вакансии</h5></div>
+    <div class="card-body">
+        <form method="post">
+            <div class="row g-3">
+                <div class="col-md-6"><label asp-for="VacancyData.CompanyName"></label><input asp-for="VacancyData.CompanyName" class="form-control" /></div>
+                <div class="col-md-6"><label asp-for="VacancyData.Title"></label><input asp-for="VacancyData.Title" class="form-control" /></div>
+                <div class="col-md-4"><label asp-for="VacancyData.Region"></label><input asp-for="VacancyData.Region" class="form-control" /></div>
+                <div class="col-md-4"><label asp-for="VacancyData.EmploymentType"></label><input asp-for="VacancyData.EmploymentType" class="form-control" /></div>
+                <div class="col-md-4"><label asp-for="VacancyData.WorkSchedule"></label><input asp-for="VacancyData.WorkSchedule" class="form-control" /></div>
+                <div class="col-md-6"><label asp-for="VacancyData.Description"></label><textarea asp-for="VacancyData.Description" class="form-control" rows="4"></textarea></div>
+                <div class="col-md-6"><label asp-for="VacancyData.Requirements"></label><textarea asp-for="VacancyData.Requirements" class="form-control" rows="4"></textarea></div>
+            </div>
+            <div class="mt-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+                <a asp-page="/Admin/Vacancies/Vacancies" class="btn btn-outline-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

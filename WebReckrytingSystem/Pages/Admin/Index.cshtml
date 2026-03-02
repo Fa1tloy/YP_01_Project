@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model WebReckrytingSystem.Pages.Admin.IndexModel
 @{
     ViewData["Title"] = "Дашборд";
@@ -53,5 +53,5 @@
 <div class="alert alert-warning">
     <i class="fa fa-exclamation-triangle me-2"></i>
     Ожидают верификации: <strong>@Model.Stats.PendingVerifications</strong> компаний
-    <a asp-page="/Admin/Companies/Index" class="btn btn-sm btn-warning ms-3">Проверить</a>
+    <a asp-page="/Admin/Companies/Companies" class="btn btn-sm btn-warning ms-3">Проверить</a>
 </div>
