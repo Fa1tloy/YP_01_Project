@@ -16,7 +16,7 @@ public class CompanyDetailsModel : PageModel
         _context = context;
     }
 
-    public Company? Company { get; private set; }
+    public Models.Company? Company { get; private set; }
 
     public async Task<IActionResult> OnGetAsync(string name)
     {
