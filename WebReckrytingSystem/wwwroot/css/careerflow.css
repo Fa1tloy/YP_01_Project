@@ -125,6 +125,13 @@ img,
     backdrop-filter: blur(10px);
     padding: 1rem 0;
 }
+.navbar.fixed-top {
+    position: fixed !important;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1030;
+}
 
 .navbar .container {
     align-items: flex-start;
