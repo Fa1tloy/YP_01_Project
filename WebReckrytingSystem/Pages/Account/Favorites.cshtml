@@ -1,0 +1,54 @@
+﻿@page
+@model WebReckrytingSystem.Pages.Account.FavoritesModel
+@{
+    ViewData["Title"] = "Избранное";
+}
+
+<div class="container py-5 mt-5">
+    <h1 class="h3 mb-4">Избранное</h1>
+
+    @if (User.IsInRole("job_seeker"))
+    {
+        if (Model.SavedVacancies.Any())
+        {
+            <div class="list-group">
+                @foreach (var item in Model.SavedVacancies)
+                {
+                    <a asp-page="/Vacancy/Details" asp-route-companyName="@item.Vacancy.CompanyName" asp-route-title="@item.Vacancy.Title" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">@item.Vacancy.Title</h5>
+                            <small>@item.SavedAt.ToLocalTime().ToString("dd.MM.yyyy")</small>
+                        </div>
+                        <p class="mb-1">@item.Vacancy.CompanyName</p>
+                    </a>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">Нет сохранённых вакансий.</p>
+        }
+    }
+    else if (User.IsInRole("employer"))
+    {
+        if (Model.SavedResumes.Any())
+        {
+            <div class="list-group">
+                @foreach (var item in Model.SavedResumes)
+                {
+                    <a asp-page="/Resume/Details" asp-route-userEmail="@item.Resume.UserEmail" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">@item.Resume.DesiredPosition</h5>
+                            <small>@item.SavedAt.ToLocalTime().ToString("dd.MM.yyyy")</small>
+                        </div>
+                        <p class="mb-1">@item.Resume.User?.FirstName @item.Resume.User?.LastName</p>
+                    </a>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">Нет сохранённых резюме.</p>
+        }
+    }
+</div>

@@ -12,7 +12,7 @@ using WebReckrytingSystem.Models;
 namespace WebReckrytingSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260302011254_initialcreate")]
+    [Migration("20260303130344_initialcreate")]
     partial class initialcreate
     {
         /// <inheritdoc />
@@ -411,6 +411,45 @@ namespace WebReckrytingSystem.Migrations
                         });
                 });
 
+            modelBuilder.Entity("WebReckrytingSystem.Models.SavedResume", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("EmployerEmail")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("employer_email");
+
+                    b.Property<string>("ResumeUserEmail")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("resume_user_email");
+
+                    b.Property<DateTime>("SavedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("saved_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ResumeUserEmail");
+
+                    b.HasIndex("EmployerEmail", "ResumeUserEmail")
+                        .IsUnique();
+
+                    b.ToTable("saved_resumes", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
             modelBuilder.Entity("WebReckrytingSystem.Models.SavedVacancy", b =>
                 {
                     b.Property<int>("Id")
@@ -444,6 +483,8 @@ namespace WebReckrytingSystem.Migrations
                         .HasColumnName("vacancy_title");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("VacancyCompanyName", "VacancyTitle");
 
                     b.HasIndex("StudentEmail", "VacancyCompanyName", "VacancyTitle")
                         .IsUnique();
@@ -599,6 +640,28 @@ namespace WebReckrytingSystem.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebReckrytingSystem.Models.SavedResume", b =>
+                {
+                    b.HasOne("WebReckrytingSystem.Models.Resume", "Resume")
+                        .WithMany()
+                        .HasForeignKey("ResumeUserEmail")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Resume");
+                });
+
+            modelBuilder.Entity("WebReckrytingSystem.Models.SavedVacancy", b =>
+                {
+                    b.HasOne("WebReckrytingSystem.Models.Vacancy", "Vacancy")
+                        .WithMany()
+                        .HasForeignKey("VacancyCompanyName", "VacancyTitle")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vacancy");
                 });
 
             modelBuilder.Entity("WebReckrytingSystem.Models.User", b =>

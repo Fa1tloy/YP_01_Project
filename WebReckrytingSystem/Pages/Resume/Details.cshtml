@@ -45,4 +45,13 @@
             </div>
         </div>
     }
+    @if (User.Identity?.IsAuthenticated == true && User.IsInRole("employer"))
+    {
+        <form method="post" asp-page-handler="SaveResume">
+            <input type="hidden" name="resumeUserEmail" value="@Model.Resume.UserEmail" />
+            <button type="submit" class="btn @(Model.IsSavedByCurrentEmployer ? "btn-warning" : "btn-outline-warning")">
+                <i class="fas fa-star"></i> @(Model.IsSavedByCurrentEmployer ? "Удалить из избранного" : "В избранное")
+            </button>
+        </form>
+    }
 </div>

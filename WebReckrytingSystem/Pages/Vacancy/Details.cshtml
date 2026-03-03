@@ -65,15 +65,13 @@
 
                 @if (User.Identity?.IsAuthenticated == true && User.IsInRole("job_seeker"))
                 {
-                    <form method="post" asp-page-handler="Apply">
+                    <form method="post" asp-page-handler="SaveVacancy">
                         <input type="hidden" name="companyName" value="@Model.Vacancy.CompanyName" />
                         <input type="hidden" name="title" value="@Model.Vacancy.Title" />
-                        <button type="submit" class="btn btn-primary">Откликнуться</button>
+                        <button type="submit" class="btn @(Model.IsSavedByCurrentStudent ? "btn-warning" : "btn-outline-warning")">
+                            <i class="fas fa-star"></i> @(Model.IsSavedByCurrentStudent ? "Удалить из избранного" : "В избранное")
+                        </button>
                     </form>
-                }
-                else
-                {
-                    <a href="/Account/Login" class="btn btn-primary">Войти, чтобы откликнуться</a>
                 }
             </div>
         </div>

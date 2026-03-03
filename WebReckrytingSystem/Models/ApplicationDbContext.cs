@@ -26,6 +26,7 @@ namespace WebReckrytingSystem.Models
         public DbSet<DailyAnalytic> DailyAnalytics { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
+        public DbSet<SavedResume> SavedResumes { get; set; }
 
         // Для миграций — строка подключения, если опции не переданы
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -164,6 +165,25 @@ namespace WebReckrytingSystem.Models
                 entity.Property(e => e.VacancyTitle).HasColumnName("vacancy_title").HasMaxLength(255).IsRequired();
                 entity.Property(e => e.SavedAt).HasColumnName("saved_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.HasIndex(e => new { e.StudentEmail, e.VacancyCompanyName, e.VacancyTitle }).IsUnique();
+                entity.HasOne(s => s.Vacancy)
+    .WithMany()
+    .HasForeignKey(s => new { s.VacancyCompanyName, s.VacancyTitle })
+    .HasPrincipalKey(v => new { v.CompanyName, v.Title });
+
+            });
+            modelBuilder.Entity<SavedResume>().ToTable("saved_resumes", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<SavedResume>(entity =>
+            {
+                entity.ToTable("saved_resumes", t => t.ExcludeFromMigrations());
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.EmployerEmail).HasColumnName("employer_email").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.ResumeUserEmail).HasColumnName("resume_user_email").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.SavedAt).HasColumnName("saved_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.HasIndex(e => new { e.EmployerEmail, e.ResumeUserEmail }).IsUnique();
+                entity.HasOne(s => s.Resume)
+    .WithMany()
+    .HasForeignKey(s => s.ResumeUserEmail)
+    .HasPrincipalKey(r => r.UserEmail);
             });
 
             // Конфигурация DailyAnalytic
