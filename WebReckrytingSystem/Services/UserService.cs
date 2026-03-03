@@ -177,5 +177,33 @@ namespace WebReckrytingSystem.Services
                 return string.Equals(password, passwordHash, StringComparison.Ordinal);
             }
         }
+        public ServiceResult ChangePassword(string email, string oldPassword, string newPassword)
+        {
+            if (string.IsNullOrWhiteSpace(oldPassword) || string.IsNullOrWhiteSpace(newPassword))
+                return ServiceResult.Error("Старый и новый пароль обязательны");
+
+            if (newPassword.Length < 8)
+                return ServiceResult.Error("Новый пароль должен содержать минимум 8 символов");
+
+            var user = _userRepository.FindByEmail(email);
+            if (user == null)
+                return ServiceResult.Error("Пользователь не найден");
+
+            if (!VerifyPassword(oldPassword, user.PasswordHash, email))
+                return ServiceResult.Error("Неверный старый пароль");
+
+            try
+            {
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                _userRepository.Update(user);
+                _logger.LogInformation("Пароль успешно изменён для {Email}", email);
+                return ServiceResult.Success("Пароль успешно изменён");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка при смене пароля для {Email}", email);
+                return ServiceResult.Error("Ошибка при смене пароля");
+            }
+        }
     }
 }

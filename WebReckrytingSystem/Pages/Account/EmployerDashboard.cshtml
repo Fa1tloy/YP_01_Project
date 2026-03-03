@@ -5,11 +5,11 @@
     ViewData["Title"] = "Личный кабинет работодателя";
 }
 
-<div class="container-fluid dashboard-page">
+<div class="container-fluid dashboard-page px-5 px-xl-5">
     <!-- ЗАГОЛОВОК -->
     <div class="dashboard-header">
         <div class="user-info">
-            <i class="fas fa-user-tie fa-4x text-primary me-3"></i>
+            <img src="/images/rabotodatel.jpg" alt="Аватар работодателя" class="user-avatar" />
             <div>
                 <h1>Привет, <span class="gradient-text">@Model.UserFirstName</span>!</h1>
                 <p class="text-muted mb-0">Работодатель</p>
@@ -17,7 +17,7 @@
             </div>
         </div>
         <div class="quick-actions">
-            <a href="/Company/Settings" class="btn btn-outline-primary me-2">
+            <a href="/Company/Settings" class="btn btn-outline-light me-2">
                 <i class="fas fa-cog me-2"></i>Моя компания
             </a>
             <a href="/Vacancy/Create" class="btn btn-success">
@@ -222,6 +222,8 @@
     <style>
         .dashboard-page {
             padding-top: 104px;
+            padding-left: 2rem;
+            padding-right: 2rem;
         }
 
         .dashboard-header {
@@ -230,6 +232,14 @@
             padding: 2rem;
             border-radius: 20px;
             margin-bottom: 2rem;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #667eea;
         }
 
             .dashboard-header .user-info {
@@ -256,9 +266,18 @@
             overflow: hidden;
         }
 
+        .table-responsive {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }
+
         @@media (max-width: 768px) {
             .dashboard-page {
                 padding-top: 112px;
+            }
+
+            .table-responsive table {
+                min-width: 700px; /* При необходимости увеличьте значение */
             }
 
             .dashboard-header {

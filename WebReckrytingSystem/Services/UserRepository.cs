@@ -24,5 +24,11 @@ namespace WebReckrytingSystem.Services
             _context.SaveChanges();
             return user;
         }
+        public User Update(User user)
+        {
+            _context.Users.Update(user);
+            _context.SaveChanges();
+            return user;
+        }
     }
 }

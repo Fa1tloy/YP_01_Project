@@ -86,24 +86,23 @@
                                 </div>
                             }
 
-                            <ul class="navbar-nav align-items-lg-center ms-lg-3">
-                                <li class="nav-item"><a class="nav-link" href="@profileUrl">Личный кабинет</a></li>
-                                <li class="nav-item"><a class="nav-link" href="@searchUrl">Поиск</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/Account/Notifications" title="Уведомления">🔔</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/Account/Chat" title="Чаты">💬</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#" title="Избранное">⭐</a></li>
+                            <ul class="navbar-nav align-items-lg-center ms-auto ">
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        @User.FindFirst(ClaimTypes.GivenName)?.Value
+                                        <i class="fas fa-user-circle me-1"></i> @User.FindFirst(ClaimTypes.GivenName)?.Value
                                     </a>
-                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                                        <li>
-                                            <a class="dropdown-item" href="@(isEmployer ? "/Company/Settings" : profileUrl)">Настройки</a>
-                                        </li>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userMenu">
+                                        <li><a class="dropdown-item" href="@profileUrl"><i class="fas fa-tachometer-alt me-2"></i>Личный кабинет</a></li>
+                                        <li><a class="dropdown-item" href="@searchUrl"><i class="fas fa-search me-2"></i>Поиск</a></li>
+                                        <li><a class="dropdown-item" href="/Account/Notifications"><i class="fas fa-bell me-2"></i>Уведомления</a></li>
+                                        <li><a class="dropdown-item" href="/Account/Chat"><i class="fas fa-comment me-2"></i>Чаты</a></li>
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-star me-2"></i>Избранное</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="/Account/Settings"><i class="fas fa-cog me-2"></i>Настройки</a></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
                                             <form method="post" asp-page="/Account/Logout">
-                                                <button type="submit" class="dropdown-item">Выход</button>
+                                                <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i>Выход</button>
                                             </form>
                                         </li>
                                     </ul>

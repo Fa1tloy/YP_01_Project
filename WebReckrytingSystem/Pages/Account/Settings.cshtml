@@ -1,0 +1,65 @@
+﻿@page
+@model WebReckrytingSystem.Pages.Account.SettingsModel
+@{
+    ViewData["Title"] = "Настройки аккаунта";
+}
+
+<div class="container py-5 mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Настройки аккаунта</h4>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @Model.SuccessMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @Model.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Input.OldPassword" class="form-label"></label>
+                            <input asp-for="Input.OldPassword" class="form-control" autocomplete="off" />
+                            <span asp-validation-for="Input.OldPassword" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Input.NewPassword" class="form-label"></label>
+                            <input asp-for="Input.NewPassword" class="form-control" autocomplete="off" />
+                            <span asp-validation-for="Input.NewPassword" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Input.ConfirmPassword" class="form-label"></label>
+                            <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="off" />
+                            <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Изменить пароль</button>
+                    </form>
+                </div>
+                <div class="card-footer text-muted text-center">
+                    <a href="/" class="text-decoration-none">← На главную</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

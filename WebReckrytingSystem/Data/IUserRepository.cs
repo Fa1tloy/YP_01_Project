@@ -6,5 +6,6 @@ namespace WebReckrytingSystem.Data
     {
         User? FindByEmail(string email);
         User Save(User user);
+        User Update(User user);
     }
 }

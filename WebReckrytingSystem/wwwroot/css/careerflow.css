@@ -69,7 +69,21 @@ img,
     }
 
 
+.dropdown-menu {
+    min-width: 240px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
 
+.dropdown-item {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.95rem;
+}
+
+    .dropdown-item i {
+        width: 20px;
+        text-align: center;
+    }
 .navbar-auth-content {
     margin-left: 1rem;
 }
@@ -135,6 +149,7 @@ img,
 
 .navbar .container {
     align-items: flex-start;
+    padding-right: 0;
 }
 
 .navbar.fixed-top {
