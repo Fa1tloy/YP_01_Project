@@ -1,57 +1,343 @@
 @page "{userEmail}"
+@using System.Text.Json
+@using WebReckrytingSystem.Helpers
 @model WebReckrytingSystem.Pages.Resume.DetailsModel
 @{
-    ViewData["Title"] = "Резюме";
+    ViewData["Title"] = Model.Resume is null ? "Резюме" : $"Резюме {Model.Resume.User?.LastName} {Model.Resume.User?.FirstName}";
+
+    // Десериализация практик - теперь это внутри существующего блока @{ ... }
+    var practices = !string.IsNullOrEmpty(Model.Resume?.PracticesJson)
+        ? JsonSerializer.Deserialize<List<PracticeViewModel>>(Model.Resume.PracticesJson)
+        : new List<PracticeViewModel>();
 }
 
-<div class="container py-5 mt-5">
+<div class="container py-5" style="padding-top: 104px !important;">
+    <!-- КНОПКА НАЗАД -->
+    <div class="mb-4" style="margin-top: 20px;">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary rounded-pill px-4" id="backButton">
+            <i class="fas fa-arrow-left me-2"></i>Назад
+        </a>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(TempData["StatusMessage"]?.ToString()))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["StatusMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
     @if (Model.Resume is null)
     {
-        <div class="alert alert-warning">Резюме не найдено.</div>
+        <div class="alert alert-warning text-center py-5">
+            <i class="fas fa-exclamation-triangle fa-4x text-warning mb-4"></i>
+            <h3>Резюме не найдено</h3>
+            <p class="text-muted mb-4">Возможно, оно было удалено или снято с публикации</p>
+            <a href="/Resume/Search" class="btn btn-primary btn-lg rounded-pill px-5">
+                <i class="fas fa-search me-2"></i>Поиск резюме
+            </a>
+        </div>
     }
     else
     {
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
-                <h1 class="h4 mb-1">@Model.Resume.User?.LastName @Model.Resume.User?.FirstName</h1>
-                <p class="text-muted">@Model.Resume.UserEmail</p>
+        <!-- Используем переменную practices, объявленную выше -->
 
-                <h2 class="h5">Желаемая должность</h2>
-                <p>@Model.Resume.DesiredPosition</p>
+        <div class="row g-4">
+            <!-- ЛЕВАЯ КОЛОНКА - ФОТО И ОСНОВНАЯ ИНФОРМАЦИЯ -->
+            <div class="col-lg-4">
+                <!-- Карточка с фото и основными данными -->
+                <div class="card border-0 shadow-lg rounded-4 mb-4 sticky-top" style="top: 104px;">
+                    <div class="card-body text-center p-4">
+                        <!-- Аватар -->
+                        <div class="position-relative d-inline-block mb-4">
+                            <img src="/images/default-avatar.png"
+                                 alt="@Model.Resume.User?.FirstName @Model.Resume.User?.LastName"
+                                 class="rounded-circle border border-3 border-primary"
+                                 style="width: 120px; height: 120px; object-fit: cover;">
+                            @if (Model.Resume.IsPublished)
+                            {
+                                <span class="position-absolute bottom-0 end-0 bg-success rounded-circle p-2 border border-2 border-white"
+                                      style="width: 20px; height: 20px;"
+                                      title="Резюме опубликовано">
+                                </span>
+                            }
+                        </div>
 
-                <h2 class="h5">Специальность</h2>
-                <p>@Model.Resume.Specialty</p>
+                        <!-- Имя и фамилия -->
+                        <h2 class="h4 fw-bold mb-1">@Model.Resume.User?.LastName @Model.Resume.User?.FirstName</h2>
+                        <p class="text-primary mb-3">@Model.Resume.DesiredPosition</p>
 
-                <h2 class="h5">Город</h2>
-                <p>@Model.Resume.City</p>
+                        <!-- Статус публикации -->
+                        @if (!Model.Resume.IsPublished)
+                        {
+                            <div class="alert alert-warning py-2 mb-3">
+                                <i class="fas fa-eye-slash me-2"></i>Резюме не опубликовано
+                            </div>
+                        }
 
-                <h2 class="h5">Параметры занятости</h2>
-                <p>Тип занятости: @Model.Resume.EmploymentType<br/>График: @Model.Resume.WorkSchedule</p>
+                        <!-- Кнопки действий для работодателя -->
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("employer"))
+                        {
+                            <div class="d-grid gap-2 mb-4">
+                                <a href="mailto:@Model.Resume.UserEmail" class="btn btn-primary rounded-pill py-3">
+                                    <i class="fas fa-envelope me-2"></i>Связаться по email
+                                </a>
 
-                <h2 class="h5">Статус кандидата</h2>
-                <p>Статус поиска: @Model.Resume.SearchStatus<br/>Готовность к командировкам: @Model.Resume.BusinessTripReadiness</p>
+                                <form method="post" asp-page-handler="SaveResume" class="d-grid">
+                                    <input type="hidden" name="resumeUserEmail" value="@Model.Resume.UserEmail" />
+                                    <button type="submit" class="btn @(Model.IsSavedByCurrentEmployer ? "btn-warning" : "btn-outline-warning") rounded-pill py-3">
+                                        <i class="fas fa-star me-2"></i>
+                                        @(Model.IsSavedByCurrentEmployer ? "Удалить из избранного" : "Сохранить в избранное")
+                                    </button>
+                                </form>
 
-                <h2 class="h5">Личные данные</h2>
-                <p>Возраст: @(Model.Resume.Age?.ToString() ?? "Не указан")<br/>Пол: @Model.Resume.Gender</p>
+                                @if (Model.HasExistingChat)
+                                {
+                                    <a href="/Account/Chat?peer=@Model.Resume.UserEmail"
+                                       class="btn btn-outline-primary rounded-pill py-3">
+                                        <i class="fas fa-comment me-2"></i>Перейти в чат
+                                    </a>
+                                }
+                            </div>
+                        }
 
-                <h2 class="h5">Навыки</h2>
-                <p>@(string.IsNullOrWhiteSpace(Model.Resume.Skills) ? "Не указаны" : Model.Resume.Skills)</p>
+                        <!-- Быстрая информация -->
+                        <div class="text-start bg-light rounded-4 p-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-map-marker-alt text-primary me-3" style="width: 20px;"></i>
+                                <span>@Model.Resume.City</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-birthday-cake text-primary me-3" style="width: 20px;"></i>
+                                <span>@(Model.Resume.Age?.ToString() ?? "Не указан") лет</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-venus-mars text-primary me-3" style="width: 20px;"></i>
+                                <span>@Model.Resume.Gender</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-ruble-sign text-primary me-3" style="width: 20px;"></i>
+                                <span class="fw-bold text-success">
+                                    @(Model.Resume.SalaryExpectations.HasValue
+                                        ? $"{Model.Resume.SalaryExpectations.Value:N0} ₽"
+                                        : "Не указано")
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                <h2 class="h5">Автомобиль и права</h2>
-                <p>Автомобиль: @(Model.Resume.HasCar ? "Есть" : "Нет")<br/>Категория прав: @(string.IsNullOrWhiteSpace(Model.Resume.DriverLicenseCategory) ? "Не указана" : Model.Resume.DriverLicenseCategory)</p>
+            <!-- ПРАВАЯ КОЛОНКА - ВСЯ ИНФОРМАЦИЯ О РЕЗЮМЕ -->
+            <div class="col-lg-8">
+                <!-- Желаемая должность -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-primary bg-opacity-10 p-3 rounded-3">
+                                <i class="fas fa-briefcase fa-2x text-primary"></i>
+                            </div>
+                            <div>
+                                <h1 class="h3 fw-bold mb-1">@Model.Resume.DesiredPosition</h1>
+                                <p class="text-muted mb-0">Желаемая должность</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                <h2 class="h5">Ожидаемая зарплата</h2>
-                <p>@(Model.Resume.SalaryExpectations.HasValue ? $"{Model.Resume.SalaryExpectations.Value:N0} ₽" : "Не указана")</p>
+                <!-- О себе / Специальность -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-user-circle text-primary me-2"></i>О себе
+                        </h5>
+                        <p class="text-secondary mb-2">@Model.Resume.Specialty</p>
+                        <p class="text-secondary mb-0">
+                            <span class="badge bg-light text-dark me-2">@ViewHelper.GetEmploymentTypeDisplay(Model.Resume.EmploymentType)</span>
+                            <span class="badge bg-light text-dark">@ViewHelper.GetWorkScheduleDisplay(Model.Resume.WorkSchedule)</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Статус поиска -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-info bg-opacity-10 p-3 rounded-3 me-3">
+                                        <i class="fas fa-search text-info"></i>
+                                    </div>
+                                    <div>
+                                        <div class="small text-muted">Статус поиска</div>
+                                        <div class="fw-semibold">@Model.Resume.SearchStatus</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-info bg-opacity-10 p-3 rounded-3 me-3">
+                                        <i class="fas fa-plane text-info"></i>
+                                    </div>
+                                    <div>
+                                        <div class="small text-muted">Готовность к командировкам</div>
+                                        <div class="fw-semibold">
+                                            @(Model.Resume.BusinessTripReadiness switch
+                                            {
+                                                "yes" => "Готов(а)",
+                                                "no" => "Не готов(а)",
+                                                "sometimes" => "Иногда",
+                                                _ => Model.Resume.BusinessTripReadiness
+                                            })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Опыт работы -->
+                @if (!string.IsNullOrEmpty(Model.Resume.ExperienceDescription))
+                {
+                    <div class="card border-0 shadow-sm rounded-4 mb-4">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-3">
+                                <i class="fas fa-briefcase text-primary me-2"></i>Опыт работы
+                            </h5>
+                            <div class="text-secondary" style="white-space: pre-line;">@Model.Resume.ExperienceDescription</div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Практики -->
+                @if (practices.Any())
+                {
+                    <div class="card border-0 shadow-sm rounded-4 mb-4">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-3">
+                                <i class="fas fa-tasks text-primary me-2"></i>Практики во время учёбы
+                            </h5>
+                            <div class="vstack gap-3">
+                                @foreach (var practice in practices)
+                                {
+                                    <div class="border-start border-3 border-primary ps-3">
+                                        <div class="fw-semibold mb-1">@practice.Place</div>
+                                        <div class="small text-muted mb-2">
+                                            @practice.StartDate.ToString("MMM yyyy") – @practice.EndDate.ToString("MMM yyyy")
+                                        </div>
+                                        @if (!string.IsNullOrWhiteSpace(practice.Description))
+                                        {
+                                            <p class="text-secondary mb-0">@practice.Description</p>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Образование -->
+                @if (!string.IsNullOrEmpty(Model.Resume.EducationDescription))
+                {
+                    <div class="card border-0 shadow-sm rounded-4 mb-4">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-3">
+                                <i class="fas fa-graduation-cap text-primary me-2"></i>Образование
+                            </h5>
+                            <div class="text-secondary" style="white-space: pre-line;">@Model.Resume.EducationDescription</div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Навыки -->
+                @if (!string.IsNullOrWhiteSpace(Model.Resume.Skills))
+                {
+                    var skills = Model.Resume.Skills
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .Where(s => !string.IsNullOrWhiteSpace(s));
+
+                    <div class="card border-0 shadow-sm rounded-4 mb-4">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-3">
+                                <i class="fas fa-code text-primary me-2"></i>Ключевые навыки
+                            </h5>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach (var skill in skills)
+                                {
+                                    <span class="badge bg-primary bg-opacity-10 text-primary fs-6 py-2 px-3 rounded-pill">
+                                        @skill
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Дополнительная информация -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-car text-primary me-2"></i>Дополнительная информация
+                        </h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-car-side text-primary me-2"></i>
+                                    <span>Наличие автомобиля: <strong>@(Model.Resume.HasCar ? "Есть" : "Нет")</strong></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-id-card text-primary me-2"></i>
+                                    <span>Категория прав: <strong>@(string.IsNullOrWhiteSpace(Model.Resume.DriverLicenseCategory) ? "Не указана" : Model.Resume.DriverLicenseCategory)</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Контакты (только для работодателя) -->
+                @if (User.Identity?.IsAuthenticated == true && User.IsInRole("employer"))
+                {
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-3">
+                                <i class="fas fa-address-card text-primary me-2"></i>Контакты
+                            </h5>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-envelope text-primary me-3"></i>
+                                <a href="mailto:@Model.Resume.UserEmail" class="text-decoration-none">@Model.Resume.UserEmail</a>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-phone text-primary me-3"></i>
+                                <span class="text-muted">Контактный телефон не указан</span>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     }
-    @if (User.Identity?.IsAuthenticated == true && User.IsInRole("employer"))
-    {
-        <form method="post" asp-page-handler="SaveResume">
-            <input type="hidden" name="resumeUserEmail" value="@Model.Resume.UserEmail" />
-            <button type="submit" class="btn @(Model.IsSavedByCurrentEmployer ? "btn-warning" : "btn-outline-warning")">
-                <i class="fas fa-star"></i> @(Model.IsSavedByCurrentEmployer ? "Удалить из избранного" : "В избранное")
-            </button>
-        </form>
-    }
 </div>
+
+@section Scripts {
+    <script>
+        // Автоматическое скрытие уведомлений через 5 секунд
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+
+        // Альтернативная кнопка назад
+        document.getElementById('backButton')?.addEventListener('click', function (e) {
+            if (document.referrer === '') {
+                e.preventDefault();
+                window.location.href = '/Resume/Search';
+            }
+        });
+    </script>
+}

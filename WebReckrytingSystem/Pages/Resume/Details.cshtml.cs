@@ -18,34 +18,49 @@ namespace WebReckrytingSystem.Pages.Resume
         }
 
         public Models.Resume? Resume { get; private set; }
-
-        // Новое свойство для хранения информации о том, сохранено ли резюме текущим работодателем
         public bool IsSavedByCurrentEmployer { get; set; }
+        public bool HasExistingChat { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string userEmail)
         {
             Resume = await _context.Resumes
                 .AsNoTracking()
                 .Include(r => r.User)
-                .FirstOrDefaultAsync(r => r.UserEmail == userEmail && r.IsPublished);
+                .FirstOrDefaultAsync(r => r.UserEmail == userEmail);
 
             if (Resume == null)
             {
                 return NotFound();
             }
 
-            // Проверяем, сохранено ли это резюме в избранное у текущего пользователя (если он работодатель)
-            if (User.Identity?.IsAuthenticated == true && User.IsInRole("employer"))
+            // Проверяем права доступа
+            var currentUserEmail = User.FindFirstValue(ClaimTypes.Email);
+            var currentUserRole = User.FindFirstValue(ClaimTypes.Role);
+
+            // Если пользователь не админ и не владелец резюме, проверяем публикацию
+            if (currentUserRole != "admin" && currentUserEmail != userEmail)
             {
-                var employerEmail = User.FindFirstValue(ClaimTypes.Email);
+                if (!Resume.IsPublished)
+                {
+                    return NotFound();
+                }
+            }
+
+            // Проверяем, сохранено ли резюме в избранное (для работодателя)
+            if (User.IsInRole("employer"))
+            {
                 IsSavedByCurrentEmployer = await _context.SavedResumes
-                    .AnyAsync(s => s.EmployerEmail == employerEmail && s.ResumeUserEmail == userEmail);
+                    .AnyAsync(s => s.EmployerEmail == currentUserEmail && s.ResumeUserEmail == userEmail);
+
+                // Проверяем, есть ли уже чат
+                HasExistingChat = await _context.ChatMessages
+                    .AnyAsync(m => (m.SenderEmail == currentUserEmail && m.RecipientEmail == userEmail) ||
+                                   (m.SenderEmail == userEmail && m.RecipientEmail == currentUserEmail));
             }
 
             return Page();
         }
 
-        // Обработчик для добавления/удаления резюме в избранное
         public async Task<IActionResult> OnPostSaveResumeAsync(string resumeUserEmail)
         {
             var employerEmail = User.FindFirstValue(ClaimTypes.Email);
@@ -55,7 +70,6 @@ namespace WebReckrytingSystem.Pages.Resume
             }
 
             var resume = await _context.Resumes
-                .AsNoTracking()
                 .FirstOrDefaultAsync(r => r.UserEmail == resumeUserEmail);
             if (resume == null)
             {
@@ -72,12 +86,12 @@ namespace WebReckrytingSystem.Pages.Resume
                     EmployerEmail = employerEmail,
                     ResumeUserEmail = resumeUserEmail
                 });
-                TempData["StatusMessage"] = "Резюме добавлено в избранное";
+                TempData["StatusMessage"] = "? Резюме добавлено в избранное";
             }
             else
             {
                 _context.SavedResumes.Remove(existing);
-                TempData["StatusMessage"] = "Резюме удалено из избранного";
+                TempData["StatusMessage"] = "??? Резюме удалено из избранного";
             }
 
             await _context.SaveChangesAsync();

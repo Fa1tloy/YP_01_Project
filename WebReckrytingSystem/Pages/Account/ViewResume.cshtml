@@ -1,177 +1,301 @@
 ﻿@page
+@using WebReckrytingSystem.Helpers
 @model WebReckrytingSystem.Pages.Account.ViewResumeModel
 @{
     ViewData["Title"] = "Моё резюме";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="fw-bold">Моё резюме</h2>
-                <div>
-                    <a href="/Account/EditResume" class="btn btn-outline-primary me-2 rounded-pill">
-                        <i class="fas fa-edit"></i> Редактировать
-                    </a>
-                    <a href="/Account/JobSeekerDashboard" class="btn btn-secondary rounded-pill">
-                        <i class="fas fa-arrow-left"></i> В кабинет
-                    </a>
-                </div>
+<div class="container py-5" style="padding-top: 104px !important;">
+    <!-- КНОПКА НАЗАД В КАБИНЕТ -->
+    <div class="mb-4" style="margin-top: 20px;">
+        <a asp-page="/Account/JobSeekerDashboard" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="fas fa-arrow-left me-2"></i>Вернуться в кабинет
+        </a>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-pill" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@Model.SuccessMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (Model.Resume != null)
+    {
+        <!-- ШАПКА С ДЕЙСТВИЯМИ -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <h1 class="h3 fw-bold mb-0">
+                <i class="fas fa-file-alt text-primary me-2"></i>Моё резюме
+            </h1>
+            <div class="d-flex gap-2 mt-3 mt-sm-0">
+                <!-- КНОПКА РЕДАКТИРОВАНИЯ -->
+                <a asp-page="/Account/EditResume" class="btn btn-primary rounded-pill px-4 py-2">
+                    <i class="fas fa-edit me-2"></i>Редактировать резюме
+                </a>
+                <!-- Кнопка просмотра резюме как видят работодатели (открывается в текущей вкладке) -->
+                <a href="/Resume/Details/@Model.Resume.UserEmail" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                    <i class="fas fa-external-link-alt me-2"></i>Просмотр для работодателей
+                </a>
             </div>
+        </div>
 
-            @if (Model.Resume != null)
-            {
-                <!-- Статус -->
-                <div class="alert @(Model.Resume.IsPublished ? "alert-success" : "alert-warning") d-flex align-items-center mb-4 rounded-pill">
-                    <i class="fas @(Model.Resume.IsPublished ? "fa-eye" : "fa-eye-slash") me-2"></i>
-                    <div>
-                        <strong>@(Model.Resume.IsPublished ? "Опубликовано" : "Черновик")</strong>
-                        <br /><small>@(Model.Resume.IsPublished ? "Видно всем работодателям" : "Только вам")</small>
-                    </div>
-                </div>
+        <!-- Статус публикации -->
+        <div class="alert @(Model.Resume.IsPublished ? "alert-success" : "alert-warning") d-flex align-items-center mb-4 rounded-4 border-0 shadow-sm">
+            <i class="fas @(Model.Resume.IsPublished ? "fa-eye" : "fa-eye-slash") fa-2x me-3"></i>
+            <div>
+                <strong>@(Model.Resume.IsPublished ? "✅ Резюме опубликовано" : "📝 Черновик")</strong>
+                <br /><small>@(Model.Resume.IsPublished ? "Видно всем работодателям" : "Только вы видите это резюме")</small>
+            </div>
+        </div>
 
-                <!-- Основная карточка -->
-                <div class="card shadow-lg border-0 mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff;">
-                    <div class="card-body text-center py-5">
-                        <h3 class="fw-bold mb-2">@Model.Resume.DesiredPosition</h3>
-                        @if (Model.Resume.SalaryExpectations.HasValue)
-                        {
-                            <h4 class="mb-0">@Model.Resume.SalaryExpectations.Value.ToString("N0") ₽</h4>
-                        }
-                    </div>
-                </div>
-
-
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-transparent">
-                        <h5 class="mb-0"><i class="fas fa-id-card me-2 text-primary"></i>Профиль кандидата</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-6"><strong>Специальность:</strong> @Model.Resume.Specialty</div>
-                            <div class="col-md-6"><strong>Город:</strong> @Model.Resume.City</div>
-                            <div class="col-md-6"><strong>Возраст:</strong> @(Model.Resume.Age?.ToString() ?? "Не указан")</div>
-                            <div class="col-md-6"><strong>Пол:</strong> @Model.Resume.Gender</div>
-                            <div class="col-md-6"><strong>Готовность к командировкам:</strong> @Model.Resume.BusinessTripReadiness</div>
-                            <div class="col-md-6"><strong>Статус поиска:</strong> @Model.Resume.SearchStatus</div>
-                            <div class="col-md-6"><strong>Тип занятости:</strong> @Model.Resume.EmploymentType</div>
-                            <div class="col-md-6"><strong>График работы:</strong> @Model.Resume.WorkSchedule</div>
-                            <div class="col-md-6"><strong>Автомобиль:</strong> @(Model.Resume.HasCar ? "Есть" : "Нет")</div>
-                            <div class="col-md-6"><strong>Категория прав:</strong> @(string.IsNullOrWhiteSpace(Model.Resume.DriverLicenseCategory) ? "Не указана" : Model.Resume.DriverLicenseCategory)</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Опыт -->
-                @if (!string.IsNullOrEmpty(Model.Resume.ExperienceDescription))
+        <!-- Основная карточка с желаемой должностью -->
+        <div class="card border-0 shadow-lg rounded-4 mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff;">
+            <div class="card-body text-center py-5">
+                <h2 class="fw-bold mb-2 display-6">@Model.Resume.DesiredPosition</h2>
+                @if (Model.Resume.SalaryExpectations.HasValue)
                 {
-                    <div class="card shadow-sm mb-4">
-                        <div class="card-header bg-transparent">
-                            <h5 class="mb-0"><i class="fas fa-briefcase me-2 text-primary"></i>Опыт работы</h5>
-                        </div>
-                        <div class="card-body">
-                            <p class="mb-0" style="white-space: pre-line">@Model.Resume.ExperienceDescription</p>
-                        </div>
-                    </div>
+                    <h3 class="mb-0">@Model.Resume.SalaryExpectations.Value.ToString("N0") ₽</h3>
                 }
-                @if (!string.IsNullOrEmpty(Model.Resume.PracticesJson))
+                else
                 {
-                    var practices = System.Text.Json.JsonSerializer.Deserialize<List<WebReckrytingSystem.Models.PracticeViewModel>>(Model.Resume.PracticesJson);
-                    <div class="card shadow-sm mb-4">
-                        <div class="card-header bg-transparent">
-                            <h5 class="mb-0"><i class="fas fa-briefcase me-2 text-info"></i>Практики</h5>
-                        </div>
-                        <div class="card-body">
-                            <ul class="mb-0">
-                                @foreach (var p in practices!)
-                                {
-                                    <li>
-                                        <strong>@p.Place</strong>
-                                        <span class="text-muted">(@p.StartDate.ToString("MMM yyyy") – @p.EndDate.ToString("MMM yyyy"))</span>
-                                        @if (!string.IsNullOrWhiteSpace(p.Description))
-                                        {
-                                            <br />
-                            
-                                            <small>@p.Description</small>
-                                        }
-                                    </li>
-                                }
-                            </ul>
-                        </div>
-                    </div>
+                    <h3 class="mb-0 text-white-50">Зарплата не указана</h3>
                 }
+            </div>
+        </div>
 
-                <!-- Образование -->
-                @if (!string.IsNullOrEmpty(Model.Resume.EducationDescription))
-                {
-                    <div class="card shadow-sm mb-4">
-                        <div class="card-header bg-transparent">
-                            <h5 class="mb-0"><i class="fas fa-graduation-cap me-2 text-success"></i>Образование</h5>
-                        </div>
-                        <div class="card-body">
-                            <p class="mb-0" style="white-space: pre-line">@Model.Resume.EducationDescription</p>
-                        </div>
+        <!-- Сетка с информацией -->
+        <div class="row g-4">
+            <!-- Левая колонка - основная информация -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4">
+                        <h5 class="fw-bold mb-0">
+                            <i class="fas fa-id-card text-primary me-2"></i>Основная информация
+                        </h5>
                     </div>
-                }
-
-              
-                @if (!string.IsNullOrWhiteSpace(Model.Resume.Skills))
-                {
-                    var skills = Model.Resume.Skills
-                    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                    .Where(s => !string.IsNullOrWhiteSpace(s));
-
-                    <div class="card shadow-sm mb-4">
-                        <div class="card-header bg-transparent">
-                            <h5 class="mb-0"><i class="fas fa-tools me-2 text-info"></i>Ключевые навыки</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-flex flex-wrap gap-2">
-                                @foreach (var skill in skills)
-                                {
-                                    <span class="badge bg-primary fs-6 py-2 px-3 rounded-pill">@skill</span>
-                                }
+                    <div class="card-body p-4 pt-2">
+                        <div class="vstack gap-3">
+                            <div class="d-flex">
+                                <span class="text-muted" style="min-width: 140px;">Специальность:</span>
+                                <span class="fw-semibold">@Model.Resume.Specialty</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="text-muted" style="min-width: 140px;">Город:</span>
+                                <span class="fw-semibold">@Model.Resume.City</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="text-muted" style="min-width: 140px;">Возраст:</span>
+                                <span class="fw-semibold">@(Model.Resume.Age?.ToString() ?? "Не указан")</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="text-muted" style="min-width: 140px;">Пол:</span>
+                                <span class="fw-semibold">@Model.Resume.Gender</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="text-muted" style="min-width: 140px;">Готовность к командировкам:</span>
+                                <span class="fw-semibold">
+                                    @(Model.Resume.BusinessTripReadiness switch
+                                    {
+                                        "yes" => "Готов(а)",
+                                        "no" => "Не готов(а)",
+                                        "sometimes" => "Иногда",
+                                        _ => Model.Resume.BusinessTripReadiness
+                                    })
+                                </span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="text-muted" style="min-width: 140px;">Статус поиска:</span>
+                                <span class="fw-semibold">@Model.Resume.SearchStatus</span>
                             </div>
                         </div>
                     </div>
-                }
+                </div>
+            </div>
 
-
-                <!-- Готово к работе -->
-                @if (Model.Resume.IsPublished)
-                {
-                    <div class="card border-success shadow-sm text-center">
-                        <div class="card-body">
-                            <h5 class="text-success mb-0">
-                                <i class="fas fa-check-circle me-2"></i>Готово к работе!
-                            </h5>
-                            <p class="text-muted mb-0 mt-2">Ваше резюме видно работодателям. Ожидайте приглашений!</p>
+            <!-- Правая колонка - работа и авто -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4">
+                        <h5 class="fw-bold mb-0">
+                            <i class="fas fa-briefcase text-primary me-2"></i>Работа и транспорт
+                        </h5>
+                    </div>
+                    <div class="card-body p-4 pt-2">
+                        <div class="vstack gap-3">
+                            <div class="d-flex">
+                                <span class="text-muted" style="min-width: 140px;">Тип занятости:</span>
+                                <span class="fw-semibold">@ViewHelper.GetEmploymentTypeDisplay(Model.Resume.EmploymentType)</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="text-muted" style="min-width: 140px;">График работы:</span>
+                                <span class="fw-semibold">@ViewHelper.GetWorkScheduleDisplay(Model.Resume.WorkSchedule)</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="text-muted" style="min-width: 140px;">Наличие автомобиля:</span>
+                                <span class="fw-semibold">@(Model.Resume.HasCar ? "Есть" : "Нет")</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="text-muted" style="min-width: 140px;">Категория прав:</span>
+                                <span class="fw-semibold">@(string.IsNullOrWhiteSpace(Model.Resume.DriverLicenseCategory) ? "Не указана" : Model.Resume.DriverLicenseCategory)</span>
+                            </div>
                         </div>
                     </div>
-                }
-            }
-            else
+                </div>
+            </div>
+        </div>
+
+        <!-- Опыт работы -->
+        @if (!string.IsNullOrEmpty(Model.Resume.ExperienceDescription))
+        {
+            <div class="card border-0 shadow-sm rounded-4 mt-4">
+                <div class="card-header bg-transparent border-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-0">
+                        <i class="fas fa-briefcase text-primary me-2"></i>Опыт работы
+                    </h5>
+                </div>
+                <div class="card-body p-4 pt-2">
+                    <div class="text-secondary" style="white-space: pre-line;">@Model.Resume.ExperienceDescription</div>
+                </div>
+            </div>
+        }
+
+        <!-- Практики -->
+        @if (!string.IsNullOrEmpty(Model.Resume.PracticesJson))
+        {
+            var practices = System.Text.Json.JsonSerializer.Deserialize<List<WebReckrytingSystem.Models.PracticeViewModel>>(Model.Resume.PracticesJson);
+            if (practices?.Any() == true)
             {
-                <div class="text-center py-5">
-                    <i class="fas fa-file-alt fa-4x text-muted mb-3"></i>
-                    <h3>Резюме не найдено</h3>
-                    <p class="text-muted mb-4">Создайте ваше первое резюме, чтобы начать поиск работы</p>
-                    <a href="/Account/CreateResume" class="btn btn-primary btn-lg rounded-pill">
-                        <i class="fas fa-plus me-2"></i>Создать резюме
-                    </a>
+                <div class="card border-0 shadow-sm rounded-4 mt-4">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4">
+                        <h5 class="fw-bold mb-0">
+                            <i class="fas fa-tasks text-primary me-2"></i>Практики во время учёбы
+                        </h5>
+                    </div>
+                    <div class="card-body p-4 pt-2">
+                        <div class="vstack gap-3">
+                            @foreach (var p in practices)
+                            {
+                                <div class="border-start border-3 border-primary ps-3">
+                                    <div class="fw-semibold mb-1">@p.Place</div>
+                                    <div class="small text-muted mb-2">
+                                        @p.StartDate.ToString("MMM yyyy") – @p.EndDate.ToString("MMM yyyy")
+                                    </div>
+                                    @if (!string.IsNullOrWhiteSpace(p.Description))
+                                    {
+                                        <p class="text-secondary mb-0">@p.Description</p>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
                 </div>
             }
+        }
+
+        <!-- Образование -->
+        @if (!string.IsNullOrEmpty(Model.Resume.EducationDescription))
+        {
+            <div class="card border-0 shadow-sm rounded-4 mt-4">
+                <div class="card-header bg-transparent border-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-0">
+                        <i class="fas fa-graduation-cap text-primary me-2"></i>Образование
+                    </h5>
+                </div>
+                <div class="card-body p-4 pt-2">
+                    <div class="text-secondary" style="white-space: pre-line;">@Model.Resume.EducationDescription</div>
+                </div>
+            </div>
+        }
+
+        <!-- Навыки -->
+        @if (!string.IsNullOrWhiteSpace(Model.Resume.Skills))
+        {
+            var skills = Model.Resume.Skills
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(s => !string.IsNullOrWhiteSpace(s));
+
+            <div class="card border-0 shadow-sm rounded-4 mt-4">
+                <div class="card-header bg-transparent border-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-0">
+                        <i class="fas fa-code text-primary me-2"></i>Ключевые навыки
+                    </h5>
+                </div>
+                <div class="card-body p-4 pt-2">
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach (var skill in skills)
+                        {
+                            <span class="badge bg-primary bg-opacity-10 text-primary fs-6 py-2 px-3 rounded-pill">
+                                @skill
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Статус готовности -->
+        @if (Model.Resume.IsPublished)
+        {
+            <div class="card border-0 bg-success bg-opacity-10 shadow-sm rounded-4 mt-4 text-center">
+                <div class="card-body py-4">
+                    <h5 class="text-success mb-2">
+                        <i class="fas fa-check-circle me-2"></i>Готово к работе!
+                    </h5>
+                    <p class="text-muted mb-0">Ваше резюме опубликовано и видно всем работодателям. Ожидайте приглашений!</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card border-0 bg-warning bg-opacity-10 shadow-sm rounded-4 mt-4">
+                <div class="card-body py-4">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <div>
+                            <h5 class="text-warning mb-2">
+                                <i class="fas fa-eye-slash me-2"></i>Резюме в черновиках
+                            </h5>
+                            <p class="text-muted mb-0">Работодатели не видят ваше резюме. Опубликуйте его, чтобы начать поиск работы.</p>
+                        </div>
+                        <a asp-page="/Account/EditResume" class="btn btn-warning rounded-pill px-4">
+                            <i class="fas fa-edit me-2"></i>Редактировать и опубликовать
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-file-alt fa-5x text-muted"></i>
+            </div>
+            <h3>У вас ещё нет резюме</h3>
+            <p class="text-muted mb-4">Создайте резюме, чтобы начать поиск работы</p>
+            <a asp-page="/Account/CreateResume" class="btn btn-primary btn-lg rounded-pill px-5">
+                <i class="fas fa-plus me-2"></i>Создать резюме
+            </a>
         </div>
-    </div>
+    }
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
     <script>
+        // Автоматическое скрытие уведомлений через 5 секунд
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+
         @if (!string.IsNullOrEmpty(Model.SuccessMessage))
         {
-                <text>showToast('@Html.Raw(Model.SuccessMessage)', 'success');</text>
+            <text>showToast('@Html.Raw(Model.SuccessMessage)', 'success');</text>
         }
     </script>
 }
