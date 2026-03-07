@@ -13,7 +13,7 @@
                 </div>
                 <div class="card-body p-4">
                     <form method="post" id="vacancyForm" novalidate>
-                        <div asp-validation-summary="All" class="alert alert-danger rounded-pill"></div>
+                        <div asp-validation-summary="All" class="alert alert-danger rounded-pill @(ViewData.ModelState.ErrorCount > 0 ? "" : "d-none")"></div>
 
                         <datalist id="companySuggestions">
                             @foreach (var company in Model.CompanySuggestions)

@@ -18,7 +18,7 @@
     <div class="row justify-content-center">
         <div class="col-lg-10">
             <form method="post" id="resumeForm" novalidate>
-                <div asp-validation-summary="All" class="alert alert-danger rounded-pill"></div>
+                <div asp-validation-summary="All" class="alert alert-danger rounded-pill @(ViewData.ModelState.ErrorCount > 0 ? "" : "d-none")"></div>
 
                 <!-- Основная информация (2 колонки) -->
                 <div class="row g-4">

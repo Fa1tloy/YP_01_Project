@@ -110,7 +110,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
             var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
             if (string.IsNullOrEmpty(userEmail))
             {
-                ErrorMessage = "Ошибка авторизации";
+                ModelState.AddModelError(string.Empty, "Ошибка авторизации");
                 _logger.LogWarning("No email claim while updating vacancy");
                 CurrentVacancy = _vacancyService.GetVacancy(companyName, title) ?? new Models.Vacancy();
                 return Page();
@@ -125,14 +125,14 @@ namespace WebReckrytingSystem.Pages.Vacancy
                     return RedirectToPage("/Account/EmployerDashboard");
                 }
 
-                ErrorMessage = result.Message;
+                ModelState.AddModelError(string.Empty, result.Message ?? "Не удалось обновить вакансию");
                 CurrentVacancy = _vacancyService.GetVacancy(companyName, title) ?? new Models.Vacancy();
                 return Page();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error while updating vacancy");
-                ErrorMessage = "Произошла ошибка при обновлении вакансии";
+                ModelState.AddModelError(string.Empty, "Произошла ошибка при обновлении вакансии");
                 CurrentVacancy = _vacancyService.GetVacancy(companyName, title) ?? new Models.Vacancy();
                 return Page();
             }

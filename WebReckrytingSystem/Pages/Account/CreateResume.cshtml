@@ -12,7 +12,7 @@
                 </div>
                 <div class="card-body">
                     <form method="post" id="resumeForm" novalidate>
-                        <div asp-validation-summary="All" class="alert alert-danger rounded-pill"></div>
+                        <div asp-validation-summary="All" class="alert alert-danger rounded-pill @(ViewData.ModelState.ErrorCount > 0 ? "" : "d-none")"></div>
 
                         <div class="row">
                             <!-- Левая колонка -->
