@@ -12,7 +12,10 @@
                 </div>
                 <div class="card-body">
                     <form method="post" id="resumeForm" novalidate>
-                        <div asp-validation-summary="All" class="alert alert-danger rounded-pill"></div>
+                        @if (ViewData.ModelState.ErrorCount > 0)
+                        {
+                            <div asp-validation-summary="All" class="alert alert-danger rounded-pill"></div>
+                        }
 
                         <div class="row">
                             <!-- Левая колонка -->
@@ -261,11 +264,11 @@
         });
 
         // toast-уведомления
-        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
         {
                 <text>showToast('@Html.Raw(Model.SuccessMessage)', 'success');</text>
         }
-        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
         {
                 <text>showToast('@Html.Raw(Model.ErrorMessage)', 'error');</text>
         }

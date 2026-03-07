@@ -71,14 +71,14 @@ namespace WebReckrytingSystem.Pages.Account
             var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
             if (string.IsNullOrWhiteSpace(userEmail))
             {
-                ErrorMessage = "Ошибка аутентификации";
+                ModelState.AddModelError(string.Empty, "Ошибка аутентификации");
                 return Page();
             }
 
             var result = _resumeService.UpdateResume(userEmail, ResumeData);
             if (!result.IsSuccess)
             {
-                ErrorMessage = result.Message;
+                ModelState.AddModelError(string.Empty, result.Message ?? "Не удалось обновить резюме");
                 return Page();
             }
 

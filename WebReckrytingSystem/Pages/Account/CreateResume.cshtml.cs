@@ -69,6 +69,7 @@ namespace WebReckrytingSystem.Pages.Account
             var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
             if (string.IsNullOrEmpty(userEmail))
             {
+                ModelState.AddModelError(string.Empty, "Ошибка аутентификации");
                 ErrorMessage = "Ошибка аутентификации";
                 return Page();
             }
@@ -82,7 +83,11 @@ namespace WebReckrytingSystem.Pages.Account
             }
             else
             {
-                ErrorMessage = result.Message;
+                var errorMessage = string.IsNullOrWhiteSpace(result.Message)
+                    ? "Не удалось создать резюме"
+                    : result.Message;
+                ModelState.AddModelError(string.Empty, errorMessage);
+                ErrorMessage = errorMessage;
                 ModelState.Remove("ResumeData.Skills");
                 return Page();
             }
