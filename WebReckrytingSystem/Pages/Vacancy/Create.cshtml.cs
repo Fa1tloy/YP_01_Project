@@ -87,12 +87,17 @@ namespace WebReckrytingSystem.Pages.Vacancy
                     return RedirectToPage("/Account/EmployerDashboard");
                 }
 
-                ErrorMessage = result.Message;
+                var errorMessage = string.IsNullOrWhiteSpace(result.Message)
+                    ? "Не удалось создать вакансию"
+                    : result.Message;
+                ModelState.AddModelError(string.Empty, errorMessage);
+                ErrorMessage = errorMessage;
                 return Page();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Ошибка создания вакансии");
+                ModelState.AddModelError(string.Empty, "Произошла ошибка при создании вакансии");
                 ErrorMessage = "Произошла ошибка при создании вакансии";
                 return Page();
             }
