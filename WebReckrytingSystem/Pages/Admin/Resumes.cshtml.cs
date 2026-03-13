@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -40,7 +41,7 @@ namespace WebReckrytingSystem.Pages.Admin
                 .AsQueryable();
 
                 .Skip((PageNumber - 1) * PageSize)
-                Page = PageNumber,
+                PageNumber = this.PageNumber,
                 query = query.Where(r => r.UserEmail.Contains(SearchEmail));
 
             if (!string.IsNullOrWhiteSpace(SearchPosition))

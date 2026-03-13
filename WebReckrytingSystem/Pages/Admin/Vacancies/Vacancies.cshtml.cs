@@ -1,3 +1,4 @@
+using System.Linq;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -39,7 +40,7 @@ namespace WebReckrytingSystem.Pages.Admin
                 .AsQueryable();
 
                 .Skip((PageNumber - 1) * PageSize)
-                Page = PageNumber,
+                PageNumber = this.PageNumber,
                 query = query.Where(v => v.Title.Contains(SearchTitle));
 
             if (!string.IsNullOrWhiteSpace(SearchCompany))

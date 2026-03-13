@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -54,7 +55,7 @@ namespace WebReckrytingSystem.Pages.Admin.Users
             {
                 Items = items,
                 TotalCount = totalCount,
-                Page = PageNumber,
+                PageNumber = this.PageNumber,
                 PageSize = PageSize
             };
         }

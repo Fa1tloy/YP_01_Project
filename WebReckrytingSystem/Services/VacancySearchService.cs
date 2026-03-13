@@ -198,7 +198,7 @@ namespace WebReckrytingSystem.Services
             {
                 Items = items,
                 TotalCount = totalCount,
-                Page = page,
+                PageNumber = page,
                 PageSize = pageSize
             };
         }
@@ -220,7 +220,7 @@ namespace WebReckrytingSystem.Services
                 {
                     Items = similarVacancies,
                     TotalCount = similarVacancies.Count,
-                    Page = 1,
+                    PageNumber = 1,
                     PageSize = count
                 };
 

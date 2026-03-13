@@ -39,7 +39,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
                     SearchResult = result.Data;
                     SuccessMessage = result.Message;
                     _logger.LogInformation("✅ Найдено {TotalCount} вакансий (Стр. {Page}/{TotalPages})",
-                        SearchResult.TotalCount, SearchResult.Page, SearchResult.TotalPages);
+                        SearchResult.TotalCount, SearchResult.PageNumber, SearchResult.TotalPages);
                 }
                 else
                 {
@@ -117,7 +117,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
             {
                 Items = new List<WebReckrytingSystem.Models.Vacancy>(),
                 TotalCount = 0,
-                Page = SearchData.Page,
+                PageNumber = SearchData.Page,
                 PageSize = SearchData.PageSize
                 // TotalPages, HasPreviousPage, HasNextPage вычисляются сами!
             };
