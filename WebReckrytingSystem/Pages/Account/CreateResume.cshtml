@@ -1,265 +1,266 @@
-﻿@page
+@page
 @model WebReckrytingSystem.Pages.Account.CreateResumeModel
 @{
     ViewData["Title"] = "Создание резюме";
 }
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Создание резюме</h4>
+
+<div class="container py-4" style="padding-top: 104px !important;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-1"><i class="fas fa-file-alt text-primary me-2"></i>Создание резюме</h1>
+            <p class="text-muted mb-0">Заполните ключевую информацию, чтобы работодатели быстрее нашли вас.</p>
+        </div>
+        <a href="/Account/JobSeekerDashboard" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="fas fa-arrow-left me-2"></i>Назад
+        </a>
+    </div>
+
+    <form method="post" id="resumeForm" novalidate>
+        <div asp-validation-summary="All" class="alert alert-danger rounded-4 @(ViewData.ModelState.ErrorCount > 0 ? "" : "d-none")"></div>
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4">
+                        <h5 class="fw-bold mb-0"><i class="fas fa-id-card text-primary me-2"></i>Основная информация</h5>
+                    </div>
+                    <div class="card-body p-4 pt-2">
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.DesiredPosition" class="form-label fw-600">Желаемая должность *</label>
+                            <input asp-for="ResumeData.DesiredPosition" class="form-control form-control-lg rounded-pill" placeholder=".NET Developer" />
+                            <span asp-validation-for="ResumeData.DesiredPosition" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.SalaryExpectations" class="form-label fw-600">Зарплатные ожидания (руб.)</label>
+                            <input asp-for="ResumeData.SalaryExpectations" type="number" class="form-control form-control-lg rounded-pill" min="0" max="9999999" placeholder="100000" />
+                            <span asp-validation-for="ResumeData.SalaryExpectations" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.Specialty" class="form-label fw-600">Специальность *</label>
+                            <input asp-for="ResumeData.Specialty" class="form-control form-control-lg rounded-pill" placeholder="Информационные системы и программирование" required />
+                            <span asp-validation-for="ResumeData.Specialty" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.City" class="form-label fw-600">Город *</label>
+                            <input asp-for="ResumeData.City" class="form-control form-control-lg rounded-pill" placeholder="Москва" required />
+                            <span asp-validation-for="ResumeData.City" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.Age" class="form-label fw-600">Возраст *</label>
+                            <input asp-for="ResumeData.Age" type="number" class="form-control form-control-lg rounded-pill" min="14" max="100" placeholder="22" required />
+                            <span asp-validation-for="ResumeData.Age" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.Gender" class="form-label fw-600">Пол *</label>
+                            <select asp-for="ResumeData.Gender" class="form-select form-select-lg rounded-pill" required>
+                                <option value="">Выберите пол</option>
+                                <option>мужской</option>
+                                <option>женский</option>
+                            </select>
+                            <span asp-validation-for="ResumeData.Gender" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.BusinessTripReadiness" class="form-label fw-600">Готовность к командировкам *</label>
+                            <select asp-for="ResumeData.BusinessTripReadiness" class="form-select form-select-lg rounded-pill" required>
+                                <option value="">Выберите вариант</option>
+                                <option value="yes">Да</option>
+                                <option value="no">Нет</option>
+                                <option value="sometimes">Иногда</option>
+                            </select>
+                            <span asp-validation-for="ResumeData.BusinessTripReadiness" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.SearchStatus" class="form-label fw-600">Статус поиска *</label>
+                            <select asp-for="ResumeData.SearchStatus" class="form-select form-select-lg rounded-pill" required>
+                                <option value="">Выберите статус</option>
+                                <option>активно ищет</option>
+                                <option>рассматривает</option>
+                                <option>не ищет</option>
+                                <option>получил предложение</option>
+                                <option>вышел на работу</option>
+                            </select>
+                            <span asp-validation-for="ResumeData.SearchStatus" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.EmploymentType" class="form-label fw-600">Тип занятости *</label>
+                            <select asp-for="ResumeData.EmploymentType" class="form-select form-select-lg rounded-pill" required>
+                                <option value="">Выберите тип занятости</option>
+                                <option>полная занятость</option>
+                                <option>частичная занятость</option>
+                                <option>проектная</option>
+                                <option>волонтерство</option>
+                                <option>стажировка</option>
+                            </select>
+                            <span asp-validation-for="ResumeData.EmploymentType" class="text-danger small"></span>
+                        </div>
+
+                        <div>
+                            <label asp-for="ResumeData.WorkSchedule" class="form-label fw-600">График работы *</label>
+                            <select asp-for="ResumeData.WorkSchedule" class="form-select form-select-lg rounded-pill" required>
+                                <option value="">Выберите график</option>
+                                <option>полный день</option>
+                                <option>сменный график</option>
+                                <option>гибкий график</option>
+                                <option>удаленная работа</option>
+                                <option>вахтовый метод</option>
+                            </select>
+                            <span asp-validation-for="ResumeData.WorkSchedule" class="text-danger small"></span>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <form method="post" id="resumeForm" novalidate>
+            </div>
 
-                        @if (ViewData.ModelState.ErrorCount > 0)
-                        {
-                            <div asp-validation-summary="All" class="alert alert-danger rounded-pill"></div>
-                        }
-
-                        <div asp-validation-summary="All" class="alert alert-danger rounded-pill @(ViewData.ModelState.ErrorCount > 0 ? "" : "d-none")"></div>
-
-
-                        <div class="row">
-                            <!-- Левая колонка -->
-                            <div class="col-md-6">
-                                <h5 class="border-bottom pb-2 mb-3">Основная информация</h5>
-
-                                <div class="mb-3">
-                                    <label asp-for="ResumeData.DesiredPosition" class="form-label">Желаемая должность *</label>
-                                    <input asp-for="ResumeData.DesiredPosition" class="form-control" placeholder=".NET Developer" />
-                                    <span asp-validation-for="ResumeData.DesiredPosition" class="text-danger"></span>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label asp-for="ResumeData.SalaryExpectations" class="form-label">Зарплатные ожидания (руб.)</label>
-                                    <input asp-for="ResumeData.SalaryExpectations" type="number" class="form-control" min="0" max="9999999" placeholder="100000" />
-                                    <span asp-validation-for="ResumeData.SalaryExpectations" class="text-danger"></span>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label asp-for="ResumeData.Specialty" class="form-label">Специальность *</label>
-                                    <input asp-for="ResumeData.Specialty" class="form-control" placeholder="Информационные системы и программирование" required />
-                                    <span asp-validation-for="ResumeData.Specialty" class="text-danger"></span>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label asp-for="ResumeData.City" class="form-label">Город *</label>
-                                    <input asp-for="ResumeData.City" class="form-control" placeholder="Москва" required />
-                                    <span asp-validation-for="ResumeData.City" class="text-danger"></span>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label asp-for="ResumeData.BusinessTripReadiness" class="form-label">Готовность к командировкам *</label>
-                                    <select asp-for="ResumeData.BusinessTripReadiness" class="form-select" required>
-                                        <option value="">Выберите вариант</option>
-                                        <option value="yes">Да</option>
-                                        <option value="no">Нет</option>
-                                        <option value="sometimes">Иногда</option>
-                                    </select>
-                                    <span asp-validation-for="ResumeData.BusinessTripReadiness" class="text-danger"></span>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label asp-for="ResumeData.SearchStatus" class="form-label">Статус поиска *</label>
-                                    <select asp-for="ResumeData.SearchStatus" class="form-select" required>
-                                        <option value="">Выберите статус</option>
-                                        <option>активно ищет</option>
-                                        <option>рассматривает</option>
-                                        <option>не ищет</option>
-                                        <option>получил предложение</option>
-                                        <option>вышел на работу</option>
-                                    </select>
-                                    <span asp-validation-for="ResumeData.SearchStatus" class="text-danger"></span>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label asp-for="ResumeData.Age" class="form-label">Возраст *</label>
-                                    <input asp-for="ResumeData.Age" type="number" class="form-control" min="14" max="100" placeholder="22" required />
-                                    <span asp-validation-for="ResumeData.Age" class="text-danger"></span>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label asp-for="ResumeData.EmploymentType" class="form-label">Тип занятости *</label>
-                                    <select asp-for="ResumeData.EmploymentType" class="form-select" required>
-                                        <option value="">Выберите тип занятости</option>
-                                        <option>полная занятость</option>
-                                        <option>частичная занятость</option>
-                                        <option>проектная</option>
-                                        <option>волонтерство</option>
-                                        <option>стажировка</option>
-                                    </select>
-                                    <span asp-validation-for="ResumeData.EmploymentType" class="text-danger"></span>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label asp-for="ResumeData.WorkSchedule" class="form-label">График работы *</label>
-                                    <select asp-for="ResumeData.WorkSchedule" class="form-select" required>
-                                        <option value="">Выберите график</option>
-                                        <option>полный день</option>
-                                        <option>сменный график</option>
-                                        <option>гибкий график</option>
-                                        <option>удаленная работа</option>
-                                        <option>вахтовый метод</option>
-                                    </select>
-                                    <span asp-validation-for="ResumeData.WorkSchedule" class="text-danger"></span>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label asp-for="ResumeData.Gender" class="form-label">Пол *</label>
-                                    <select asp-for="ResumeData.Gender" class="form-select" required>
-                                        <option value="">Выберите пол</option>
-                                        <option>мужской</option>
-                                        <option>женский</option>
-                                    </select>
-                                    <span asp-validation-for="ResumeData.Gender" class="text-danger"></span>
-                                </div>
-
-
-                                <div class="mb-3">
-                                    <label asp-for="ResumeData.ExperienceYears" class="form-label">Опыт работы (лет)</label>
-                                    <input asp-for="ResumeData.ExperienceYears" type="number" class="form-control" min="0" max="60" placeholder="3" />
-                                    <span asp-validation-for="ResumeData.ExperienceYears" class="text-danger"></span>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label asp-for="ResumeData.ExperienceDescription" class="form-label">Описание опыта</label>
-                                    <textarea asp-for="ResumeData.ExperienceDescription" class="form-control" rows="3" maxlength="1000" placeholder="Ключевые проекты и достижения"></textarea>
-                                    <span asp-validation-for="ResumeData.ExperienceDescription" class="text-danger"></span>
-                                </div>
-                            </div>
-
-                            <!-- Правая колонка -->
-                            <div class="col-md-6">
-                                <h5 class="border-bottom pb-2 mb-3">Образование</h5>
-
-                                <div class="mb-3">
-                                    <label asp-for="ResumeData.EducationalInstitution" class="form-label">Учебное заведение *</label>
-                                    <input asp-for="ResumeData.EducationalInstitution" class="form-control" placeholder="МГУ им. Ломоносова" />
-                                    <span asp-validation-for="ResumeData.EducationalInstitution" class="text-danger"></span>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label asp-for="ResumeData.Faculty" class="form-label">Факультет</label>
-                                    <input asp-for="ResumeData.Faculty" class="form-control" placeholder="Факультет ВМК" />
-                                    <span asp-validation-for="ResumeData.Faculty" class="text-danger"></span>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label asp-for="ResumeData.Specialization" class="form-label">Специализация</label>
-                                    <input asp-for="ResumeData.Specialization" class="form-control" placeholder="Прикладная математика" />
-                                    <span asp-validation-for="ResumeData.Specialization" class="text-danger"></span>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label asp-for="ResumeData.GraduationYear" class="form-label">Год окончания</label>
-                                    <input asp-for="ResumeData.GraduationYear" type="number" class="form-control" min="1900" max="2025" placeholder="2023" />
-                                    <span asp-validation-for="ResumeData.GraduationYear" class="text-danger"></span>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label asp-for="ResumeData.HasCar" class="form-label">Наличие автомобиля</label>
-                                    <select asp-for="ResumeData.HasCar" class="form-select">
-                                        <option value="false">Нет</option>
-                                        <option value="true">Есть</option>
-                                    </select>
-                                    <span asp-validation-for="ResumeData.HasCar" class="text-danger"></span>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label asp-for="ResumeData.DriverLicenseCategory" class="form-label">Категория прав</label>
-                                    <input asp-for="ResumeData.DriverLicenseCategory" class="form-control" placeholder="B" />
-                                    <span asp-validation-for="ResumeData.DriverLicenseCategory" class="text-danger"></span>
-                                </div>
-
-                                <!-- Практики -->
-                                <h5 class="border-bottom pb-2 mt-4">Практики во время учёбы</h5>
-                                <div id="practicesContainer">
-                                    @for (int i = 0; i < Model.ResumeData.Practices.Count; i++)
-                                    {
-                                        <div class="card mb-2 p-3">
-                                            <div class="row g-2">
-                                                <div class="col-md-6">
-                                                    <label>Место практики</label>
-                                                    <input asp-for="ResumeData.Practices[i].Place" class="form-control" placeholder="ООО ТехноПрактик" />
-                                                    <span asp-validation-for="ResumeData.Practices[i].Place" class="text-danger"></span>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label>С</label>
-                                                    <input asp-for="ResumeData.Practices[i].StartDate" type="date" class="form-control" />
-                                                    <span asp-validation-for="ResumeData.Practices[i].StartDate" class="text-danger"></span>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label>По</label>
-                                                    <input asp-for="ResumeData.Practices[i].EndDate" type="date" class="form-control" />
-                                                    <span asp-validation-for="ResumeData.Practices[i].EndDate" class="text-danger"></span>
-                                                </div>
-                                            </div>
-                                            <div class="mt-2">
-                                                <label>Описание</label>
-                                                <textarea asp-for="ResumeData.Practices[i].Description" class="form-control" rows="2" maxlength="500"></textarea>
-                                            </div>
-                                            <div class="text-end mt-2">
-                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.card').remove()">Удалить</button>
-                                            </div>
-                                        </div>
-                                    }
-                                </div>
-                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addPractice()">+ Добавить практику</button>
-
-                                <!-- Навыки -->
-                                <h5 class="border-bottom pb-2 mt-4">Ключевые навыки</h5>
-                                <div class="mb-3">
-                                    <input id="skillsInput" class="form-control" placeholder="C#, ASP.NET, SQL и нажмите Enter" autocomplete="off">
-                                    <small class="form-text text-muted">Нажмите Enter после каждого навыка. Макс. 20.</small>
-                                    <div id="skillsTags" class="mt-2"></div>
-                                    <!-- Скрытое поле без asp-for и без валидации -->
-                                    <input type="hidden" name="SkillsHidden" id="skillsHidden" data-val="false">
-                                </div>
-                            </div>
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4">
+                        <h5 class="fw-bold mb-0"><i class="fas fa-graduation-cap text-primary me-2"></i>Образование и опыт</h5>
+                    </div>
+                    <div class="card-body p-4 pt-2">
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.EducationalInstitution" class="form-label fw-600">Учебное заведение *</label>
+                            <input asp-for="ResumeData.EducationalInstitution" class="form-control rounded-pill" placeholder="МГУ им. Ломоносова" />
+                            <span asp-validation-for="ResumeData.EducationalInstitution" class="text-danger small"></span>
                         </div>
 
-                        <!-- Публикация -->
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <div class="form-check form-switch">
-                                    <input asp-for="ResumeData.IsPublished" class="form-check-input" checked />
-                                    <label asp-for="ResumeData.IsPublished" class="form-check-label">Опубликовать резюме (видно работодателям)</label>
-                                </div>
-                            </div>
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.Faculty" class="form-label fw-600">Факультет</label>
+                            <input asp-for="ResumeData.Faculty" class="form-control rounded-pill" placeholder="Факультет ВМК" />
+                            <span asp-validation-for="ResumeData.Faculty" class="text-danger small"></span>
                         </div>
 
-                        <!-- Кнопки -->
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-success btn-lg px-4">
-                                    <i class="fas fa-save me-2"></i>Сохранить и опубликовать
-                                </button>
-                                <a href="/Account/JobSeekerDashboard" class="btn btn-outline-secondary ms-2">Отмена</a>
-                            </div>
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.Specialization" class="form-label fw-600">Специализация</label>
+                            <input asp-for="ResumeData.Specialization" class="form-control rounded-pill" placeholder="Прикладная математика" />
+                            <span asp-validation-for="ResumeData.Specialization" class="text-danger small"></span>
                         </div>
-                    </form>
+
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.GraduationYear" class="form-label fw-600">Год окончания</label>
+                            <input asp-for="ResumeData.GraduationYear" type="number" class="form-control rounded-pill" min="1900" max="2025" placeholder="2023" />
+                            <span asp-validation-for="ResumeData.GraduationYear" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.ExperienceYears" class="form-label fw-600">Опыт работы (лет)</label>
+                            <input asp-for="ResumeData.ExperienceYears" type="number" class="form-control rounded-pill" min="0" max="60" placeholder="3" />
+                            <span asp-validation-for="ResumeData.ExperienceYears" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.ExperienceDescription" class="form-label fw-600">Описание опыта</label>
+                            <textarea asp-for="ResumeData.ExperienceDescription" class="form-control rounded-3" rows="3" maxlength="1000" placeholder="Ключевые проекты и достижения"></textarea>
+                            <span asp-validation-for="ResumeData.ExperienceDescription" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.HasCar" class="form-label fw-600">Наличие автомобиля</label>
+                            <select asp-for="ResumeData.HasCar" class="form-select rounded-pill">
+                                <option value="false">Нет</option>
+                                <option value="true">Есть</option>
+                            </select>
+                            <span asp-validation-for="ResumeData.HasCar" class="text-danger small"></span>
+                        </div>
+
+                        <div>
+                            <label asp-for="ResumeData.DriverLicenseCategory" class="form-label fw-600">Категория прав</label>
+                            <input asp-for="ResumeData.DriverLicenseCategory" class="form-control rounded-pill" placeholder="B" />
+                            <span asp-validation-for="ResumeData.DriverLicenseCategory" class="text-danger small"></span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+
+        <div class="card border-0 shadow-sm rounded-4 mt-4">
+            <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0"><i class="fas fa-briefcase text-primary me-2"></i>Практики во время учёбы</h5>
+                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill" onclick="addPractice()">+ Добавить практику</button>
+            </div>
+            <div class="card-body p-4 pt-2" id="practicesContainer">
+                @for (int i = 0; i < Model.ResumeData.Practices.Count; i++)
+                {
+                    <div class="card border mb-3 p-3 practice-item">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label">Место практики</label>
+                                <input asp-for="ResumeData.Practices[i].Place" class="form-control" placeholder="ООО ТехноПрактик" />
+                                <span asp-validation-for="ResumeData.Practices[i].Place" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">С</label>
+                                <input asp-for="ResumeData.Practices[i].StartDate" type="date" class="form-control" />
+                                <span asp-validation-for="ResumeData.Practices[i].StartDate" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">По</label>
+                                <input asp-for="ResumeData.Practices[i].EndDate" type="date" class="form-control" />
+                                <span asp-validation-for="ResumeData.Practices[i].EndDate" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <label class="form-label">Описание</label>
+                            <textarea asp-for="ResumeData.Practices[i].Description" class="form-control" rows="2" maxlength="500"></textarea>
+                        </div>
+                        <div class="text-end mt-2">
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.practice-item').remove()">Удалить</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 mt-4">
+            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                <h5 class="fw-bold mb-0"><i class="fas fa-code text-primary me-2"></i>Ключевые навыки</h5>
+            </div>
+            <div class="card-body p-4 pt-2">
+                <input id="skillsInput" class="form-control rounded-pill" placeholder="C#, ASP.NET, SQL и нажмите Enter" autocomplete="off" />
+                <small class="form-text text-muted">Нажмите Enter после каждого навыка. Макс. 20.</small>
+                <div id="skillsTags" class="mt-2 d-flex flex-wrap gap-2"></div>
+                <input type="hidden" name="SkillsHidden" id="skillsHidden" data-val="false" value='@System.Text.Json.JsonSerializer.Serialize(Model.ResumeData.Skills)'>
+            </div>
+        </div>
+
+        <div class="row mt-4 align-items-center">
+            <div class="col-lg-6 mb-3 mb-lg-0">
+                <div class="form-check form-switch">
+                    <input asp-for="ResumeData.IsPublished" class="form-check-input" checked />
+                    <label asp-for="ResumeData.IsPublished" class="form-check-label">Опубликовать резюме (видно работодателям)</label>
+                </div>
+            </div>
+            <div class="col-lg-6 text-lg-end">
+                <button type="submit" class="btn btn-success btn-lg rounded-pill px-4">
+                    <i class="fas fa-save me-2"></i>Сохранить резюме
+                </button>
+                <a href="/Account/JobSeekerDashboard" class="btn btn-outline-secondary btn-lg rounded-pill px-4 ms-2">Отмена</a>
+            </div>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        // Отладка отправки формы
-        document.getElementById('resumeForm').addEventListener('submit', function (e) {
-            console.log('Форма отправляется...');
-            console.log('SkillsHidden value:', document.getElementById('skillsHidden').value);
+        const resumeForm = document.getElementById('resumeForm');
+        const skillsInput = document.getElementById('skillsInput');
+        const skillsTags = document.getElementById('skillsTags');
+        const skillsHidden = document.getElementById('skillsHidden');
+        const practicesContainer = document.getElementById('practicesContainer');
+        let skills = [];
 
-            // Проверяем, заполнены ли обязательные поля
+        resumeForm.addEventListener('submit', function (e) {
             const requiredFields = this.querySelectorAll('[required]');
-            for (let field of requiredFields) {
+            for (const field of requiredFields) {
                 if (!field.value.trim()) {
-                    console.error('Не заполнено обязательное поле:', field.name);
                     e.preventDefault();
                     showToast('Заполните все обязательные поля', 'error');
                     return false;
@@ -267,87 +268,102 @@
             }
         });
 
-        // toast-уведомления
         @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
         {
-                <text>showToast('@Html.Raw(Model.SuccessMessage)', 'success');</text>
+            <text>showToast('@Html.Raw(Model.SuccessMessage)', 'success');</text>
         }
         @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
         {
-                <text>showToast('@Html.Raw(Model.ErrorMessage)', 'error');</text>
+            <text>showToast('@Html.Raw(Model.ErrorMessage)', 'error');</text>
         }
 
-        // tag-input навыков
-        const inp = document.getElementById('skillsInput');
-        const tags = document.getElementById('skillsTags');
-        const hidden = document.getElementById('skillsHidden');
-        let skills = [];
-
-        // Загрузка существующих навыков при редактировании
         document.addEventListener('DOMContentLoaded', () => {
             try {
-                skills = JSON.parse(hidden.value || '[]');
-                render();
-            } catch (e) {
+                skills = JSON.parse(skillsHidden.value || '[]');
+            } catch {
                 skills = [];
             }
+            renderSkills();
         });
 
-        inp.addEventListener('keydown', e => {
+        skillsInput.addEventListener('keydown', (e) => {
             if (e.key !== 'Enter') return;
             e.preventDefault();
-            const v = inp.value.trim();
-            if (!v) return;
-            if (skills.includes(v)) return;
+            const value = skillsInput.value.trim();
+            if (!value) return;
+
+            const exists = skills.some(s => s.toLowerCase() === value.toLowerCase());
+            if (exists) {
+                showToast('Такой навык уже добавлен', 'error');
+                return;
+            }
+
             if (skills.length >= 20) {
                 showToast('Максимум 20 навыков', 'error');
                 return;
             }
-            skills.push(v);
-            render();
-            inp.value = '';
+
+            skills.push(value);
+            skillsInput.value = '';
+            renderSkills();
         });
 
-        function render() {
-            tags.innerHTML = skills.map(s =>
-                `<span class="badge bg-primary me-2">${s}
-                     <a href="#" class="text-white ms-1" onclick="skills=skills.filter(x=>x!=='${s}');render();return false;">×</a>
-                 </span>`).join('');
-            hidden.value = JSON.stringify(skills);
-            console.log('Навыки обновлены:', hidden.value);
+        function renderSkills() {
+            skillsTags.innerHTML = '';
+
+            skills.forEach((skill, index) => {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-primary d-inline-flex align-items-center';
+                badge.textContent = skill;
+
+                const removeButton = document.createElement('button');
+                removeButton.type = 'button';
+                removeButton.className = 'btn btn-link btn-sm text-white text-decoration-none p-0 ms-2';
+                removeButton.innerHTML = '&times;';
+                removeButton.setAttribute('aria-label', `Удалить навык ${skill}`);
+                removeButton.addEventListener('click', () => {
+                    skills.splice(index, 1);
+                    renderSkills();
+                });
+
+                badge.appendChild(removeButton);
+                skillsTags.appendChild(badge);
+            });
+
+            skillsHidden.value = JSON.stringify(skills);
         }
 
-        // добавление практик
         function addPractice() {
-            const container = document.getElementById('practicesContainer');
-            const index = container.children.length;
+            const index = practicesContainer.querySelectorAll('.practice-item').length;
             const practiceDiv = document.createElement('div');
-            practiceDiv.className = 'card mb-2 p-3';
+            practiceDiv.className = 'card border mb-3 p-3 practice-item';
             practiceDiv.innerHTML = `
                 <div class="row g-2">
                     <div class="col-md-6">
-                        <label>Место практики</label>
+                        <label class="form-label">Место практики</label>
                         <input name="ResumeData.Practices[${index}].Place" class="form-control" placeholder="ООО ТехноПрактик" required />
                     </div>
                     <div class="col-md-3">
-                        <label>С</label>
+                        <label class="form-label">С</label>
                         <input name="ResumeData.Practices[${index}].StartDate" type="date" class="form-control" required />
                     </div>
                     <div class="col-md-3">
-                        <label>По</label>
+                        <label class="form-label">По</label>
                         <input name="ResumeData.Practices[${index}].EndDate" type="date" class="form-control" required />
                     </div>
                 </div>
                 <div class="mt-2">
-                    <label>Описание</label>
+                    <label class="form-label">Описание</label>
                     <textarea name="ResumeData.Practices[${index}].Description" class="form-control" rows="2" maxlength="500"></textarea>
                 </div>
                 <div class="text-end mt-2">
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.card').remove()">Удалить</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-practice-btn">Удалить</button>
                 </div>
             `;
-            container.appendChild(practiceDiv);
-            console.log('Практика добавлена, индекс:', index);
+
+            const removeButton = practiceDiv.querySelector('.remove-practice-btn');
+            removeButton.addEventListener('click', () => practiceDiv.remove());
+            practicesContainer.appendChild(practiceDiv);
         }
     </script>
 }
