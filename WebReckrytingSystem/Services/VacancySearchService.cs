@@ -1,3 +1,4 @@
+using System.Linq;
 ﻿using Microsoft.Extensions.Logging;
 using WebReckrytingSystem.Data;
 using WebReckrytingSystem.Models;

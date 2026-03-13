@@ -368,7 +368,7 @@ namespace UnitTests.Services
             // Assert
             Assert.IsTrue(result.IsSuccess);
             Assert.AreEqual(3, result.Data.Items.Count);
-            Assert.AreEqual(1, result.Data.Page);
+            Assert.AreEqual(1, result.Data.PageNumber);
             Assert.AreEqual(3, result.Data.PageSize);
             Assert.AreEqual(2, result.Data.TotalPages); // 6 вакансий / 3 на страницу = 2 страницы
         }
@@ -387,7 +387,7 @@ namespace UnitTests.Services
             // Assert
             Assert.IsTrue(result.IsSuccess);
             Assert.AreEqual(3, result.Data.Items.Count); // Вторая страница тоже имеет 3 элемента
-            Assert.AreEqual(2, result.Data.Page);
+            Assert.AreEqual(2, result.Data.PageNumber);
             Assert.IsTrue(result.Data.HasPreviousPage);
             Assert.IsFalse(result.Data.HasNextPage); // На второй странице из двух
         }
