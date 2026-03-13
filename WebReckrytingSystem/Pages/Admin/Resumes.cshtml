@@ -118,19 +118,19 @@
                     @if (Model.Resumes.HasPreviousPage)
                     {
                         <li class="page-item">
-                            <a class="page-link" asp-route-page="@(Model.Resumes.Page - 1)">Назад</a>
+                            <a class="page-link" asp-route-PageNumber="@(Model.Resumes.Page - 1)" asp-route-SearchEmail="@Model.SearchEmail" asp-route-SearchPosition="@Model.SearchPosition" asp-route-FilterStatus="@Model.FilterStatus">Назад</a>
                         </li>
                     }
                     @for (int i = 1; i <= Model.Resumes.TotalPages; i++)
                     {
                         <li class="page-item @(i == Model.Resumes.Page ? "active" : "")">
-                            <a class="page-link" asp-route-page="@i">@i</a>
+                            <a class="page-link" asp-route-PageNumber="@i" asp-route-SearchEmail="@Model.SearchEmail" asp-route-SearchPosition="@Model.SearchPosition" asp-route-FilterStatus="@Model.FilterStatus">@i</a>
                         </li>
                     }
                     @if (Model.Resumes.HasNextPage)
                     {
                         <li class="page-item">
-                            <a class="page-link" asp-route-page="@(Model.Resumes.Page + 1)">Вперед</a>
+                            <a class="page-link" asp-route-PageNumber="@(Model.Resumes.Page + 1)" asp-route-SearchEmail="@Model.SearchEmail" asp-route-SearchPosition="@Model.SearchPosition" asp-route-FilterStatus="@Model.FilterStatus">Вперед</a>
                         </li>
                     }
                 </ul>

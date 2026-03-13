@@ -26,7 +26,7 @@ namespace WebReckrytingSystem.Pages.Admin.Users
         public string? FilterRole { get; set; }
 
         [BindProperty(SupportsGet = true)]
-        public int Page { get; set; } = 1;
+        public int PageNumber { get; set; } = 1;
 
         public int PageSize { get; set; } = 10;
 
@@ -46,7 +46,7 @@ namespace WebReckrytingSystem.Pages.Admin.Users
 
             // Pagination
             var items = query
-                .Skip((Page - 1) * PageSize)
+                .Skip((PageNumber - 1) * PageSize)
                 .Take(PageSize)
                 .ToList();
 
@@ -54,7 +54,7 @@ namespace WebReckrytingSystem.Pages.Admin.Users
             {
                 Items = items,
                 TotalCount = totalCount,
-                Page = Page,
+                Page = PageNumber,
                 PageSize = PageSize
             };
         }

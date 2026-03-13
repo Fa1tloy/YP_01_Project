@@ -29,7 +29,7 @@ namespace WebReckrytingSystem.Pages.Admin.Companies
         public string? FilterStatus { get; set; }
 
         [BindProperty(SupportsGet = true)]
-        public int Page { get; set; } = 1;
+        public int PageNumber { get; set; } = 1;
 
         public int PageSize { get; set; } = 10;
 
@@ -39,8 +39,8 @@ namespace WebReckrytingSystem.Pages.Admin.Companies
                 .Include(c => c.Vacancies)
                 .AsQueryable();
 
-            // Фильтры
-            if (!string.IsNullOrWhiteSpace(SearchName))
+                .Skip((PageNumber - 1) * PageSize)
+                Page = PageNumber,
                 query = query.Where(c => c.Name.Contains(SearchName));
 
             if (FilterStatus == "verified")
