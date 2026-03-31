@@ -9,7 +9,7 @@
 
     <div class="row g-4">
         <div class="col-lg-4">
-            <div class="list-group shadow-sm">
+            <div id="conversationList" class="list-group shadow-sm">
                 @if (!Model.Conversations.Any())
                 {
                     <div class="list-group-item text-muted">Пока нет активных чатов.</div>
@@ -34,15 +34,17 @@
         </div>
 
         <div class="col-lg-8">
-            <div class="card shadow-sm">
+                <div class="card shadow-sm">
                 <div class="card-header bg-white">
-                    <div class="fw-semibold">@(Model.Peer ?? "Выберите чат")</div>
-                    @if (!string.IsNullOrWhiteSpace(Model.Title))
-                    {
-                        <div class="small text-muted">Вакансия: @Model.Title</div>
-                    }
+                    <div id="chatPeer" class="fw-semibold">@(Model.Peer ?? "Выберите чат")</div>
+                    <div id="chatTitle" class="small text-muted">
+                        @if (!string.IsNullOrWhiteSpace(Model.Title))
+                        {
+                            <text>Вакансия: @Model.Title</text>
+                        }
+                    </div>
                 </div>
-                <div class="card-body" style="max-height: 450px; overflow-y: auto;">
+                <div id="messagesContainer" class="card-body" style="max-height: 450px; overflow-y: auto;">
                     @if (!Model.Messages.Any())
                     {
                         <p class="text-muted mb-0">Сообщений пока нет.</p>
@@ -67,10 +69,113 @@
                         <input type="hidden" asp-for="CompanyName" />
                         <input type="hidden" asp-for="Title" />
                         <input asp-for="MessageText" class="form-control" placeholder="Введите сообщение..." />
-                        <button type="submit" class="btn btn-primary" disabled="@(string.IsNullOrWhiteSpace(Model.Peer))">Отправить</button>
+                        <button id="sendButton" type="submit" class="btn btn-primary" disabled="@(string.IsNullOrWhiteSpace(Model.Peer))">Отправить</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        (() => {
+            const conversationList = document.getElementById('conversationList');
+            const messagesContainer = document.getElementById('messagesContainer');
+            const chatPeer = document.getElementById('chatPeer');
+            const chatTitle = document.getElementById('chatTitle');
+            const hiddenPeer = document.querySelector('input[name="Peer"]');
+            const hiddenCompany = document.querySelector('input[name="CompanyName"]');
+            const hiddenTitle = document.querySelector('input[name="Title"]');
+            const sendButton = document.getElementById('sendButton');
+
+            const escapeHtml = (text) => {
+                const div = document.createElement('div');
+                div.textContent = text ?? '';
+                return div.innerHTML;
+            };
+
+            const formatDate = (isoDate) => {
+                const date = new Date(isoDate);
+                return date.toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', '');
+            };
+
+            const buildConversationHref = (convo) => {
+                const url = new URL(window.location.origin + window.location.pathname);
+                url.searchParams.set('peer', convo.peerEmail);
+                if (convo.vacancyCompanyName) url.searchParams.set('companyName', convo.vacancyCompanyName);
+                if (convo.vacancyTitle) url.searchParams.set('title', convo.vacancyTitle);
+                return url.pathname + url.search;
+            };
+
+            const renderConversations = (conversations, selectedPeer, selectedCompanyName, selectedTitle) => {
+                if (!conversations.length) {
+                    conversationList.innerHTML = '<div class="list-group-item text-muted">Пока нет активных чатов.</div>';
+                    return;
+                }
+
+                conversationList.innerHTML = conversations.map((convo) => {
+                    const isActive = convo.peerEmail === selectedPeer
+                        && (convo.vacancyCompanyName || '') === (selectedCompanyName || '')
+                        && (convo.vacancyTitle || '') === (selectedTitle || '');
+                    return `
+                        <a class="list-group-item list-group-item-action ${isActive ? 'active' : ''}" href="${buildConversationHref(convo)}">
+                            <div class="fw-semibold">${escapeHtml(convo.peerEmail)}</div>
+                            <div class="small">${escapeHtml(convo.vacancyTitle || '')}</div>
+                            <div class="small text-muted text-truncate">${escapeHtml(convo.lastMessage || '')}</div>
+                        </a>`;
+                }).join('');
+            };
+
+            const renderMessages = (messages, currentUserEmail) => {
+                if (!messages.length) {
+                    messagesContainer.innerHTML = '<p class="text-muted mb-0">Сообщений пока нет.</p>';
+                    return;
+                }
+
+                messagesContainer.innerHTML = messages.map((message) => {
+                    const isMine = message.senderEmail === currentUserEmail;
+                    return `
+                        <div class="d-flex mb-3 ${isMine ? 'justify-content-end' : 'justify-content-start'}">
+                            <div class="p-2 rounded ${isMine ? 'bg-primary text-white' : 'bg-light'}" style="max-width: 75%;">
+                                <div>${escapeHtml(message.message)}</div>
+                                <div class="small ${isMine ? 'text-white-50' : 'text-muted'}">${formatDate(message.sentAt)}</div>
+                            </div>
+                        </div>`;
+                }).join('');
+
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            };
+
+            const refreshChat = async () => {
+                const url = new URL(window.location.href);
+                url.searchParams.set('handler', 'Updates');
+                if (hiddenPeer?.value) url.searchParams.set('peer', hiddenPeer.value);
+                if (hiddenCompany?.value) url.searchParams.set('companyName', hiddenCompany.value);
+                if (hiddenTitle?.value) url.searchParams.set('title', hiddenTitle.value);
+
+                const response = await fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                if (!response.ok) return;
+
+                const data = await response.json();
+                if (!hiddenPeer.value && data.selectedPeer) {
+                    hiddenPeer.value = data.selectedPeer;
+                    hiddenCompany.value = data.selectedCompanyName || '';
+                    hiddenTitle.value = data.selectedTitle || '';
+                }
+
+                if (sendButton) {
+                    sendButton.disabled = !data.selectedPeer;
+                }
+
+                chatPeer.textContent = data.selectedPeer || 'Выберите чат';
+                chatTitle.textContent = data.selectedTitle ? `Вакансия: ${data.selectedTitle}` : '';
+                renderConversations(data.conversations || [], data.selectedPeer, data.selectedCompanyName, data.selectedTitle);
+                renderMessages(data.messages || [], data.currentUserEmail);
+            };
+
+            refreshChat();
+            setInterval(refreshChat, 5000);
+        })();
+    </script>
+}
