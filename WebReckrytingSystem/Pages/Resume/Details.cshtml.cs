@@ -124,6 +124,56 @@ namespace WebReckrytingSystem.Pages.Resume
             return RedirectToPage(new { userEmail = resumeUserEmail });
         }
 
+        public async Task<IActionResult> OnPostRespondAsync(string resumeUserEmail)
+        {
+            var employerEmail = User.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrEmpty(employerEmail) || !User.IsInRole("employer"))
+            {
+                return RedirectToPage("/Account/Login");
+            }
+
+            var resume = await _context.Resumes
+                .AsNoTracking()
+                .FirstOrDefaultAsync(r => r.UserEmail == resumeUserEmail && r.IsPublished);
+            if (resume == null)
+            {
+                return NotFound();
+            }
+
+            var alreadyHasChat = await _context.ChatMessages
+                .AnyAsync(m => (m.SenderEmail == employerEmail && m.RecipientEmail == resumeUserEmail) ||
+                               (m.SenderEmail == resumeUserEmail && m.RecipientEmail == employerEmail));
+
+            if (!alreadyHasChat)
+            {
+                var firstMessage = new ChatMessage
+                {
+                    SenderEmail = employerEmail,
+                    RecipientEmail = resumeUserEmail,
+                    Message = "Здравствуйте! Нас заинтересовало ваше резюме. Хотим обсудить сотрудничество.",
+                    SentAt = DateTime.UtcNow,
+                    IsRead = false
+                };
+
+                var notification = new Notification
+                {
+                    RecipientEmail = resumeUserEmail,
+                    SenderEmail = employerEmail,
+                    Title = "Новый отклик на ваше резюме",
+                    Message = "Работодатель откликнулся на ваше резюме и начал чат.",
+                    Link = Url.Page("/Account/Chat", null, new { peer = employerEmail }, Request.Scheme),
+                    CreatedAt = DateTime.UtcNow,
+                    IsRead = false
+                };
+
+                _context.ChatMessages.Add(firstMessage);
+                _context.Notifications.Add(notification);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToPage("/Account/Chat", new { peer = resumeUserEmail });
+        }
+
         private static bool IsSavedResumesSchemaIssue(MySqlException ex)
         {
             var isTableMissing = ex.Message.Contains("saved_resumes", StringComparison.OrdinalIgnoreCase)
