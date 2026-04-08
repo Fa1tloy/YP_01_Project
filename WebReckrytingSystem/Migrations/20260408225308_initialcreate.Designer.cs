@@ -12,7 +12,7 @@ using WebReckrytingSystem.Models;
 namespace WebReckrytingSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260303130344_initialcreate")]
+    [Migration("20260408225308_initialcreate")]
     partial class initialcreate
     {
         /// <inheritdoc />
@@ -298,8 +298,8 @@ namespace WebReckrytingSystem.Migrations
                         .HasColumnName("desired_position");
 
                     b.Property<string>("DriverLicenseCategory")
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
                         .HasColumnName("driver_license_category");
 
                     b.Property<string>("EducationDescription")

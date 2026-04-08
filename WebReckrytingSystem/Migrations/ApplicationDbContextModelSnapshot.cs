@@ -295,8 +295,8 @@ namespace WebReckrytingSystem.Migrations
                         .HasColumnName("desired_position");
 
                     b.Property<string>("DriverLicenseCategory")
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
                         .HasColumnName("driver_license_category");
 
                     b.Property<string>("EducationDescription")
