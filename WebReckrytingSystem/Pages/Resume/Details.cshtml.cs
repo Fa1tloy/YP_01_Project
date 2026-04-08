@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using MySqlConnector;
 using System.Security.Claims;
 using WebReckrytingSystem.Models;
 
@@ -33,11 +34,9 @@ namespace WebReckrytingSystem.Pages.Resume
                 return NotFound();
             }
 
-            // Проверяем права доступа
             var currentUserEmail = User.FindFirstValue(ClaimTypes.Email);
             var currentUserRole = User.FindFirstValue(ClaimTypes.Role);
 
-            // Если пользователь не админ и не владелец резюме, проверяем публикацию
             if (currentUserRole != "admin" && currentUserEmail != userEmail)
             {
                 if (!Resume.IsPublished)
@@ -46,13 +45,19 @@ namespace WebReckrytingSystem.Pages.Resume
                 }
             }
 
-            // Проверяем, сохранено ли резюме в избранное (для работодателя)
             if (User.IsInRole("employer"))
             {
-                IsSavedByCurrentEmployer = await _context.SavedResumes
-                    .AnyAsync(s => s.EmployerEmail == currentUserEmail && s.ResumeUserEmail == userEmail);
+                try
+                {
+                    IsSavedByCurrentEmployer = await _context.SavedResumes
+                        .AnyAsync(s => s.EmployerEmail == currentUserEmail && s.ResumeUserEmail == userEmail);
+                }
+                catch (MySqlException ex) when (IsSavedResumesTableMissing(ex))
+                {
+                    IsSavedByCurrentEmployer = false;
+                    TempData["StatusMessage"] = "Р¤СѓРЅРєС†РёСЏ РёР·Р±СЂР°РЅРЅРѕРіРѕ РІСЂРµРјРµРЅРЅРѕ РЅРµРґРѕСЃС‚СѓРїРЅР°.";
+                }
 
-                // Проверяем, есть ли уже чат
                 HasExistingChat = await _context.ChatMessages
                     .AnyAsync(m => (m.SenderEmail == currentUserEmail && m.RecipientEmail == userEmail) ||
                                    (m.SenderEmail == userEmail && m.RecipientEmail == currentUserEmail));
@@ -76,8 +81,17 @@ namespace WebReckrytingSystem.Pages.Resume
                 return NotFound();
             }
 
-            var existing = await _context.SavedResumes
-                .FirstOrDefaultAsync(s => s.EmployerEmail == employerEmail && s.ResumeUserEmail == resumeUserEmail);
+            SavedResume? existing;
+            try
+            {
+                existing = await _context.SavedResumes
+                    .FirstOrDefaultAsync(s => s.EmployerEmail == employerEmail && s.ResumeUserEmail == resumeUserEmail);
+            }
+            catch (MySqlException ex) when (IsSavedResumesTableMissing(ex))
+            {
+                TempData["StatusMessage"] = "Р¤СѓРЅРєС†РёСЏ РёР·Р±СЂР°РЅРЅРѕРіРѕ РІСЂРµРјРµРЅРЅРѕ РЅРµРґРѕСЃС‚СѓРїРЅР°.";
+                return RedirectToPage(new { userEmail = resumeUserEmail });
+            }
 
             if (existing == null)
             {
@@ -86,16 +100,30 @@ namespace WebReckrytingSystem.Pages.Resume
                     EmployerEmail = employerEmail,
                     ResumeUserEmail = resumeUserEmail
                 });
-                TempData["StatusMessage"] = "? Резюме добавлено в избранное";
+                TempData["StatusMessage"] = "Р РµР·СЋРјРµ РґРѕР±Р°РІР»РµРЅРѕ РІ РёР·Р±СЂР°РЅРЅРѕРµ";
             }
             else
             {
                 _context.SavedResumes.Remove(existing);
-                TempData["StatusMessage"] = "??? Резюме удалено из избранного";
+                TempData["StatusMessage"] = "Р РµР·СЋРјРµ СѓРґР°Р»РµРЅРѕ РёР· РёР·Р±СЂР°РЅРЅРѕРіРѕ";
             }
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (MySqlException ex) when (IsSavedResumesTableMissing(ex))
+            {
+                TempData["StatusMessage"] = "Р¤СѓРЅРєС†РёСЏ РёР·Р±СЂР°РЅРЅРѕРіРѕ РІСЂРµРјРµРЅРЅРѕ РЅРµРґРѕСЃС‚СѓРїРЅР°.";
+            }
+
             return RedirectToPage(new { userEmail = resumeUserEmail });
+        }
+
+        private static bool IsSavedResumesTableMissing(MySqlException ex)
+        {
+            return ex.Message.Contains("saved_resumes", StringComparison.OrdinalIgnoreCase)
+                   && ex.Message.Contains("doesn't exist", StringComparison.OrdinalIgnoreCase);
         }
     }
 }
