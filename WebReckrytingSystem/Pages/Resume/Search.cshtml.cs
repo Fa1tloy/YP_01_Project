@@ -57,8 +57,9 @@ namespace WebReckrytingSystem.Pages.Resume
         public string? HasCar { get; set; }
 
         [BindProperty(SupportsGet = true)]
-        public string? DriverLicenseCategory { get; set; }
+        public List<string> DriverLicenseCategories { get; set; } = new();
         public IReadOnlyList<string> Specialties => SpecialtyCatalog.All;
+        public IReadOnlyList<string> AvailableDriverLicenseCategories => DriverLicenseCategoryCatalog.All;
 
         public List<Models.Resume> Resumes { get; set; } = new();
 
@@ -148,15 +149,37 @@ namespace WebReckrytingSystem.Pages.Resume
                 query = query.Where(r => r.HasCar == hasCar);
             }
 
-            if (!string.IsNullOrWhiteSpace(DriverLicenseCategory))
+            var resumes = await query
+                .OrderBy(r => r.DesiredPosition)
+                .ToListAsync();
+
+            if (DriverLicenseCategories.Any())
             {
-                query = query.Where(r => r.DriverLicenseCategory != null && r.DriverLicenseCategory.Contains(DriverLicenseCategory));
+                var selectedCategories = DriverLicenseCategories
+                    .Where(c => !string.IsNullOrWhiteSpace(c))
+                    .Select(c => c.Trim().ToUpperInvariant())
+                    .Distinct()
+                    .ToList();
+
+                resumes = resumes
+                    .Where(r =>
+                    {
+                        if (string.IsNullOrWhiteSpace(r.DriverLicenseCategory))
+                        {
+                            return false;
+                        }
+
+                        var resumeCategories = r.DriverLicenseCategory
+                            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                            .Select(c => c.ToUpperInvariant())
+                            .ToHashSet();
+
+                        return selectedCategories.All(c => resumeCategories.Contains(c));
+                    })
+                    .ToList();
             }
 
-            Resumes = await query
-                .OrderBy(r => r.DesiredPosition)
-                .Take(50)
-                .ToListAsync();
+            Resumes = resumes.Take(50).ToList();
         }
     }
 }

@@ -176,9 +176,15 @@
                         </div>
 
                         <div>
-                            <label asp-for="ResumeData.DriverLicenseCategory" class="form-label fw-600">Категория прав</label>
-                            <input asp-for="ResumeData.DriverLicenseCategory" class="form-control rounded-pill" placeholder="B" />
-                            <span asp-validation-for="ResumeData.DriverLicenseCategory" class="text-danger small"></span>
+                            <label asp-for="ResumeData.DriverLicenseCategories" class="form-label fw-600">Категория(и) прав</label>
+                            <select asp-for="ResumeData.DriverLicenseCategories" class="form-select rounded-3" multiple>
+                                @foreach (var category in Model.DriverLicenseCategories)
+                                {
+                                    <option value="@category">@category</option>
+                                }
+                            </select>
+                            <small class="text-muted">Можно выбрать несколько категорий (Ctrl/Cmd + клик).</small>
+                            <span asp-validation-for="ResumeData.DriverLicenseCategories" class="text-danger small"></span>
                         </div>
                     </div>
                 </div>

@@ -56,9 +56,12 @@ namespace WebReckrytingSystem.Models
         [Display(Name = "Наличие автомобиля")]
         public bool HasCar { get; set; }
 
-        [StringLength(20, ErrorMessage = "Категория прав не должна превышать 20 символов")]
+        [StringLength(255, ErrorMessage = "Категория прав не должна превышать 255 символов")]
         [Display(Name = "Категория прав")]
         public string? DriverLicenseCategory { get; set; }
+
+        [Display(Name = "Категории прав")]
+        public List<string> DriverLicenseCategories { get; set; } = new();
 
         [Display(Name = "Опыт работы (лет)")]
         [Range(0, 60, ErrorMessage = "Опыт работы не может быть отрицательным или больше 60 лет")]

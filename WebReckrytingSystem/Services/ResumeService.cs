@@ -40,7 +40,7 @@ namespace WebReckrytingSystem.Services
                     Gender = model.Gender,
                     SalaryExpectations = model.SalaryExpectations,
                     HasCar = model.HasCar,
-                    DriverLicenseCategory = string.IsNullOrWhiteSpace(model.DriverLicenseCategory) ? null : model.DriverLicenseCategory.Trim(),
+                    DriverLicenseCategory = FormatDriverLicenseCategories(model.DriverLicenseCategories),
                     ExperienceDescription = FormatExperienceDescription(model),
                     EducationDescription = FormatEducationDescription(model),
                     Skills = string.Join(", ", model.Skills.Select(s => s.Trim()).Distinct()),
@@ -80,7 +80,7 @@ namespace WebReckrytingSystem.Services
                 existingResume.Gender = model.Gender;
                 existingResume.SalaryExpectations = model.SalaryExpectations;
                 existingResume.HasCar = model.HasCar;
-                existingResume.DriverLicenseCategory = string.IsNullOrWhiteSpace(model.DriverLicenseCategory) ? null : model.DriverLicenseCategory.Trim();
+                existingResume.DriverLicenseCategory = FormatDriverLicenseCategories(model.DriverLicenseCategories);
                 existingResume.ExperienceDescription = FormatExperienceDescription(model);
                 existingResume.EducationDescription = FormatEducationDescription(model);
                 existingResume.Skills = string.Join(", ", model.Skills.Select(s => s.Trim()).Distinct());
@@ -112,6 +112,9 @@ namespace WebReckrytingSystem.Services
 
             if (!SpecialtyCatalog.All.Contains(model.Specialty))
                 return ServiceResult.Error("Выберите специальность из списка");
+
+            if (model.DriverLicenseCategories.Any(c => !DriverLicenseCategoryCatalog.All.Contains(c)))
+                return ServiceResult.Error("Выберите категории прав из списка");
 
             var distinctSkills = model.Skills.Select(s => s.Trim().ToLower()).Distinct();
             if (distinctSkills.Count() != model.Skills.Count)
@@ -175,6 +178,17 @@ namespace WebReckrytingSystem.Services
                                    .Select(s => s.Trim())
                                    .Distinct();
             return validSkills.Any() ? string.Join(", ", validSkills) : null;
+        }
+
+        private string? FormatDriverLicenseCategories(List<string> categories)
+        {
+            var validCategories = categories
+                .Where(c => !string.IsNullOrWhiteSpace(c))
+                .Select(c => c.Trim().ToUpperInvariant())
+                .Distinct()
+                .ToList();
+
+            return validCategories.Any() ? string.Join(", ", validCategories) : null;
         }
 
         private string? FormatPractices(List<PracticeViewModel> practices)
