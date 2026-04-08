@@ -73,8 +73,7 @@ CREATE TABLE IF NOT EXISTS saved_resumes (
     saved_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uq_saved_resumes_unique (employer_email, resume_user_email),
     INDEX idx_saved_resumes_employer_email (employer_email),
-    INDEX idx_saved_resumes_resume_user_email (resume_user_email),
-    CONSTRAINT fk_saved_resumes_resume FOREIGN KEY (resume_user_email) REFERENCES resumes(user_email) ON DELETE CASCADE
+    INDEX idx_saved_resumes_resume_user_email (resume_user_email)
 );";
 
             await _context.Database.ExecuteSqlRawAsync(sql);
