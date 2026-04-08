@@ -58,6 +58,7 @@ namespace WebReckrytingSystem.Pages.Resume
 
         [BindProperty(SupportsGet = true)]
         public string? DriverLicenseCategory { get; set; }
+        public IReadOnlyList<string> Specialties => SpecialtyCatalog.All;
 
         public List<Models.Resume> Resumes { get; set; } = new();
 
@@ -80,7 +81,7 @@ namespace WebReckrytingSystem.Pages.Resume
 
             if (!string.IsNullOrWhiteSpace(Specialty))
             {
-                query = query.Where(r => r.Specialty.Contains(Specialty) || r.DesiredPosition.Contains(Specialty));
+                query = query.Where(r => r.Specialty == Specialty);
             }
 
 

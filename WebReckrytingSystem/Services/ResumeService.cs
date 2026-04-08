@@ -110,6 +110,9 @@ namespace WebReckrytingSystem.Services
             if (model.Skills.Any(string.IsNullOrWhiteSpace))
                 return ServiceResult.Error("Навык не может быть пустым");
 
+            if (!SpecialtyCatalog.All.Contains(model.Specialty))
+                return ServiceResult.Error("Выберите специальность из списка");
+
             var distinctSkills = model.Skills.Select(s => s.Trim().ToLower()).Distinct();
             if (distinctSkills.Count() != model.Skills.Count)
                 return ServiceResult.Error("Обнаружены дублирующиеся навыки");
