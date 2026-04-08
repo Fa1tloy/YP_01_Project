@@ -12,6 +12,10 @@ namespace WebReckrytingSystem.Models
         [Display(Name = "Компания")]
         public string? CompanyName { get; set; }
 
+        [StringLength(100, ErrorMessage = "Регион не должен превышать 100 символов")]
+        [Display(Name = "Регион")]
+        public string? Region { get; set; }
+
         [Range(0, 9999999, ErrorMessage = "Зарплата должна быть в диапазоне от 0 до 9 999 999")]
         [Display(Name = "Зарплата от (руб.)")]
         public int? SalaryFrom { get; set; }
@@ -25,6 +29,22 @@ namespace WebReckrytingSystem.Models
 
         [Display(Name = "График работы")]
         public string? WorkSchedule { get; set; }
+
+        [Range(1, 24, ErrorMessage = "Рабочие часы в день должны быть от 1 до 24")]
+        [Display(Name = "Рабочие часы в день")]
+        public int? WorkHoursPerDay { get; set; }
+
+        [Display(Name = "Формат работы")]
+        public string? WorkFormat { get; set; }
+
+        [Display(Name = "Период дохода")]
+        public string? SalaryPeriod { get; set; }
+
+        [Display(Name = "Частота выплат")]
+        public string? PaymentFrequency { get; set; }
+
+        [Display(Name = "Специальность")]
+        public string? Specialty { get; set; }
 
         [Range(1, 100, ErrorMessage = "Номер страницы должен быть от 1 до 100")]
         public int Page { get; set; } = 1;

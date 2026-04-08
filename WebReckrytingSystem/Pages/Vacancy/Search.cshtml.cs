@@ -78,10 +78,16 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 var query = new QueryBuilder();
                 AddIfNotEmpty(query, "Keywords", SearchData.Keywords);
                 AddIfNotEmpty(query, "CompanyName", SearchData.CompanyName);
+                AddIfNotEmpty(query, "Region", SearchData.Region);
                 AddIfNotNull(query, "SalaryFrom", SearchData.SalaryFrom);
                 AddIfNotNull(query, "SalaryTo", SearchData.SalaryTo);
                 AddIfNotEmpty(query, "EmploymentType", SearchData.EmploymentType);
                 AddIfNotEmpty(query, "WorkSchedule", SearchData.WorkSchedule);
+                AddIfNotNull(query, "WorkHoursPerDay", SearchData.WorkHoursPerDay);
+                AddIfNotEmpty(query, "WorkFormat", SearchData.WorkFormat);
+                AddIfNotEmpty(query, "SalaryPeriod", SearchData.SalaryPeriod);
+                AddIfNotEmpty(query, "PaymentFrequency", SearchData.PaymentFrequency);
+                AddIfNotEmpty(query, "Specialty", SearchData.Specialty);
                 query.Add("Page", SearchData.Page.ToString());
                 query.Add("PageSize", SearchData.PageSize.ToString());
 
