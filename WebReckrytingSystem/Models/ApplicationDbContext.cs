@@ -79,7 +79,7 @@ namespace WebReckrytingSystem.Models
                 entity.Property(e => e.Specialty).HasColumnName("specialty").HasMaxLength(255).IsRequired();
                 entity.Property(e => e.Gender).HasColumnName("gender").HasMaxLength(20).IsRequired();
                 entity.Property(e => e.HasCar).HasColumnName("has_car").HasDefaultValue(false);
-                entity.Property(e => e.DriverLicenseCategory).HasColumnName("driver_license_category").HasMaxLength(20).IsRequired(false);
+                entity.Property(e => e.DriverLicenseCategory).HasColumnName("driver_license_category").HasMaxLength(255).IsRequired(false);
                 entity.Property(e => e.ExperienceDescription).HasColumnName("experience_description");
                 entity.Property(e => e.EducationDescription).HasColumnName("education_description");
                 entity.Property(e => e.Skills).HasColumnName("skills");
