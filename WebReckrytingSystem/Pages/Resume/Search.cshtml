@@ -50,11 +50,10 @@
                 <label asp-for="Specialty" class="form-label">Специальность</label>
                 <select asp-for="Specialty" class="form-select">
                     <option value="">Любая</option>
-                    <option>Информационные системы и программирование</option>
-                    <option>Сетевое и системное администрирование</option>
-                    <option>Экономика и бухгалтерский учет</option>
-                    <option>Дизайн</option>
-                    <option>Маркетинг</option>
+                    @foreach (var specialty in Model.Specialties)
+                    {
+                        <option value="@specialty">@specialty</option>
+                    }
                 </select>
             </div>
 
@@ -106,8 +105,29 @@
                 <input asp-for="SalaryExpectationsTo" type="number" class="form-control" min="0" />
             </div>
             <div class="col-lg-3 col-md-6">
-                <label asp-for="DriverLicenseCategory" class="form-label">Категория прав</label>
-                <input asp-for="DriverLicenseCategory" class="form-control" placeholder="B" />
+                <label asp-for="DriverLicenseCategories" class="form-label">Категория(и) прав</label>
+                <div class="dropdown" data-bs-auto-close="outside" data-target-select="searchDriverLicenseCategories">
+                    <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Выберите категории прав
+                    </button>
+                    <ul class="dropdown-menu w-100 shadow-sm p-2">
+                        @foreach (var category in Model.AvailableDriverLicenseCategories)
+                        {
+                            <li>
+                                <button type="button" class="dropdown-item d-flex justify-content-between align-items-center rounded-3" data-license-value="@category">
+                                    <span>@category</span>
+                                    <i class="fas fa-check text-success d-none"></i>
+                                </button>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <select asp-for="DriverLicenseCategories" id="searchDriverLicenseCategories" class="d-none" multiple>
+                    @foreach (var category in Model.AvailableDriverLicenseCategories)
+                    {
+                        <option value="@category">@category</option>
+                    }
+                </select>
             </div>
 
             <div class="col-lg-4 col-md-6">
@@ -168,3 +188,43 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => initLicenseDropdown('searchDriverLicenseCategories'));
+
+        function initLicenseDropdown(selectId) {
+            const select = document.getElementById(selectId);
+            const container = document.querySelector(`[data-target-select="${selectId}"]`);
+            if (!select || !container) return;
+
+            const toggle = container.querySelector('[data-bs-toggle="dropdown"]');
+            const items = container.querySelectorAll('[data-license-value]');
+
+            const syncUi = () => {
+                const selected = Array.from(select.selectedOptions).map(o => o.value);
+                items.forEach(item => {
+                    const value = item.getAttribute('data-license-value');
+                    const isSelected = selected.includes(value);
+                    item.classList.toggle('active', isSelected);
+                    item.querySelector('.fa-check')?.classList.toggle('d-none', !isSelected);
+                });
+                toggle.textContent = selected.length
+                    ? `Выбрано категорий: ${selected.length}`
+                    : 'Выберите категории прав';
+            };
+
+            items.forEach(item => {
+                item.addEventListener('click', () => {
+                    const value = item.getAttribute('data-license-value');
+                    const option = Array.from(select.options).find(o => o.value === value);
+                    if (!option) return;
+                    option.selected = !option.selected;
+                    syncUi();
+                });
+            });
+
+            syncUi();
+        }
+    </script>
+}

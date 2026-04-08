@@ -20,6 +20,8 @@ namespace WebReckrytingSystem.Pages.Account
 
         [BindProperty]
         public CreateResumeViewModel ResumeData { get; set; } = new();
+        public IReadOnlyList<string> Specialties => SpecialtyCatalog.All;
+        public IReadOnlyList<string> DriverLicenseCategories => DriverLicenseCategoryCatalog.All;
 
         public string? SuccessMessage { get; set; }
         public string? ErrorMessage { get; set; }

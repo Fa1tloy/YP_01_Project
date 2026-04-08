@@ -45,7 +45,13 @@
 
                                 <div class="mb-3">
                                     <label asp-for="ResumeData.Specialty" class="form-label fw-600">Специальность *</label>
-                                    <input asp-for="ResumeData.Specialty" class="form-control form-control-lg rounded-pill" placeholder="Информационные системы и программирование" required />
+                                    <select asp-for="ResumeData.Specialty" class="form-select form-select-lg rounded-pill" required>
+                                        <option value="">Выберите специальность</option>
+                                        @foreach (var specialty in Model.Specialties)
+                                        {
+                                            <option value="@specialty">@specialty</option>
+                                        }
+                                    </select>
                                     <span asp-validation-for="ResumeData.Specialty" class="text-danger small"></span>
                                 </div>
 
@@ -149,9 +155,30 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label asp-for="ResumeData.DriverLicenseCategory" class="form-label fw-600">Категория прав</label>
-                                    <input asp-for="ResumeData.DriverLicenseCategory" class="form-control form-control-lg rounded-pill" placeholder="B" />
-                                    <span asp-validation-for="ResumeData.DriverLicenseCategory" class="text-danger small"></span>
+                                    <label asp-for="ResumeData.DriverLicenseCategories" class="form-label fw-600">Категория(и) прав</label>
+                                    <div class="dropdown" data-bs-auto-close="outside" data-target-select="editDriverLicenseCategories">
+                                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Выберите категории прав
+                                        </button>
+                                        <ul class="dropdown-menu w-100 shadow-sm p-2">
+                                            @foreach (var category in Model.DriverLicenseCategories)
+                                            {
+                                                <li>
+                                                    <button type="button" class="dropdown-item d-flex justify-content-between align-items-center rounded-3" data-license-value="@category">
+                                                        <span>@category</span>
+                                                        <i class="fas fa-check text-success d-none"></i>
+                                                    </button>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                    <select asp-for="ResumeData.DriverLicenseCategories" id="editDriverLicenseCategories" class="d-none" multiple>
+                                        @foreach (var category in Model.DriverLicenseCategories)
+                                        {
+                                            <option value="@category">@category</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="ResumeData.DriverLicenseCategories" class="text-danger small"></span>
                                 </div>
                             </div>
                         </div>
@@ -345,6 +372,7 @@
             window.skills = skills; // делаем глобальной для доступа из функций
 
             renderSkills();
+            initLicenseDropdown('editDriverLicenseCategories');
 
             // Обработчик ввода навыков
             const inp = document.getElementById('skillsInput');
@@ -432,6 +460,40 @@
                         </div>
                     `;
             container.appendChild(div);
+        }
+
+        function initLicenseDropdown(selectId) {
+            const select = document.getElementById(selectId);
+            const container = document.querySelector(`[data-target-select="${selectId}"]`);
+            if (!select || !container) return;
+
+            const toggle = container.querySelector('[data-bs-toggle="dropdown"]');
+            const items = container.querySelectorAll('[data-license-value]');
+
+            const syncUi = () => {
+                const selected = Array.from(select.selectedOptions).map(o => o.value);
+                items.forEach(item => {
+                    const value = item.getAttribute('data-license-value');
+                    const isSelected = selected.includes(value);
+                    item.classList.toggle('active', isSelected);
+                    item.querySelector('.fa-check')?.classList.toggle('d-none', !isSelected);
+                });
+                toggle.textContent = selected.length
+                    ? `Выбрано категорий: ${selected.length}`
+                    : 'Выберите категории прав';
+            };
+
+            items.forEach(item => {
+                item.addEventListener('click', () => {
+                    const value = item.getAttribute('data-license-value');
+                    const option = Array.from(select.options).find(o => o.value === value);
+                    if (!option) return;
+                    option.selected = !option.selected;
+                    syncUi();
+                });
+            });
+
+            syncUi();
         }
 
         // toast-уведомления

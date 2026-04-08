@@ -19,6 +19,8 @@ namespace WebReckrytingSystem.Pages.Account
 
         [BindProperty]
         public CreateResumeViewModel ResumeData { get; set; } = new();
+        public IReadOnlyList<string> Specialties => SpecialtyCatalog.All;
+        public IReadOnlyList<string> DriverLicenseCategories => DriverLicenseCategoryCatalog.All;
 
         public string? SuccessMessage { get; set; }
         public string? ErrorMessage { get; set; }
@@ -102,6 +104,11 @@ namespace WebReckrytingSystem.Pages.Account
                 SalaryExpectations = resume.SalaryExpectations,
                 HasCar = resume.HasCar,
                 DriverLicenseCategory = resume.DriverLicenseCategory,
+                DriverLicenseCategories = string.IsNullOrWhiteSpace(resume.DriverLicenseCategory)
+                    ? new List<string>()
+                    : resume.DriverLicenseCategory
+                        .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                        .ToList(),
                 IsPublished = resume.IsPublished,
                 Skills = string.IsNullOrWhiteSpace(resume.Skills)
                     ? new List<string>()
