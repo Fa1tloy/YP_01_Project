@@ -47,20 +47,28 @@ namespace WebReckrytingSystem.Pages.Account
                         .OrderByDescending(s => s.SavedAt)
                         .ToListAsync();
                 }
-                catch (MySqlException ex) when (IsSavedResumesTableMissing(ex))
+                catch (MySqlException ex) when (IsSavedResumesSchemaIssue(ex))
                 {
                     await EnsureSavedResumesTableExistsAsync();
-                    SavedResumes = new List<SavedResume>();
+
+                    SavedResumes = await _context.SavedResumes
+                        .Where(s => s.EmployerEmail == userEmail)
+                        .Include(s => s.Resume)
+                        .OrderByDescending(s => s.SavedAt)
+                        .ToListAsync();
                 }
             }
 
             return Page();
         }
 
-        private static bool IsSavedResumesTableMissing(MySqlException ex)
+        private static bool IsSavedResumesSchemaIssue(MySqlException ex)
         {
-            return ex.Message.Contains("saved_resumes", StringComparison.OrdinalIgnoreCase)
-                   && ex.Message.Contains("doesn't exist", StringComparison.OrdinalIgnoreCase);
+            var isTableMissing = ex.Message.Contains("saved_resumes", StringComparison.OrdinalIgnoreCase)
+                                 && ex.Message.Contains("doesn't exist", StringComparison.OrdinalIgnoreCase);
+            var isCollationMismatch = ex.Message.Contains("Illegal mix of collations", StringComparison.OrdinalIgnoreCase);
+
+            return isTableMissing || isCollationMismatch;
         }
 
         private async Task EnsureSavedResumesTableExistsAsync()
@@ -68,15 +76,23 @@ namespace WebReckrytingSystem.Pages.Account
             const string sql = @"
 CREATE TABLE IF NOT EXISTS saved_resumes (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    employer_email VARCHAR(255) NOT NULL,
-    resume_user_email VARCHAR(255) NOT NULL,
+    employer_email VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+    resume_user_email VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
     saved_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uq_saved_resumes_unique (employer_email, resume_user_email),
     INDEX idx_saved_resumes_employer_email (employer_email),
     INDEX idx_saved_resumes_resume_user_email (resume_user_email)
-);";
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;";
+
+            const string alterSql = @"
+ALTER TABLE saved_resumes
+    CONVERT TO CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;";
 
             await _context.Database.ExecuteSqlRawAsync(sql);
+            await _context.Database.ExecuteSqlRawAsync(alterSql);
         }
     }
 }
