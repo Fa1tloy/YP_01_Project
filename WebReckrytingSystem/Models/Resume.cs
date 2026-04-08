@@ -45,7 +45,7 @@ namespace WebReckrytingSystem.Models
 
         public bool HasCar { get; set; }
 
-        [StringLength(20)]
+        [StringLength(255)]
         public string? DriverLicenseCategory { get; set; }
 
         public bool IsPublished { get; set; }
