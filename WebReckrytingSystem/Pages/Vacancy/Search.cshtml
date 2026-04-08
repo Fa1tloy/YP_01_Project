@@ -104,11 +104,12 @@
                                 <label class="form-label">Специальность</label>
                                 <select name="Specialty" class="form-select">
                                     <option value="">Любая</option>
-                                    <option>Информационные системы и программирование</option>
-                                    <option>Сетевое и системное администрирование</option>
-                                    <option>Экономика и бухгалтерский учет</option>
-                                    <option>Дизайн</option>
-                                    <option>Маркетинг</option>
+                                    @foreach (var specialty in WebReckrytingSystem.Models.SpecialtyCatalog.All)
+                                    {
+                                        <option value="@specialty" selected="@(Request.Query["Specialty"] == specialty)">
+                                            @specialty
+                                        </option>
+                                    }
                                 </select>
                             </div>
 
