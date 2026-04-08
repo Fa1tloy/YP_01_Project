@@ -54,8 +54,9 @@ namespace WebReckrytingSystem.Pages.Resume
                 }
                 catch (MySqlException ex) when (IsSavedResumesTableMissing(ex))
                 {
-                    IsSavedByCurrentEmployer = false;
-                    TempData["StatusMessage"] = "Функция избранного временно недоступна.";
+                    await EnsureSavedResumesTableExistsAsync();
+                    IsSavedByCurrentEmployer = await _context.SavedResumes
+                        .AnyAsync(s => s.EmployerEmail == currentUserEmail && s.ResumeUserEmail == userEmail);
                 }
 
                 HasExistingChat = await _context.ChatMessages
@@ -89,8 +90,10 @@ namespace WebReckrytingSystem.Pages.Resume
             }
             catch (MySqlException ex) when (IsSavedResumesTableMissing(ex))
             {
-                TempData["StatusMessage"] = "Функция избранного временно недоступна.";
-                return RedirectToPage(new { userEmail = resumeUserEmail });
+                await EnsureSavedResumesTableExistsAsync();
+
+                existing = await _context.SavedResumes
+                    .FirstOrDefaultAsync(s => s.EmployerEmail == employerEmail && s.ResumeUserEmail == resumeUserEmail);
             }
 
             if (existing == null)
@@ -114,7 +117,8 @@ namespace WebReckrytingSystem.Pages.Resume
             }
             catch (MySqlException ex) when (IsSavedResumesTableMissing(ex))
             {
-                TempData["StatusMessage"] = "Функция избранного временно недоступна.";
+                await EnsureSavedResumesTableExistsAsync();
+                await _context.SaveChangesAsync();
             }
 
             return RedirectToPage(new { userEmail = resumeUserEmail });
@@ -124,6 +128,23 @@ namespace WebReckrytingSystem.Pages.Resume
         {
             return ex.Message.Contains("saved_resumes", StringComparison.OrdinalIgnoreCase)
                    && ex.Message.Contains("doesn't exist", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private async Task EnsureSavedResumesTableExistsAsync()
+        {
+            const string sql = @"
+CREATE TABLE IF NOT EXISTS saved_resumes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    employer_email VARCHAR(255) NOT NULL,
+    resume_user_email VARCHAR(255) NOT NULL,
+    saved_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_saved_resumes_unique (employer_email, resume_user_email),
+    INDEX idx_saved_resumes_employer_email (employer_email),
+    INDEX idx_saved_resumes_resume_user_email (resume_user_email),
+    CONSTRAINT fk_saved_resumes_resume FOREIGN KEY (resume_user_email) REFERENCES resumes(user_email) ON DELETE CASCADE
+);";
+
+            await _context.Database.ExecuteSqlRawAsync(sql);
         }
     }
 }

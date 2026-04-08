@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using MySqlConnector;
 using System.Security.Claims;
 using WebReckrytingSystem.Models;
 
@@ -32,20 +33,51 @@ namespace WebReckrytingSystem.Pages.Account
             {
                 SavedVacancies = await _context.SavedVacancies
                     .Where(s => s.StudentEmail == userEmail)
-                    .Include(s => s.Vacancy) // потребуется навигационное свойство
+                    .Include(s => s.Vacancy)
                     .OrderByDescending(s => s.SavedAt)
                     .ToListAsync();
             }
             else if (role == "employer")
             {
-                SavedResumes = await _context.SavedResumes
-                    .Where(s => s.EmployerEmail == userEmail)
-                    .Include(s => s.Resume) // тоже нужно навигационное свойство
-                    .OrderByDescending(s => s.SavedAt)
-                    .ToListAsync();
+                try
+                {
+                    SavedResumes = await _context.SavedResumes
+                        .Where(s => s.EmployerEmail == userEmail)
+                        .Include(s => s.Resume)
+                        .OrderByDescending(s => s.SavedAt)
+                        .ToListAsync();
+                }
+                catch (MySqlException ex) when (IsSavedResumesTableMissing(ex))
+                {
+                    await EnsureSavedResumesTableExistsAsync();
+                    SavedResumes = new List<SavedResume>();
+                }
             }
 
             return Page();
+        }
+
+        private static bool IsSavedResumesTableMissing(MySqlException ex)
+        {
+            return ex.Message.Contains("saved_resumes", StringComparison.OrdinalIgnoreCase)
+                   && ex.Message.Contains("doesn't exist", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private async Task EnsureSavedResumesTableExistsAsync()
+        {
+            const string sql = @"
+CREATE TABLE IF NOT EXISTS saved_resumes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    employer_email VARCHAR(255) NOT NULL,
+    resume_user_email VARCHAR(255) NOT NULL,
+    saved_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_saved_resumes_unique (employer_email, resume_user_email),
+    INDEX idx_saved_resumes_employer_email (employer_email),
+    INDEX idx_saved_resumes_resume_user_email (resume_user_email),
+    CONSTRAINT fk_saved_resumes_resume FOREIGN KEY (resume_user_email) REFERENCES resumes(user_email) ON DELETE CASCADE
+);";
+
+            await _context.Database.ExecuteSqlRawAsync(sql);
         }
     }
 }
