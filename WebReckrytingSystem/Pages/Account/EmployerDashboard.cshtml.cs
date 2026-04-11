@@ -26,6 +26,7 @@ namespace WebReckrytingSystem.Pages.Account
         // Îñíîâíàÿ èíôîðìàöèÿ
         public string UserFirstName { get; set; } = string.Empty;
         public string UserEmail { get; set; } = string.Empty;
+        public string UserAvatarUrl { get; set; } = "/images/rabotodatel.jpg";
 
         // Ñòàòèñòèêà
         public int TotalVacancies { get; set; }
@@ -83,6 +84,11 @@ namespace WebReckrytingSystem.Pages.Account
 
                 UserEmail = userEmail;
                 UserFirstName = User.FindFirst(ClaimTypes.GivenName)?.Value ?? "Ðàáîòîäàòåëü";
+                var user = _context.Users.FirstOrDefault(u => u.Email == userEmail);
+                if (!string.IsNullOrWhiteSpace(user?.AvatarUrl))
+                {
+                    UserAvatarUrl = user.AvatarUrl;
+                }
 
                 LoadStatistics(userEmail);
                 LoadVacanciesWithStats(userEmail);

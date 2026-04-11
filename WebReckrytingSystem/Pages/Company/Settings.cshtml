@@ -93,7 +93,7 @@
                             <label asp-for="CompanyData.LogoUrl" class="form-label fw-600">
                                 <i class="fas fa-image me-2"></i>Логотип
                             </label>
-                            <input type="file" name="logoFile" class="form-control form-control-lg rounded-pill" accept="image/*" />
+                            <input asp-for="LogoFile" type="file" class="form-control form-control-lg rounded-pill" accept="image/*" />
                             <small class="form-text text-muted">Рекомендуемый размер: 200x200px</small>
 
                             @if (!string.IsNullOrEmpty(Model.CompanyData.LogoUrl))

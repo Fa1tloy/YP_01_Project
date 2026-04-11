@@ -12,7 +12,7 @@ using WebReckrytingSystem.Models;
 namespace WebReckrytingSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260408225308_initialcreate")]
+    [Migration("20260411194202_initialcreate")]
     partial class initialcreate
     {
         /// <inheritdoc />
@@ -501,6 +501,11 @@ namespace WebReckrytingSystem.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
                         .HasColumnName("email");
+
+                    b.Property<string>("AvatarUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("avatar_url");
 
                     b.Property<string>("CompanyName")
                         .HasMaxLength(255)

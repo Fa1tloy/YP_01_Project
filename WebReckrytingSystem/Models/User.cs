@@ -22,6 +22,9 @@ namespace WebReckrytingSystem.Models
 
         [Required]
         public  string Role { get; set; }
+
+        public string? AvatarUrl { get; set; }
+
         // === ДОБАВЛЯЕМ СВЯЗЬ С КОМПАНИЕЙ ===
         public string? CompanyName { get; set; }
 

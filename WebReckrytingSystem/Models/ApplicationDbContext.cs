@@ -52,6 +52,7 @@ namespace WebReckrytingSystem.Models
                 entity.Property(e => e.FirstName).HasColumnName("first_name").HasMaxLength(100).IsRequired();
                 entity.Property(e => e.LastName).HasColumnName("last_name").HasMaxLength(100).IsRequired();
                 entity.Property(e => e.Role).HasColumnName("role").HasMaxLength(20).IsRequired();
+                entity.Property(e => e.AvatarUrl).HasColumnName("avatar_url").HasMaxLength(500).IsRequired(false);
 
                 // === НОВОЕ: СВЯЗЬ С КОМПАНИЕЙ ===
                 entity.Property(e => e.CompanyName).HasColumnName("company_name").HasMaxLength(255).IsRequired(false);
