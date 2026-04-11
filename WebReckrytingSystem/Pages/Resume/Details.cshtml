@@ -98,6 +98,15 @@
                                         <i class="fas fa-comment me-2"></i>Перейти в чат
                                     </a>
                                 }
+                                else
+                                {
+                                    <form method="post" asp-page-handler="Respond" class="d-grid">
+                                        <input type="hidden" name="resumeUserEmail" value="@Model.Resume.UserEmail" />
+                                        <button type="submit" class="btn btn-success rounded-pill py-3">
+                                            <i class="fas fa-paper-plane me-2"></i>Откликнуться на резюме
+                                        </button>
+                                    </form>
+                                }
                             </div>
                         }
 

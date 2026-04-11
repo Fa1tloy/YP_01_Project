@@ -128,7 +128,7 @@ namespace WebReckrytingSystem.Services
                 return ServiceResult.Error("Недопустимый тип занятости");
 
             var validWorkSchedules = new[] { "full_day", "shifts", "flexible", "remote", "shift_work" };
-            var validWorkFormats = new[] { "office", "remote", "hybrid" };
+            var validWorkFormats = new[] { "office", "remote", "travel", "hybrid" };
             var validSalaryPeriods = new[] { "month", "hour", "shift", "service", "rotation" };
             var validPaymentFrequencies = new[] { "weekly", "biweekly", "monthly", "after_shift", "contract" };
             if (!validWorkSchedules.Contains(model.WorkSchedule))

@@ -30,20 +30,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
         public Models.Vacancy CurrentVacancy { get; set; } = null!;
         public List<string> CompanySuggestions { get; set; } = new();
 
-        public IReadOnlyList<string> Specialties { get; } = new List<string>
-        {
-            "Информационные системы и программирование",
-            "Сетевое и системное администрирование",
-            "Экономика и бухгалтерский учет",
-            "Банковское дело",
-            "Дизайн",
-            "Маркетинг",
-            "Юриспруденция",
-            "Техническое обслуживание и ремонт автотранспорта",
-            "Строительство и эксплуатация зданий и сооружений",
-            "Электромонтер",
-            "Туризм и гостеприимство"
-        };
+        public IReadOnlyList<string> Specialties => SpecialtyCatalog.All;
 
         public string? SuccessMessage { get; set; }
         public string? ErrorMessage { get; set; }
