@@ -39,7 +39,6 @@ namespace WebReckrytingSystem.Pages.Admin.Companies
                 .Include(c => c.Vacancies)
                 .AsQueryable();
 
-            // Фильтры
             if (!string.IsNullOrWhiteSpace(SearchName))
                 query = query.Where(c => c.Name.Contains(SearchName));
 
@@ -70,6 +69,17 @@ namespace WebReckrytingSystem.Pages.Admin.Companies
             if (company != null)
             {
                 company.Verified = true;
+                
+                // Verify all employer users of this company
+                var employerUsers = _context.Users
+                    .Where(u => u.CompanyName == companyName && u.Role == User.ROLE_EMPLOYER)
+                    .ToList();
+                
+                foreach (var user in employerUsers)
+                {
+                    user.IsVerified = true;
+                }
+                
                 await _context.SaveChangesAsync();
             }
             return RedirectToPage();

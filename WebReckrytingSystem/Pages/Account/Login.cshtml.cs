@@ -68,6 +68,14 @@ namespace WebReckrytingSystem.Pages.Account
                         return Page();
                     }
 
+                    // === ПРОВЕРКА ВЕРИФИКАЦИИ ДЛЯ РАБОТОДАТЕЛЕЙ ===
+                    if (user.Role == User.ROLE_EMPLOYER && !user.IsVerified)
+                    {
+                        _logger.LogWarning("🚫 Попытка входа неверифицированного работодателя: {Email}", user.Email);
+                        ErrorMessage = "Ваш аккаунт работодателя ожидает проверки администратором. Пожалуйста, дождитесь верификации.";
+                        return Page();
+                    }
+
                     // Создаем claims
                     var claims = new List<Claim>
                     {
@@ -75,7 +83,8 @@ namespace WebReckrytingSystem.Pages.Account
                         new Claim(ClaimTypes.GivenName, user.FirstName),
                         new Claim(ClaimTypes.Surname, user.LastName),
                         new Claim(ClaimTypes.Role, user.Role),
-                        new Claim("FullName", $"{user.FirstName} {user.LastName}")
+                        new Claim("FullName", $"{user.FirstName} {user.LastName}"),
+                        new Claim("IsVerified", user.IsVerified.ToString())
                     };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
