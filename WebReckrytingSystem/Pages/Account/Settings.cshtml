@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model WebReckrytingSystem.Pages.Account.SettingsModel
 @{
     ViewData["Title"] = "Настройки аккаунта";
@@ -28,6 +28,19 @@
                         </div>
                     }
 
+                    <div class="border rounded-3 p-3 mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="@Model.CurrentAvatarUrl" alt="Аватар" class="rounded-circle" style="width:72px;height:72px;object-fit:cover;" />
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold mb-1">Аватар профиля</div>
+                                <small class="text-muted d-block mb-2">Если фото не загружено, используется стандартный аватар.</small>
+                                <form method="post" enctype="multipart/form-data" asp-page-handler="Avatar" class="d-flex gap-2 align-items-center">
+                                    <input asp-for="AvatarFile" type="file" accept="image/*" class="form-control form-control-sm" />
+                                    <button type="submit" class="btn btn-outline-primary btn-sm">Загрузить</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="border rounded-3 p-3 mb-4">
                         <div class="d-flex justify-content-between align-items-center">
@@ -41,7 +54,7 @@
                         </div>
                     </div>
 
-                    <form method="post">
+                    <form method="post" asp-page-handler="Password">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                         <div class="mb-3">
