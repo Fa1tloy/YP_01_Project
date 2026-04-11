@@ -97,7 +97,8 @@ namespace WebReckrytingSystem.Services
                     FirstName = firstName.Trim(),
                     LastName = lastName.Trim(),
                     Role = role,
-                    CompanyName = role == "employer" ? companyName?.Trim() : null // === ПРИВЯЗЬ К КОМПАНИИ ТОЛЬКО ДЛЯ РАБОТОДАТЕЛЕЙ ===
+                    CompanyName = role == "employer" ? companyName?.Trim() : null, // === ПРИВЯЗЬ К КОМПАНИИ ТОЛЬКО ДЛЯ РАБОТОДАТЕЛЕЙ ===
+                    IsVerified = role == "job_seeker" // Соискатели верифицированы сразу, работодатели ждут проверки
                 };
 
                 var savedUser = _userRepository.Save(newUser);

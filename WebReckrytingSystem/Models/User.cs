@@ -28,6 +28,9 @@ namespace WebReckrytingSystem.Models
         // === ДОБАВЛЯЕМ СВЯЗЬ С КОМПАНИЕЙ ===
         public string? CompanyName { get; set; }
 
+        // === ПРОВЕРКА ВЕРИФИКАЦИИ ДЛЯ РАБОТОДАТЕЛЕЙ ===
+        public bool IsVerified { get; set; } = false;
+
         // === НАВИГАЦИОННОЕ СВОЙСТВО ===
         public Company? Company { get; set; }
         // Константы для ролей

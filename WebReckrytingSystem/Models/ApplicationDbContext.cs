@@ -56,6 +56,9 @@ namespace WebReckrytingSystem.Models
 
                 // === НОВОЕ: СВЯЗЬ С КОМПАНИЕЙ ===
                 entity.Property(e => e.CompanyName).HasColumnName("company_name").HasMaxLength(255).IsRequired(false);
+                
+                // === ВЕРИФИКАЦИЯ ПОЛЬЗОВАТЕЛЯ ===
+                entity.Property(e => e.IsVerified).HasColumnName("is_verified").HasDefaultValue(false);
 
                 entity.HasOne(u => u.Company)
                     .WithMany()
