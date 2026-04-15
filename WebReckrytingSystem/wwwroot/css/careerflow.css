@@ -598,6 +598,26 @@ img,
     background: rgba(18, 21, 28, 0.95) !important;
 }
 
+:root[data-theme='dark'] .navbar-nav .nav-link {
+    color: #e9edf5 !important;
+}
+
+:root[data-theme='dark'] .navbar-nav .nav-link:hover {
+    color: #9fb2ff !important;
+}
+
+:root[data-theme='dark'] .search-mode-btn {
+    background: #242c3b;
+    border-color: #3b465d;
+    color: #e9edf5;
+}
+
+:root[data-theme='dark'] .search-mode-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #ffffff;
+}
+
 :root[data-theme='dark'] .card,
 :root[data-theme='dark'] .dropdown-menu {
     background-color: #1a1f29;
@@ -624,4 +644,14 @@ img,
 
 :root[data-theme='dark'] .text-muted {
     color: #aab3c5 !important;
+}
+
+:root[data-theme='dark'] .dropdown-item {
+    color: #e9edf5;
+}
+
+:root[data-theme='dark'] .dropdown-item:hover,
+:root[data-theme='dark'] .dropdown-item:focus {
+    color: #ffffff;
+    background-color: #2b3344;
 }
