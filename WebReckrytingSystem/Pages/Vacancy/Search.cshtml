@@ -184,6 +184,60 @@
     </div>
 </div>
 
+@section Scripts {
+    <script>
+        (() => {
+            const form = document.getElementById('searchForm');
+            if (!form) {
+                return;
+            }
+
+            const autoSubmitSelectors = [
+                'input[name="SearchData.Keywords"]',
+                'input[name="SearchData.Region"]',
+                'input[name="SearchData.WorkHoursPerDay"]',
+                'input[name="SearchData.SalaryFrom"]',
+                'input[name="SearchData.SalaryTo"]',
+                'input[name="SearchData.CompanyName"]',
+                'select[name="SearchData.WorkSchedule"]',
+                'select[name="SearchData.WorkFormat"]',
+                'select[name="SearchData.SalaryPeriod"]',
+                'select[name="SearchData.PaymentFrequency"]',
+                'select[name="SearchData.Specialty"]'
+            ];
+
+            const controls = form.querySelectorAll(autoSubmitSelectors.join(','));
+            const pageInput = form.querySelector('input[name="SearchData.Page"]');
+            let debounceTimer;
+
+            const submitSearch = () => {
+                if (pageInput) {
+                    pageInput.value = '1';
+                }
+
+                form.requestSubmit();
+            };
+
+            const debouncedSubmit = () => {
+                window.clearTimeout(debounceTimer);
+                debounceTimer = window.setTimeout(submitSearch, 400);
+            };
+
+            controls.forEach(control => {
+                if (control.tagName === 'SELECT') {
+                    control.addEventListener('change', submitSearch);
+                    return;
+                }
+
+                if (control.type === 'number' || control.type === 'text') {
+                    control.addEventListener('input', debouncedSubmit);
+                    control.addEventListener('change', submitSearch);
+                }
+            });
+        })();
+    </script>
+}
+
 @functions {
     string Truncate(string text, int maxLength)
     {
