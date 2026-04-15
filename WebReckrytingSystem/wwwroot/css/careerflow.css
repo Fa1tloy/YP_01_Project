@@ -655,3 +655,37 @@ img,
     color: #ffffff;
     background-color: #2b3344;
 }
+
+:root[data-theme='dark'] .bg-white,
+:root[data-theme='dark'] .card-header.bg-white,
+:root[data-theme='dark'] .card-footer.bg-white,
+:root[data-theme='dark'] .card-header.bg-light,
+:root[data-theme='dark'] .card-footer.bg-light {
+    background-color: #1a1f29 !important;
+    color: #e9edf5 !important;
+}
+
+:root[data-theme='dark'] .bg-light {
+    background-color: #242c3b !important;
+    color: #e9edf5 !important;
+}
+
+:root[data-theme='dark'] .list-group-item {
+    background-color: #1a1f29;
+    border-color: #2d3442;
+    color: #e9edf5;
+}
+
+:root[data-theme='dark'] .list-group-item-action:hover,
+:root[data-theme='dark'] .list-group-item-action:focus {
+    background-color: #242c3b;
+    color: #ffffff;
+}
+
+:root[data-theme='dark'] .table-light,
+:root[data-theme='dark'] .table-light > th,
+:root[data-theme='dark'] .table-light > td {
+    --bs-table-bg: #242c3b;
+    --bs-table-color: #e9edf5;
+    color: #e9edf5;
+}

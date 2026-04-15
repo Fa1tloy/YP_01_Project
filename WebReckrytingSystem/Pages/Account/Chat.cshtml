@@ -35,7 +35,7 @@
 
         <div class="col-lg-8">
                 <div class="card shadow-sm">
-                <div class="card-header bg-white">
+                <div class="card-header bg-transparent">
                     <div id="chatPeer" class="fw-semibold">@(Model.Peer ?? "Выберите чат")</div>
                     <div id="chatTitle" class="small text-muted">
                         @if (!string.IsNullOrWhiteSpace(Model.Title))
@@ -63,7 +63,7 @@
                         }
                     }
                 </div>
-                <div class="card-footer bg-white">
+                <div class="card-footer bg-transparent">
                     <form method="post" asp-page-handler="Send" class="d-flex gap-2">
                         <input type="hidden" asp-for="Peer" />
                         <input type="hidden" asp-for="CompanyName" />
