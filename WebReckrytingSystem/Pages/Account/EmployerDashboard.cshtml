@@ -291,6 +291,27 @@
                     justify-content: center;
                 }
         }
+
+        :root[data-theme='dark'] .table {
+            --bs-table-bg: #1a1f29;
+            --bs-table-color: #e9edf5;
+            --bs-table-border-color: #2d3442;
+            --bs-table-striped-bg: #212838;
+            --bs-table-hover-bg: #242c3b;
+            --bs-table-hover-color: #ffffff;
+            color: #e9edf5;
+        }
+
+        :root[data-theme='dark'] .table td,
+        :root[data-theme='dark'] .table th {
+            background-color: transparent !important;
+            color: inherit;
+        }
+
+        :root[data-theme='dark'] .table .bg-light {
+            background-color: #2a3345 !important;
+            color: #e9edf5 !important;
+        }
     </style>
 }
 
