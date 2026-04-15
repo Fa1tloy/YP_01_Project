@@ -55,9 +55,9 @@
                         {
                             var isMine = message.SenderEmail == Model.CurrentUserEmail;
                             <div class="d-flex mb-3 @(isMine ? "justify-content-end" : "justify-content-start")">
-                                <div class="p-2 rounded @(isMine ? "bg-primary text-white" : "bg-light")" style="max-width: 75%; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word;">
-                                    <div>@message.Message</div>
-                                    <div class="small @(isMine ? "text-white-50" : "text-muted")">@message.SentAt.ToLocalTime().ToString("dd.MM HH:mm")</div>
+                                <div class="chat-message-bubble p-2 rounded @(isMine ? "bg-primary text-white" : "bg-light")" style="max-width: 75%;">
+                                    <div class="chat-message-text">@message.Message</div>
+                                    <div class="chat-message-time small @(isMine ? "text-white-50" : "text-muted")">@message.SentAt.ToLocalTime().ToString("dd.MM HH:mm")</div>
                                 </div>
                             </div>
                         }
@@ -68,7 +68,7 @@
                         <input type="hidden" asp-for="Peer" />
                         <input type="hidden" asp-for="CompanyName" />
                         <input type="hidden" asp-for="Title" />
-                        <textarea asp-for="MessageText" class="form-control chat-message-input" rows="2" placeholder="Введите сообщение..."></textarea>
+                        <textarea asp-for="MessageText" class="form-control chat-message-input" rows="1" placeholder="Введите сообщение..."></textarea>
                         <button id="sendButton" type="submit" class="btn btn-primary" disabled="@(string.IsNullOrWhiteSpace(Model.Peer))">Отправить</button>
                     </form>
                 </div>
@@ -137,9 +137,9 @@
                     const isMine = message.senderEmail === currentUserEmail;
                     return `
                         <div class="d-flex mb-3 ${isMine ? 'justify-content-end' : 'justify-content-start'}">
-                            <div class="p-2 rounded ${isMine ? 'bg-primary text-white' : 'bg-light'}" style="max-width: 75%; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word;">
-                                <div>${escapeHtml(message.message)}</div>
-                                <div class="small ${isMine ? 'text-white-50' : 'text-muted'}">${formatDate(message.sentAt)}</div>
+                            <div class="chat-message-bubble p-2 rounded ${isMine ? 'bg-primary text-white' : 'bg-light'}" style="max-width: 75%;">
+                                <div class="chat-message-text">${escapeHtml(message.message)}</div>
+                                <div class="chat-message-time small ${isMine ? 'text-white-50' : 'text-muted'}">${formatDate(message.sentAt)}</div>
                             </div>
                         </div>`;
                 }).join('');
@@ -182,8 +182,26 @@
     <style>
         .chat-message-input {
             resize: vertical;
-            min-height: 3rem;
-            max-height: 12rem;
+            min-height: 2.25rem;
+            max-height: 8rem;
+            line-height: 1.35;
+        }
+
+        .chat-message-bubble {
+            padding: 0.45rem 0.65rem !important;
+        }
+
+        .chat-message-text {
+            margin: 0;
+            line-height: 1.35;
+            white-space: pre-line;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .chat-message-time {
+            margin-top: 0.2rem;
+            line-height: 1.2;
         }
     </style>
 }
