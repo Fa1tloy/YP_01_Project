@@ -152,12 +152,12 @@
     </div>
 
     <!-- ПОСЛЕДНИЕ ОТКЛИКИ -->
-    <div class="card shadow-sm">
+    <div id="recentApplicationsSection" class="card shadow-sm">
         <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
             <h5 class="mb-0 fw-600">
                 <i class="fas fa-paper-plane me-2 text-success"></i>Последние отклики
             </h5>
-            <a href="/Employer/Responses" class="btn btn-sm btn-outline-primary">
+            <a href="#recentApplicationsSection" class="btn btn-sm btn-outline-primary">
                 <i class="fas fa-list me-1"></i>Все отклики
             </a>
         </div>
@@ -290,6 +290,27 @@
                     width: 100%;
                     justify-content: center;
                 }
+        }
+
+        :root[data-theme='dark'] .table {
+            --bs-table-bg: #1a1f29;
+            --bs-table-color: #e9edf5;
+            --bs-table-border-color: #2d3442;
+            --bs-table-striped-bg: #212838;
+            --bs-table-hover-bg: #242c3b;
+            --bs-table-hover-color: #ffffff;
+            color: #e9edf5;
+        }
+
+        :root[data-theme='dark'] .table td,
+        :root[data-theme='dark'] .table th {
+            background-color: transparent !important;
+            color: inherit;
+        }
+
+        :root[data-theme='dark'] .table .bg-light {
+            background-color: #2a3345 !important;
+            color: #e9edf5 !important;
         }
     </style>
 }
