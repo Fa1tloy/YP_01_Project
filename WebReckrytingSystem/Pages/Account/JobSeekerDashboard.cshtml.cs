@@ -26,6 +26,7 @@ namespace WebReckrytingSystem.Pages.Account
 
         // Основная информация
         public string UserFirstName { get; set; } = string.Empty;
+        public string UserAvatarUrl { get; set; } = "/images/student.png";
         public Models.Resume? UserResume { get; set; }
         public bool HasResume { get; set; }
 
@@ -85,6 +86,12 @@ namespace WebReckrytingSystem.Pages.Account
                 _logger.LogInformation("Загрузка дашборда для {Email}", userEmail);
 
                 UserFirstName = User.FindFirst(ClaimTypes.GivenName)?.Value ?? "Студент";
+
+                var user = _context.Users.FirstOrDefault(u => u.Email == userEmail);
+                if (!string.IsNullOrWhiteSpace(user?.AvatarUrl))
+                {
+                    UserAvatarUrl = user.AvatarUrl;
+                }
                 UserResume = _resumeService.GetUserResume(userEmail);
                 HasResume = UserResume != null;
 

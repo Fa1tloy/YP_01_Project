@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace WebReckrytingSystem.Models
 {
     public class Notification
@@ -9,6 +11,8 @@ namespace WebReckrytingSystem.Models
         public string Message { get; set; } = string.Empty;
         public string? Link { get; set; }
         public bool IsRead { get; set; }
-        public DateTime CreatedAt { get; set; }
+
+        [Column("CreatedAt")]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

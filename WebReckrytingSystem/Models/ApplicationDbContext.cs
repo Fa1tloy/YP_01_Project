@@ -26,6 +26,7 @@ namespace WebReckrytingSystem.Models
         public DbSet<DailyAnalytic> DailyAnalytics { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
+        public DbSet<SavedResume> SavedResumes { get; set; }
 
         // Для миграций — строка подключения, если опции не переданы
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -33,8 +34,8 @@ namespace WebReckrytingSystem.Models
             if (!optionsBuilder.IsConfigured)
             {
                 optionsBuilder.UseMySql(
-                    "Server=localhost;Database=rekryting_system;Uid=root;Pwd=vertrigo;",
-                    new MySqlServerVersion(new Version(8, 0, 21))
+                    "Server=localhost;Database=webreckrytingsystem;Uid=webuser;Pwd=StrongPassword123!;",
+                    new MySqlServerVersion(new Version(8, 0, 45))
                 );
             }
         }
@@ -42,7 +43,7 @@ namespace WebReckrytingSystem.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Конфигурация User
-            modelBuilder.Entity<User>().ToTable("users", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<User>().ToTable("users");
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.Email);
@@ -51,6 +52,7 @@ namespace WebReckrytingSystem.Models
                 entity.Property(e => e.FirstName).HasColumnName("first_name").HasMaxLength(100).IsRequired();
                 entity.Property(e => e.LastName).HasColumnName("last_name").HasMaxLength(100).IsRequired();
                 entity.Property(e => e.Role).HasColumnName("role").HasMaxLength(20).IsRequired();
+                entity.Property(e => e.AvatarUrl).HasColumnName("avatar_url").HasMaxLength(500).IsRequired(false);
 
                 // === НОВОЕ: СВЯЗЬ С КОМПАНИЕЙ ===
                 entity.Property(e => e.CompanyName).HasColumnName("company_name").HasMaxLength(255).IsRequired(false);
@@ -63,7 +65,7 @@ namespace WebReckrytingSystem.Models
             });
 
             // Конфигурация Resume
-            modelBuilder.Entity<Resume>().ToTable("resumes", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<Resume>().ToTable("resumes");
             modelBuilder.Entity<Resume>(entity =>
             {
                 entity.HasKey(e => e.UserEmail);
@@ -78,7 +80,7 @@ namespace WebReckrytingSystem.Models
                 entity.Property(e => e.Specialty).HasColumnName("specialty").HasMaxLength(255).IsRequired();
                 entity.Property(e => e.Gender).HasColumnName("gender").HasMaxLength(20).IsRequired();
                 entity.Property(e => e.HasCar).HasColumnName("has_car").HasDefaultValue(false);
-                entity.Property(e => e.DriverLicenseCategory).HasColumnName("driver_license_category").HasMaxLength(20).IsRequired(false);
+                entity.Property(e => e.DriverLicenseCategory).HasColumnName("driver_license_category").HasMaxLength(255).IsRequired(false);
                 entity.Property(e => e.ExperienceDescription).HasColumnName("experience_description");
                 entity.Property(e => e.EducationDescription).HasColumnName("education_description");
                 entity.Property(e => e.Skills).HasColumnName("skills");
@@ -94,7 +96,7 @@ namespace WebReckrytingSystem.Models
             });
 
             // Конфигурация Company
-            modelBuilder.Entity<Company>().ToTable("companies", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<Company>().ToTable("companies");
             modelBuilder.Entity<Company>(entity =>
             {
                 entity.HasKey(e => e.Name);
@@ -106,7 +108,7 @@ namespace WebReckrytingSystem.Models
             });
 
             // Конфигурация Vacancy
-            modelBuilder.Entity<Vacancy>().ToTable("vacancies", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<Vacancy>().ToTable("vacancies");
             modelBuilder.Entity<Vacancy>(entity =>
             {
                 entity.HasKey(v => new { v.CompanyName, v.Title });
@@ -131,18 +133,18 @@ namespace WebReckrytingSystem.Models
             });
 
             // Конфигурация ResumeView
-            modelBuilder.Entity<ResumeView>().ToTable("resume_views", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<ResumeView>().ToTable("resume_views");
             modelBuilder.Entity<ResumeView>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.ResumeEmail).HasColumnName("resume_email").HasMaxLength(255).IsRequired();
                 entity.Property(e => e.ViewerEmail).HasColumnName("viewer_email").HasMaxLength(255).IsRequired();
-                entity.Property(e => e.ViewedAt).HasColumnName("viewed_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.ViewedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.ViewedFromIp).HasColumnName("viewed_from_ip").HasMaxLength(45);
             });
 
             // Конфигурация JobApplication
-            modelBuilder.Entity<JobApplication>().ToTable("job_applications", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<JobApplication>().ToTable("job_applications");
             modelBuilder.Entity<JobApplication>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -151,23 +153,42 @@ namespace WebReckrytingSystem.Models
                 entity.Property(e => e.VacancyTitle).HasColumnName("vacancy_title").HasMaxLength(255).IsRequired();
                 entity.Property(e => e.CoverLetter).HasColumnName("cover_letter");
                 entity.Property(e => e.Status).HasColumnName("status").HasMaxLength(20).HasDefaultValue("pending");
-                entity.Property(e => e.AppliedAt).HasColumnName("applied_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.AppliedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // Конфигурация SavedVacancy
-            modelBuilder.Entity<SavedVacancy>().ToTable("saved_vacancies", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<SavedVacancy>().ToTable("saved_vacancies");
             modelBuilder.Entity<SavedVacancy>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.StudentEmail).HasColumnName("student_email").HasMaxLength(255).IsRequired();
                 entity.Property(e => e.VacancyCompanyName).HasColumnName("vacancy_company_name").HasMaxLength(255).IsRequired();
                 entity.Property(e => e.VacancyTitle).HasColumnName("vacancy_title").HasMaxLength(255).IsRequired();
-                entity.Property(e => e.SavedAt).HasColumnName("saved_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.SavedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.HasIndex(e => new { e.StudentEmail, e.VacancyCompanyName, e.VacancyTitle }).IsUnique();
+                entity.HasOne(s => s.Vacancy)
+    .WithMany()
+    .HasForeignKey(s => new { s.VacancyCompanyName, s.VacancyTitle })
+    .HasPrincipalKey(v => new { v.CompanyName, v.Title });
+
+            });
+            modelBuilder.Entity<SavedResume>().ToTable("saved_resumes");
+            modelBuilder.Entity<SavedResume>(entity =>
+            {
+                entity.ToTable("saved_resumes", t => t.ExcludeFromMigrations());
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.EmployerEmail).HasColumnName("employer_email").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.ResumeUserEmail).HasColumnName("resume_user_email").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.SavedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.HasIndex(e => new { e.EmployerEmail, e.ResumeUserEmail }).IsUnique();
+                entity.HasOne(s => s.Resume)
+    .WithMany()
+    .HasForeignKey(s => s.ResumeUserEmail)
+    .HasPrincipalKey(r => r.UserEmail);
             });
 
             // Конфигурация DailyAnalytic
-            modelBuilder.Entity<DailyAnalytic>().ToTable("daily_analytics", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<DailyAnalytic>().ToTable("daily_analytics");
             modelBuilder.Entity<DailyAnalytic>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -180,7 +201,7 @@ namespace WebReckrytingSystem.Models
             });
 
             // Конфигурация Notification
-            modelBuilder.Entity<Notification>().ToTable("notifications", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<Notification>().ToTable("notifications");
             modelBuilder.Entity<Notification>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -190,11 +211,11 @@ namespace WebReckrytingSystem.Models
                 entity.Property(e => e.Message).HasColumnName("message").IsRequired();
                 entity.Property(e => e.Link).HasColumnName("link").HasMaxLength(500);
                 entity.Property(e => e.IsRead).HasColumnName("is_read").HasDefaultValue(false);
-                entity.Property(e => e.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // Конфигурация ChatMessage
-            modelBuilder.Entity<ChatMessage>().ToTable("chat_messages", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<ChatMessage>().ToTable("chat_messages");
             modelBuilder.Entity<ChatMessage>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -203,7 +224,7 @@ namespace WebReckrytingSystem.Models
                 entity.Property(e => e.Message).HasColumnName("message").IsRequired();
                 entity.Property(e => e.VacancyCompanyName).HasColumnName("vacancy_company_name").HasMaxLength(255);
                 entity.Property(e => e.VacancyTitle).HasColumnName("vacancy_title").HasMaxLength(255);
-                entity.Property(e => e.SentAt).HasColumnName("sent_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.SentAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.IsRead).HasColumnName("is_read").HasDefaultValue(false);
             });
         }

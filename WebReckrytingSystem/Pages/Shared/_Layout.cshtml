@@ -41,8 +41,6 @@
                     ? "resumes"
                     : "vacancies";
         var searchUrl = isEmployer ? "/Resume/Search" : "/Vacancy/Search";
-        var searchPlaceholder = isEmployer ? "Найти резюме по навыкам или должности" : "Найти вакансию по ключевым словам";
-
         var showNavbarSearch = currentPage == "/Vacancy/Search" || currentPage == "/Resume/Search";
     }
 
@@ -75,15 +73,6 @@
                                         <button type="button" class="search-mode-btn @(defaultSearchMode == "vacancies" ? "active" : "")" data-search-mode="vacancies">Вакансии</button>
                                         <button type="button" class="search-mode-btn @(defaultSearchMode == "resumes" ? "active" : "")" data-search-mode="resumes">Резюме</button>
                                     </div>
-                                    <form id="navbarSearchForm" method="get" action="@searchUrl" class="navbar-search-form">
-                                        <input id="navbarSearchInput"
-                                               type="text"
-                                               class="form-control"
-                                               name="Keywords"
-                                               placeholder="@searchPlaceholder"
-                                               autocomplete="off" />
-                                        <button type="submit" class="btn btn-login">Поиск</button>
-                                    </form>
                                 </div>
                             }
 
@@ -97,7 +86,7 @@
                                         <li><a class="dropdown-item" href="@searchUrl"><i class="fas fa-search me-2"></i>Поиск</a></li>
                                         <li><a class="dropdown-item" href="/Account/Notifications"><i class="fas fa-bell me-2"></i>Уведомления</a></li>
                                         <li><a class="dropdown-item" href="/Account/Chat"><i class="fas fa-comment me-2"></i>Чаты</a></li>
-                                        <li><a class="dropdown-item" href="#"><i class="fas fa-star me-2"></i>Избранное</a></li>
+                                        <li><a class="dropdown-item" href="/Account/Favorites"><i class="fas fa-star me-2"></i>Избранное</a></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li><a class="dropdown-item" href="/Account/Settings"><i class="fas fa-cog me-2"></i>Настройки</a></li>
                                         <li><hr class="dropdown-divider"></li>
@@ -136,15 +125,13 @@
                 <div class="col-md-2 mb-4">
                     <h6 class="fw-bold">Для студентов</h6>
                     <ul class="list-unstyled">
-                        <li><a href="/Vacancy/Search">Поиск вакансий</a></li>
-                        <li><a href="/Account/CreateResume">Создать резюме</a></li>
+                        
                     </ul>
                 </div>
                 <div class="col-md-2 mb-4">
                     <h6 class="fw-bold">Для работодателей</h6>
                     <ul class="list-unstyled">
-                        <li><a href="/Account/Register?role=employer">Разместить вакансию</a></li>
-                        <li><a href="/Vacancy/Search">Найти сотрудников</a></li>
+                       
                     </ul>
                 </div>
                 <div class="col-md-2 mb-4">
@@ -190,21 +177,11 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const switchButtons = document.querySelectorAll('.search-mode-btn');
-            const searchForm = document.getElementById('navbarSearchForm');
-            const searchInput = document.getElementById('navbarSearchInput');
-
-            if (!switchButtons.length || !searchForm || !searchInput) {
+            if (!switchButtons.length) {
                 return;
             }
 
             const applySearchMode = (mode) => {
-                const isResumeMode = mode === 'resumes';
-                searchForm.action = isResumeMode ? '/Resume/Search' : '/Vacancy/Search';
-                searchInput.name = isResumeMode ? 'SearchQuery' : 'Keywords';
-                searchInput.placeholder = isResumeMode
-                    ? 'Найти резюме по навыкам или должности'
-                    : 'Найти вакансию по ключевым словам';
-
                 switchButtons.forEach((button) => {
                     button.classList.toggle('active', button.dataset.searchMode === mode);
                 });

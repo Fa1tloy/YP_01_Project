@@ -14,7 +14,7 @@
                 </div>
 
                 <form method="post" id="registerForm" novalidate>
-                    <div asp-validation-summary="All" class="alert alert-danger"></div>
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger @(ViewData.ModelState.ErrorCount > 0 ? "" : "d-none")"></div>
 
                     <!-- РОЛИ -->
                     <div class="form-group mb-4">

@@ -20,20 +20,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
 
         public List<string> CompanySuggestions { get; set; } = new();
 
-        public IReadOnlyList<string> Specialties { get; } = new List<string>
-        {
-            "Информационные системы и программирование",
-            "Сетевое и системное администрирование",
-            "Экономика и бухгалтерский учет",
-            "Банковское дело",
-            "Дизайн",
-            "Маркетинг",
-            "Юриспруденция",
-            "Техническое обслуживание и ремонт автотранспорта",
-            "Строительство и эксплуатация зданий и сооружений",
-            "Электромонтер",
-            "Туризм и гостеприимство"
-        };
+        public IReadOnlyList<string> Specialties => SpecialtyCatalog.All;
 
         public string? SuccessMessage { get; set; }
         public string? ErrorMessage { get; set; }
@@ -87,12 +74,17 @@ namespace WebReckrytingSystem.Pages.Vacancy
                     return RedirectToPage("/Account/EmployerDashboard");
                 }
 
-                ErrorMessage = result.Message;
+                var errorMessage = string.IsNullOrWhiteSpace(result.Message)
+                    ? "Не удалось создать вакансию"
+                    : result.Message;
+                ModelState.AddModelError(string.Empty, errorMessage);
+                ErrorMessage = errorMessage;
                 return Page();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Ошибка создания вакансии");
+                ModelState.AddModelError(string.Empty, "Произошла ошибка при создании вакансии");
                 ErrorMessage = "Произошла ошибка при создании вакансии";
                 return Page();
             }

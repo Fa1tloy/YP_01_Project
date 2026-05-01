@@ -18,9 +18,12 @@ namespace WebReckrytingSystem.Pages.Company
         private readonly ApplicationDbContext _context;
         private readonly ICompanyService _companyService;
         private readonly ILogger<SettingsModel> _logger;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         [BindProperty]
         public CompanySettingsViewModel CompanyData { get; set; } = new();
+        [BindProperty]
+        public IFormFile? LogoFile { get; set; }
 
         public CompanyEntity? CurrentCompany { get; set; } // ✅ ИСПРАВЛЕНО: Явно указываем тип
         public bool HasCompany { get; set; }
@@ -28,11 +31,13 @@ namespace WebReckrytingSystem.Pages.Company
         public SettingsModel(
             ApplicationDbContext context,
             ICompanyService companyService,
-            ILogger<SettingsModel> logger)
+            ILogger<SettingsModel> logger,
+            IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             _companyService = companyService;
             _logger = logger;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public void OnGet()
@@ -106,6 +111,14 @@ namespace WebReckrytingSystem.Pages.Company
 
                     // Обновляем пользователя
                     user.CompanyName = CompanyData.Name;
+                    if (LogoFile != null && LogoFile.Length > 0)
+                    {
+                        var createdCompany = _context.Companies.Find(CompanyData.Name);
+                        if (createdCompany != null)
+                        {
+                            createdCompany.LogoUrl = SaveLogoFile(LogoFile);
+                        }
+                    }
                     _context.SaveChanges();
                 }
                 else
@@ -116,7 +129,10 @@ namespace WebReckrytingSystem.Pages.Company
                     {
                         company.Description = CompanyData.Description;
                         company.Website = CompanyData.Website;
-                        company.LogoUrl = CompanyData.LogoUrl;
+                        if (LogoFile != null && LogoFile.Length > 0)
+                        {
+                            company.LogoUrl = SaveLogoFile(LogoFile);
+                        }
                         _context.SaveChanges();
                     }
                 }
@@ -130,6 +146,21 @@ namespace WebReckrytingSystem.Pages.Company
                 ModelState.AddModelError("", "Произошла ошибка при сохранении");
                 return Page();
             }
+        }
+
+        private string SaveLogoFile(IFormFile file)
+        {
+            var uploadsDir = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "companies");
+            Directory.CreateDirectory(uploadsDir);
+
+            var extension = Path.GetExtension(file.FileName);
+            var fileName = $"{Guid.NewGuid():N}{extension}";
+            var fullPath = Path.Combine(uploadsDir, fileName);
+
+            using var stream = System.IO.File.Create(fullPath);
+            file.CopyTo(stream);
+
+            return $"/uploads/companies/{fileName}";
         }
     }
 

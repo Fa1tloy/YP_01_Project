@@ -1,88 +1,174 @@
 ﻿@page
 @model WebReckrytingSystem.Pages.Company.SettingsModel
 @{
-    ViewData["Title"] = "Настройки компании";
+    ViewData["Title"] = Model.HasCompany ? "Настройки компании" : "Создание компании";
 }
 
-<div class="container mt-5">
+<div class="container py-4" style="padding-top: 104px !important;">
+    <!-- Заголовок страницы -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 fw-bold">
+            <i class="fas fa-building text-primary me-2"></i>
+            @(Model.HasCompany ? "Настройки компании" : "Создание компании")
+        </h1>
+        
+    </div>
+
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card shadow-lg">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">
+            <!-- Карточка с формой -->
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-gradient-primary text-white p-4 border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h5 class="mb-0 fw-bold">
                         @if (Model.HasCompany)
                         {
-                            <text>Редактировать компанию</text>
-                        }
+                            <i class="fas fa-edit me-2">Редактирование компании</i>
+                           
+                                    }
                         else
                         {
-                            <text>Создать компанию</text>
-                        }
-                    </h4>
+                            <i class="fas fa-plus-circle me-2">Создание новой компании</i>
+                
+                                    }
+                    </h5>
                 </div>
                 <div class="card-body p-4">
+
                     @if (!string.IsNullOrEmpty(TempData["SuccessMessage"]?.ToString()))
                     {
-                        <div class="alert alert-success">
-                            @TempData["SuccessMessage"]
+                        <div class="alert alert-success alert-dismissible fade show rounded-pill" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     }
 
                     @if (!Model.HasCompany)
                     {
-                        <div class="alert alert-info">
+                        <div class="alert alert-info rounded-pill mb-4">
                             <i class="fas fa-info-circle me-2"></i>
                             Сначала создайте компанию, чтобы иметь возможность публиковать вакансии
                         </div>
                     }
 
                     <form method="post" enctype="multipart/form-data">
-                        <div asp-validation-summary="All" class="alert alert-danger"></div>
+                        <div asp-validation-summary="All" class="alert alert-danger rounded-pill @(ViewData.ModelState.ErrorCount > 0 ? "" : "d-none")"></div>
 
-                        <div class="mb-3">
-                            <label asp-for="CompanyData.Name" class="form-label">Название компании *</label>
-                            <input asp-for="CompanyData.Name" class="form-control" readonly="@Model.HasCompany" />
+                        <!-- Название компании -->
+                        <div class="mb-4">
+                            <label asp-for="CompanyData.Name" class="form-label fw-600">
+                                <i class="fas fa-tag me-2"></i>Название компании *
+                            </label>
+                            <input asp-for="CompanyData.Name" class="form-control form-control-lg rounded-pill"
+                                   readonly="@(Model.HasCompany ? "readonly" : null)"
+                                   placeholder="ООО Ромашка" />
                             @if (Model.HasCompany)
                             {
                                 <small class="text-muted">Название компании изменить нельзя</small>
                             }
+                            <span asp-validation-for="CompanyData.Name" class="text-danger small"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="CompanyData.Description" class="form-label">Описание</label>
-                            <textarea asp-for="CompanyData.Description" class="form-control" rows="4"
-                                      placeholder="Расскажите о вашей компании"></textarea>
+                        <!-- Описание -->
+                        <div class="mb-4">
+                            <label asp-for="CompanyData.Description" class="form-label fw-600">
+                                <i class="fas fa-align-left me-2"></i>Описание компании
+                            </label>
+                            <textarea asp-for="CompanyData.Description" class="form-control rounded-4" rows="5"
+                                      placeholder="Расскажите о вашей компании, её миссии и преимуществах"></textarea>
+                            <span asp-validation-for="CompanyData.Description" class="text-danger small"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="CompanyData.Website" class="form-label">Веб-сайт</label>
-                            <input asp-for="CompanyData.Website" class="form-control" type="url"
+                        <!-- Веб-сайт -->
+                        <div class="mb-4">
+                            <label asp-for="CompanyData.Website" class="form-label fw-600">
+                                <i class="fas fa-globe me-2"></i>Веб-сайт
+                            </label>
+                            <input asp-for="CompanyData.Website" type="url" class="form-control form-control-lg rounded-pill"
                                    placeholder="https://company.com" />
+                            <span asp-validation-for="CompanyData.Website" class="text-danger small"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="CompanyData.LogoUrl" class="form-label">Логотип</label>
-                            <input type="file" name="logoFile" class="form-control" accept="image/*" />
+                        <!-- Логотип -->
+                        <div class="mb-4">
+                            <label asp-for="CompanyData.LogoUrl" class="form-label fw-600">
+                                <i class="fas fa-image me-2"></i>Логотип
+                            </label>
+                            <input asp-for="LogoFile" type="file" class="form-control form-control-lg rounded-pill" accept="image/*" />
+                            <small class="form-text text-muted">Рекомендуемый размер: 200x200px</small>
+
                             @if (!string.IsNullOrEmpty(Model.CompanyData.LogoUrl))
                             {
-                                <img src="@Model.CompanyData.LogoUrl" class="img-fluid mt-3" style="max-height: 100px;" />
+                                <div class="mt-3 p-3 bg-light rounded-4 d-inline-block">
+                                    <img src="@Model.CompanyData.LogoUrl" alt="Логотип" style="max-height: 100px; max-width: 200px;" class="rounded-3" />
+                                </div>
                             }
                         </div>
 
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary">
+                        <hr class="my-4">
+
+                        <!-- Кнопки -->
+                        <div class="d-flex gap-3 justify-content-end">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5">
                                 <i class="fas fa-save me-2"></i>Сохранить
                             </button>
-                            <a href="/Account/EmployerDashboard" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left me-2"></i>Назад
+                            <a asp-page="/Account/EmployerDashboard" class="btn btn-outline-secondary btn-lg rounded-pill px-4">
+                                <i class="fas fa-times me-2"></i>Отмена
                             </a>
                         </div>
                     </form>
                 </div>
             </div>
+
+            <!-- Дополнительная информация (опционально) -->
+            @if (Model.HasCompany && Model.CurrentCompany != null)
+            {
+                <div class="card border-0 shadow-sm rounded-4 mt-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-info-circle text-primary me-2"></i>Информация о компании
+                        </h5>
+                        <p>
+                            <strong>Статус верификации:</strong>
+                            @if (Model.CurrentCompany.Verified)
+                            {
+                                <span class="badge bg-success rounded-pill px-3 py-2">Верифицирована</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark rounded-pill px-3 py-2">Ожидает проверки</span>
+                            }
+                        </p>
+                        <p class="mb-0"><strong>Количество вакансий:</strong> @Model.CurrentCompany.Vacancies?.Count</p>
+                    </div>
+                </div>
+            }
         </div>
     </div>
 </div>
+
+@section Styles {
+    <style>
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--secondary-color, #764ba2) 100%);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            }
+    </style>
+}
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

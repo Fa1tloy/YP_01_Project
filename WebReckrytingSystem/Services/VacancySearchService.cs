@@ -84,6 +84,9 @@ namespace WebReckrytingSystem.Services
                     return ServiceResult.Error("Недопустимый график работы");
             }
 
+            if (model.WorkHoursPerDay.HasValue && (model.WorkHoursPerDay < 1 || model.WorkHoursPerDay > 24))
+                return ServiceResult.Error("Рабочие часы в день должны быть от 1 до 24");
+
             // Валидация пагинации
             if (model.Page < 1 || model.Page > 100)
                 return ServiceResult.Error("Некорректный номер страницы");
@@ -119,6 +122,13 @@ namespace WebReckrytingSystem.Services
                     v.CompanyName.Contains(model.CompanyName, StringComparison.OrdinalIgnoreCase));
             }
 
+            if (!string.IsNullOrWhiteSpace(model.Region))
+            {
+                filtered = filtered.Where(v =>
+                    !string.IsNullOrWhiteSpace(v.Region) &&
+                    v.Region.Contains(model.Region, StringComparison.OrdinalIgnoreCase));
+            }
+
             // Фильтр по зарплате
             if (model.SalaryFrom.HasValue)
             {
@@ -142,6 +152,31 @@ namespace WebReckrytingSystem.Services
             if (!string.IsNullOrEmpty(model.WorkSchedule))
             {
                 filtered = filtered.Where(v => v.WorkSchedule == model.WorkSchedule);
+            }
+
+            if (model.WorkHoursPerDay.HasValue)
+            {
+                filtered = filtered.Where(v => v.WorkHoursPerDay == model.WorkHoursPerDay);
+            }
+
+            if (!string.IsNullOrWhiteSpace(model.WorkFormat))
+            {
+                filtered = filtered.Where(v => v.WorkFormat == model.WorkFormat);
+            }
+
+            if (!string.IsNullOrWhiteSpace(model.SalaryPeriod))
+            {
+                filtered = filtered.Where(v => v.SalaryPeriod == model.SalaryPeriod);
+            }
+
+            if (!string.IsNullOrWhiteSpace(model.PaymentFrequency))
+            {
+                filtered = filtered.Where(v => v.PaymentFrequency == model.PaymentFrequency);
+            }
+
+            if (!string.IsNullOrWhiteSpace(model.Specialty))
+            {
+                filtered = filtered.Where(v => v.Specialty == model.Specialty);
             }
 
             return filtered.ToList();

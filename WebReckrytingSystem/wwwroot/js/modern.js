@@ -53,17 +53,6 @@
         setBubble();
     });
 
-    // переключатель темы (если нужно)
-    const toggle = document.createElement('button');
-    toggle.className = 'btn btn-sm btn-outline-secondary position-fixed top-0 end-0 m-3';
-    toggle.innerHTML = '🌓';
-    toggle.onclick = () => {
-        const html = document.documentElement;
-        const current = html.getAttribute('data-theme');
-        const next = current === 'dark' ? 'light' : 'dark';   
-        html.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
-    };
-    document.body.appendChild(toggle);
+    // применяем сохранённую тему
     document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
 })(); 

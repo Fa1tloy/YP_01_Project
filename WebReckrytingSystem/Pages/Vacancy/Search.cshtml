@@ -27,11 +27,11 @@
             <div class="row g-4 mt-1">
                 <div class="col-lg-4 col-xl-3">
                     <div class="card shadow-sm border-0 sticky-top" style="top: 96px;">
-                        <div class="card-header bg-white fw-bold">Фильтры</div>
+                        <div class="card-header bg-transparent fw-bold">Фильтры</div>
                         <div class="card-body">
                             <div class="mb-3">
                                 <label class="form-label">Регион</label>
-                                <input name="Region" class="form-control" placeholder="Москва, СПб" value="@Request.Query["Region"]" />
+                                <input asp-for="SearchData.Region" class="form-control" placeholder="Москва, СПб" />
                             </div>
 
                             <div class="mb-3">
@@ -48,17 +48,17 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Рабочие часы в день</label>
-                                <input name="WorkHoursPerDay" type="number" class="form-control" min="1" max="24" value="@Request.Query["WorkHoursPerDay"]" />
+                                <input asp-for="SearchData.WorkHoursPerDay" type="number" class="form-control" min="1" max="24" />
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Формат работы</label>
-                                <select name="WorkFormat" class="form-select">
+                                <select asp-for="SearchData.WorkFormat" class="form-select">
                                     <option value="">Любой</option>
-                                    <option>на месте работодателя</option>
-                                    <option>удалённая</option>
-                                    <option>разъездная</option>
-                                    <option>гибрид</option>
+                                    <option value="office">В офисе</option>
+                                    <option value="remote">Удалённо</option>
+                                    <option value="travel">Разъездной</option>
+                                    <option value="hybrid">Гибрид</option>
                                 </select>
                             </div>
 
@@ -75,23 +75,23 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Период дохода</label>
-                                <select name="IncomePeriod" class="form-select">
+                                <select asp-for="SearchData.SalaryPeriod" class="form-select">
                                     <option value="">Любой</option>
-                                    <option>месяц</option>
-                                    <option>час</option>
-                                    <option>смена</option>
-                                    <option>услуга</option>
-                                    <option>вахта</option>
+                                    <option value="месяц">месяц</option>
+                                    <option value="час">час</option>
+                                    <option value="смена">смена</option>
+                                    <option value="услуга">услуга</option>
+                                    <option value="вахта">вахта</option>
                                 </select>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Частота выплат</label>
-                                <select name="PaymentFrequency" class="form-select">
+                                <select asp-for="SearchData.PaymentFrequency" class="form-select">
                                     <option value="">Любая</option>
-                                    <option>еженедельно</option>
-                                    <option>2 раза в месяц</option>
-                                    <option>ежемесячно</option>
+                                    <option value="еженедельно">еженедельно</option>
+                                    <option value="2 раза в месяц">2 раза в месяц</option>
+                                    <option value="ежемесячно">ежемесячно</option>
                                 </select>
                             </div>
 
@@ -102,13 +102,12 @@
 
                             <div class="mb-4">
                                 <label class="form-label">Специальность</label>
-                                <select name="Specialty" class="form-select">
+                                <select asp-for="SearchData.Specialty" class="form-select">
                                     <option value="">Любая</option>
-                                    <option>Информационные системы и программирование</option>
-                                    <option>Сетевое и системное администрирование</option>
-                                    <option>Экономика и бухгалтерский учет</option>
-                                    <option>Дизайн</option>
-                                    <option>Маркетинг</option>
+                                    @foreach (var specialty in WebReckrytingSystem.Models.SpecialtyCatalog.All)
+                                    {
+                                        <option value="@specialty">@specialty</option>
+                                    }
                                 </select>
                             </div>
 
@@ -133,7 +132,7 @@
                                     <div class="card h-100 shadow-sm border-0">
                                         <div class="card-body d-flex flex-column">
                                             <div class="d-flex align-items-start gap-3 mb-2">
-                                                <img src="@(string.IsNullOrWhiteSpace(vacancy.Company?.LogoUrl) ? "/images/favicon.ico" : vacancy.Company.LogoUrl)"
+                                                <img src="@(string.IsNullOrWhiteSpace(vacancy.Company?.LogoUrl) ? "/images/rabotodatel.jpg" : vacancy.Company.LogoUrl)"
                                                      alt="Логотип @vacancy.CompanyName"
                                                      style="width:48px;height:48px;object-fit:cover;border-radius:10px;" />
                                                 <div>

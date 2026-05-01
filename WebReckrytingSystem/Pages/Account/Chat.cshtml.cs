@@ -84,6 +84,48 @@ namespace WebReckrytingSystem.Pages.Account
             return RedirectToPage(new { peer = Peer, companyName = CompanyName, title = Title });
         }
 
+        public async Task<IActionResult> OnGetUpdatesAsync(string? peer, string? companyName, string? title)
+        {
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrWhiteSpace(userEmail))
+            {
+                return new UnauthorizedResult();
+            }
+
+            CurrentUserEmail = userEmail;
+            Peer = peer;
+            CompanyName = companyName;
+            Title = title;
+
+            await LoadDataAsync();
+
+            var conversations = Conversations.Select(c => new
+            {
+                peerEmail = c.PeerEmail,
+                vacancyCompanyName = c.VacancyCompanyName,
+                vacancyTitle = c.VacancyTitle,
+                lastMessage = c.LastMessage,
+                lastSentAt = c.LastSentAt
+            });
+
+            var messages = Messages.Select(m => new
+            {
+                senderEmail = m.SenderEmail,
+                message = m.Message,
+                sentAt = m.SentAt
+            });
+
+            return new JsonResult(new
+            {
+                currentUserEmail = CurrentUserEmail,
+                selectedPeer = Peer,
+                selectedCompanyName = CompanyName,
+                selectedTitle = Title,
+                conversations,
+                messages
+            });
+        }
+
         private async Task LoadDataAsync()
         {
             var allRelated = await _context.ChatMessages
