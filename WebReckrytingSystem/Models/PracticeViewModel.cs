@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebReckrytingSystem.Models
 {
@@ -11,10 +12,12 @@ namespace WebReckrytingSystem.Models
 
         [Required(ErrorMessage = "Укажите дату начала")]
         [DataType(DataType.Date)]
+        [Column("StartDate")]
         public DateTime StartDate { get; set; }
 
         [Required(ErrorMessage = "Укажите дату окончания")]
         [DataType(DataType.Date)]
+        [Column("EndDate")]
         public DateTime EndDate { get; set; }
 
         [StringLength(500, ErrorMessage = "Описание не должно превышать 500 символов")]

@@ -12,8 +12,8 @@ using WebReckrytingSystem.Models;
 namespace WebReckrytingSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260411194202_initialcreate")]
-    partial class initialcreate
+    [Migration("20260501042733_AddNotificationCreatedAt")]
+    partial class AddNotificationCreatedAt
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -58,8 +58,7 @@ namespace WebReckrytingSystem.Migrations
 
                     b.Property<DateTime>("SentAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("sent_at")
+                        .HasColumnType("timestamp")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("VacancyCompanyName")
@@ -74,10 +73,7 @@ namespace WebReckrytingSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("chat_messages", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("chat_messages", (string)null);
                 });
 
             modelBuilder.Entity("WebReckrytingSystem.Models.Company", b =>
@@ -107,10 +103,7 @@ namespace WebReckrytingSystem.Migrations
 
                     b.HasKey("Name");
 
-                    b.ToTable("companies", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("companies", (string)null);
                 });
 
             modelBuilder.Entity("WebReckrytingSystem.Models.DailyAnalytic", b =>
@@ -154,10 +147,7 @@ namespace WebReckrytingSystem.Migrations
                     b.HasIndex("UserEmail", "Date")
                         .IsUnique();
 
-                    b.ToTable("daily_analytics", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("daily_analytics", (string)null);
                 });
 
             modelBuilder.Entity("WebReckrytingSystem.Models.JobApplication", b =>
@@ -170,8 +160,7 @@ namespace WebReckrytingSystem.Migrations
 
                     b.Property<DateTime>("AppliedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("applied_at")
+                        .HasColumnType("timestamp")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("CoverLetter")
@@ -206,10 +195,7 @@ namespace WebReckrytingSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("job_applications", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("job_applications", (string)null);
                 });
 
             modelBuilder.Entity("WebReckrytingSystem.Models.Notification", b =>
@@ -222,8 +208,7 @@ namespace WebReckrytingSystem.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at")
+                        .HasColumnType("timestamp")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<bool>("IsRead")
@@ -262,10 +247,7 @@ namespace WebReckrytingSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("notifications", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("notifications", (string)null);
                 });
 
             modelBuilder.Entity("WebReckrytingSystem.Models.Resume", b =>
@@ -366,10 +348,7 @@ namespace WebReckrytingSystem.Migrations
 
                     b.HasKey("UserEmail");
 
-                    b.ToTable("resumes", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("resumes", (string)null);
                 });
 
             modelBuilder.Entity("WebReckrytingSystem.Models.ResumeView", b =>
@@ -388,8 +367,7 @@ namespace WebReckrytingSystem.Migrations
 
                     b.Property<DateTime>("ViewedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("viewed_at")
+                        .HasColumnType("timestamp")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("ViewedFromIp")
@@ -405,10 +383,7 @@ namespace WebReckrytingSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("resume_views", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("resume_views", (string)null);
                 });
 
             modelBuilder.Entity("WebReckrytingSystem.Models.SavedResume", b =>
@@ -433,8 +408,7 @@ namespace WebReckrytingSystem.Migrations
 
                     b.Property<DateTime>("SavedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("saved_at")
+                        .HasColumnType("timestamp")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
@@ -460,8 +434,7 @@ namespace WebReckrytingSystem.Migrations
 
                     b.Property<DateTime>("SavedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("saved_at")
+                        .HasColumnType("timestamp")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("StudentEmail")
@@ -489,10 +462,7 @@ namespace WebReckrytingSystem.Migrations
                     b.HasIndex("StudentEmail", "VacancyCompanyName", "VacancyTitle")
                         .IsUnique();
 
-                    b.ToTable("saved_vacancies", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("saved_vacancies", (string)null);
                 });
 
             modelBuilder.Entity("WebReckrytingSystem.Models.User", b =>
@@ -540,10 +510,7 @@ namespace WebReckrytingSystem.Migrations
 
                     b.HasIndex("CompanyName");
 
-                    b.ToTable("users", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("WebReckrytingSystem.Models.Vacancy", b =>
@@ -630,10 +597,7 @@ namespace WebReckrytingSystem.Migrations
 
                     b.HasIndex("AuthorEmail");
 
-                    b.ToTable("vacancies", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("vacancies", (string)null);
                 });
 
             modelBuilder.Entity("WebReckrytingSystem.Models.Resume", b =>
