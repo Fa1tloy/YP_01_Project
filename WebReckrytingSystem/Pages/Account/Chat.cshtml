@@ -24,9 +24,14 @@
                            asp-route-peer="@convo.PeerEmail"
                            asp-route-companyName="@convo.VacancyCompanyName"
                            asp-route-title="@convo.VacancyTitle">
-                            <div class="fw-semibold">@convo.PeerEmail</div>
-                            <div class="small">@convo.VacancyTitle</div>
-                            <div class="small text-muted text-truncate">@convo.LastMessage</div>
+                            <div class="d-flex align-items-start gap-2">
+                                <img src="@convo.PeerAvatarUrl" alt="Аватар @convo.PeerEmail" class="rounded-circle flex-shrink-0" style="width: 40px; height: 40px; object-fit: cover;" />
+                                <div class="min-w-0">
+                                    <div class="fw-semibold">@convo.PeerEmail</div>
+                                    <div class="small">@convo.VacancyTitle</div>
+                                    <div class="small text-muted text-truncate">@convo.LastMessage</div>
+                                </div>
+                            </div>
                         </a>
                     }
                 }
@@ -120,9 +125,14 @@
                         && (convo.vacancyTitle || '') === (selectedTitle || '');
                     return `
                         <a class="list-group-item list-group-item-action ${isActive ? 'active' : ''}" href="${buildConversationHref(convo)}">
-                            <div class="fw-semibold">${escapeHtml(convo.peerEmail)}</div>
-                            <div class="small">${escapeHtml(convo.vacancyTitle || '')}</div>
-                            <div class="small text-muted text-truncate">${escapeHtml(convo.lastMessage || '')}</div>
+                            <div class="d-flex align-items-start gap-2">
+                                <img src="${escapeHtml(convo.peerAvatarUrl || '/images/student.png')}" alt="Аватар ${escapeHtml(convo.peerEmail)}" class="rounded-circle flex-shrink-0" style="width: 40px; height: 40px; object-fit: cover;" />
+                                <div class="min-w-0">
+                                    <div class="fw-semibold">${escapeHtml(convo.peerEmail)}</div>
+                                    <div class="small">${escapeHtml(convo.vacancyTitle || '')}</div>
+                                    <div class="small text-muted text-truncate">${escapeHtml(convo.lastMessage || '')}</div>
+                                </div>
+                            </div>
                         </a>`;
                 }).join('');
             };
