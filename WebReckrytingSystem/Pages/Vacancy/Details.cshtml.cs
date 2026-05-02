@@ -26,6 +26,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
             Vacancy = await _context.Vacancies
                 .AsNoTracking()
                 .Include(v => v.Company)
+                .Include(v => v.Author)
                 .FirstOrDefaultAsync(v => v.CompanyName == companyName && v.Title == title);
 
             if (Vacancy == null)
@@ -73,6 +74,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
             Vacancy = await _context.Vacancies
                 .AsNoTracking()
                 .Include(v => v.Company)
+                .Include(v => v.Author)
                 .FirstOrDefaultAsync(v => v.CompanyName == companyName && v.Title == title);
 
             if (Vacancy is null)
