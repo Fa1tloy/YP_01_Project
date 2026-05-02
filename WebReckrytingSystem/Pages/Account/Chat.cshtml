@@ -26,10 +26,10 @@
                            asp-route-title="@convo.VacancyTitle">
                             <div class="d-flex align-items-start gap-2">
                                 <img src="@convo.PeerAvatarUrl" alt="Аватар @convo.PeerEmail" class="rounded-circle flex-shrink-0" style="width: 40px; height: 40px; object-fit: cover;" />
-                                <div class="min-w-0">
+                                <div class="chat-convo-text">
                                     <div class="fw-semibold">@convo.PeerEmail</div>
                                     <div class="small">@convo.VacancyTitle</div>
-                                    <div class="small text-muted text-truncate">@convo.LastMessage</div>
+                                    <div class="small text-muted chat-convo-last-message">@convo.LastMessage</div>
                                 </div>
                             </div>
                         </a>
@@ -127,10 +127,10 @@
                         <a class="list-group-item list-group-item-action ${isActive ? 'active' : ''}" href="${buildConversationHref(convo)}">
                             <div class="d-flex align-items-start gap-2">
                                 <img src="${escapeHtml(convo.peerAvatarUrl || '/images/student.png')}" alt="Аватар ${escapeHtml(convo.peerEmail)}" class="rounded-circle flex-shrink-0" style="width: 40px; height: 40px; object-fit: cover;" />
-                                <div class="min-w-0">
+                                <div class="chat-convo-text">
                                     <div class="fw-semibold">${escapeHtml(convo.peerEmail)}</div>
                                     <div class="small">${escapeHtml(convo.vacancyTitle || '')}</div>
-                                    <div class="small text-muted text-truncate">${escapeHtml(convo.lastMessage || '')}</div>
+                                    <div class="small text-muted chat-convo-last-message">${escapeHtml(convo.lastMessage || '')}</div>
                                 </div>
                             </div>
                         </a>`;
@@ -212,6 +212,18 @@
         .chat-message-time {
             margin-top: 0.2rem;
             line-height: 1.2;
+        }
+
+        .chat-convo-text {
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+
+        .chat-convo-last-message {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
         }
     </style>
 }
