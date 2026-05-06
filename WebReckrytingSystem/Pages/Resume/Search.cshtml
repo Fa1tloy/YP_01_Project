@@ -157,8 +157,15 @@
                     <div class="col-xl-4 col-md-6">
                         <div class="card h-100 shadow-sm border-0">
                             <div class="card-body d-flex flex-column">
-                                <h5 class="card-title mb-1">@resume.User?.LastName @resume.User?.FirstName</h5>
-                                <div class="text-muted small mb-2">@resume.UserEmail</div>
+                                <div class="d-flex align-items-start gap-3 mb-2">
+                                    <img src="@(string.IsNullOrWhiteSpace(resume.User?.AvatarUrl) ? "/images/student.png" : resume.User.AvatarUrl)"
+                                         alt="Аватар @resume.User?.LastName @resume.User?.FirstName"
+                                         style="width:48px;height:48px;object-fit:cover;border-radius:50%;" />
+                                    <div>
+                                        <h5 class="card-title mb-1">@resume.User?.LastName @resume.User?.FirstName</h5>
+                                        <div class="text-muted small mb-2">@resume.UserEmail</div>
+                                    </div>
+                                </div>
                                 <div class="fw-semibold mb-1">@resume.DesiredPosition</div>
                                 <div class="small text-muted mb-2">@resume.Specialty · @resume.City</div>
                                 <p class="small text-muted mb-2">@resume.EmploymentType, @resume.WorkSchedule</p>
