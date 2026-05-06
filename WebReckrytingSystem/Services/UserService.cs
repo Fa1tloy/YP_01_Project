@@ -50,41 +50,15 @@ namespace WebReckrytingSystem.Services
             if (string.IsNullOrWhiteSpace(password) || password.Length < 8)
                 return ServiceResult<User>.Error("Пароль должен содержать минимум 8 символов");
 
-            // Валидация роли
-            if (role != "job_seeker" && role != "employer")
-                return ServiceResult<User>.Error("Неверно указана роль. Допустимые значения: job_seeker, employer");
-
-            // Для работодателя проверяем наличие названия компании
-            if (role == "employer" && string.IsNullOrWhiteSpace(companyName))
-                return ServiceResult<User>.Error("Для работодателя обязательно указать название компании");
+            // Валидация роли: публичная регистрация доступна только для соискателей.
+            if (role != User.ROLE_JOB_SEEKER)
+                return ServiceResult<User>.Error("Регистрация работодателей отключена. Компании и вакансии создает администратор.");
 
             // Проверка уникальности email
             var existingUser = _userRepository.FindByEmail(email);
             if (existingUser != null)
             {
                 return ServiceResult<User>.Error($"Пользователь с email '{email}' уже зарегистрирован. Перейдите на страницу входа.");
-            }
-
-            // Для работодателя - проверяем/создаем компанию
-            if (role == "employer" && !string.IsNullOrWhiteSpace(companyName))
-            {
-                var existingCompany = _companyRepository.FindByName(companyName.Trim());
-                if (existingCompany == null)
-                {
-                    // Создаем компанию автоматически
-                    var newCompany = new Company
-                    {
-                        Name = companyName.Trim(),
-                        Verified = false,
-                        Description = $"Компания {companyName}"
-                    };
-                    _companyRepository.Save(newCompany);
-                    _logger.LogInformation("✅ Компания {CompanyName} создана автоматически", companyName);
-                }
-                else
-                {
-                    _logger.LogInformation("Компания {CompanyName} уже существует, используем существующую", companyName);
-                }
             }
 
             try
@@ -96,8 +70,8 @@ namespace WebReckrytingSystem.Services
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
                     FirstName = firstName.Trim(),
                     LastName = lastName.Trim(),
-                    Role = role,
-                    CompanyName = role == "employer" ? companyName?.Trim() : null // === ПРИВЯЗЬ К КОМПАНИИ ТОЛЬКО ДЛЯ РАБОТОДАТЕЛЕЙ ===
+                    Role = User.ROLE_JOB_SEEKER,
+                    CompanyName = null
                 };
 
                 var savedUser = _userRepository.Save(newUser);

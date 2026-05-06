@@ -29,10 +29,7 @@ namespace WebReckrytingSystem.Pages.Account
 
         public void OnGet(string? role)
         {
-            if (!string.IsNullOrEmpty(role) && (role == "job_seeker" || role == "employer"))
-            {
-                RegisterData.Role = role;
-            }
+            RegisterData.Role = WebReckrytingSystem.Models.User.ROLE_JOB_SEEKER;
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -48,8 +45,7 @@ namespace WebReckrytingSystem.Pages.Account
                 RegisterData.Password,
                 RegisterData.FirstName,
                 RegisterData.LastName,
-                RegisterData.Role,
-                RegisterData.CompanyName
+                WebReckrytingSystem.Models.User.ROLE_JOB_SEEKER
             );
 
             if (result.IsSuccess)
@@ -60,7 +56,7 @@ namespace WebReckrytingSystem.Pages.Account
                 await SignInUser(result.Data!);
 
                 // Редирект на дашборд
-                return RedirectToDashboard(RegisterData.Role);
+                return RedirectToDashboard(WebReckrytingSystem.Models.User.ROLE_JOB_SEEKER);
             }
             else
             {

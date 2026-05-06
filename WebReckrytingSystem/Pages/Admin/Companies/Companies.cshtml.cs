@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using WebReckrytingSystem.Data;
 using WebReckrytingSystem.Models;
-using WebReckrytingSystem.Services;
 
 namespace WebReckrytingSystem.Pages.Admin.Companies
 {
@@ -12,15 +11,16 @@ namespace WebReckrytingSystem.Pages.Admin.Companies
     public class CompaniesModel : PageModel
     {
         private readonly ApplicationDbContext _context;
-        private readonly ICompanyRepository _companyRepository;
 
-        public CompaniesModel(ApplicationDbContext context, ICompanyRepository companyRepository)
+        public CompaniesModel(ApplicationDbContext context)
         {
             _context = context;
-            _companyRepository = companyRepository;
         }
 
         public SearchResult<Models.Company> Companies { get; set; } = new();
+
+        [BindProperty]
+        public CreateCompanyViewModel CreateCompany { get; set; } = new();
 
         [BindProperty(SupportsGet = true)]
         public string? SearchName { get; set; }
@@ -39,7 +39,6 @@ namespace WebReckrytingSystem.Pages.Admin.Companies
                 .Include(c => c.Vacancies)
                 .AsQueryable();
 
-            // �������
             if (!string.IsNullOrWhiteSpace(SearchName))
                 query = query.Where(c => c.Name.Contains(SearchName));
 
@@ -62,6 +61,36 @@ namespace WebReckrytingSystem.Pages.Admin.Companies
                 Page = Page,
                 PageSize = PageSize
             };
+        }
+
+        public async Task<IActionResult> OnPostCreateAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                OnGet();
+                return Page();
+            }
+
+            var companyName = CreateCompany.Name.Trim();
+            var existingCompany = await _context.Companies.FindAsync(companyName);
+            if (existingCompany != null)
+            {
+                ModelState.AddModelError("CreateCompany.Name", "Компания с таким названием уже существует");
+                OnGet();
+                return Page();
+            }
+
+            _context.Companies.Add(new Models.Company
+            {
+                Name = companyName,
+                Description = CreateCompany.Description?.Trim(),
+                Website = CreateCompany.Website?.Trim(),
+                Verified = true
+            });
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Компания успешно создана";
+            return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostVerifyAsync(string companyName)

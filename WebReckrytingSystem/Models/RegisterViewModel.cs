@@ -26,10 +26,6 @@ namespace WebReckrytingSystem.Models
         [Display(Name = "Фамилия")]
         public string LastName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Роль обязательна")]
-        public string Role { get; set; } = string.Empty;
-
-        [Display(Name = "Название компании")]
-        public string? CompanyName { get; set; }
+        public string Role { get; set; } = User.ROLE_JOB_SEEKER;
     }
 }

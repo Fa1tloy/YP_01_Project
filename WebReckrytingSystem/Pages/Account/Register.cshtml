@@ -16,22 +16,11 @@
                 <form method="post" id="registerForm" novalidate>
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger @(ViewData.ModelState.ErrorCount > 0 ? "" : "d-none")"></div>
 
-                    <!-- РОЛИ -->
-                    <div class="form-group mb-4">
-                        <label class="form-label fw-600">Выберите роль</label>
-                        <div class="btn-group w-100" role="group">
-                            <input type="radio" class="btn-check" name="RegisterData.Role" id="job_seeker" 
-                                   value="job_seeker" @(Model.RegisterData.Role == "job_seeker" ? "checked" : "") />
-                            <label class="btn btn-outline-primary" for="job_seeker">
-                                <i class="fas fa-user-graduate me-2"></i>Соискатель
-                            </label>
+                    <input type="hidden" asp-for="RegisterData.Role" value="job_seeker" />
 
-                            <input type="radio" class="btn-check" name="RegisterData.Role" id="employer" 
-                                   value="employer" @(Model.RegisterData.Role == "employer" ? "checked" : "") />
-                            <label class="btn btn-outline-success" for="employer">
-                                <i class="fas fa-building me-2"></i>Работодатель
-                            </label>
-                        </div>
+                    <div class="alert alert-info rounded-3 mb-4">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Регистрация доступна только для соискателей. Компании и вакансии создает администратор платформы.
                     </div>
 
                     <!-- EMAIL -->
@@ -59,15 +48,6 @@
                             </label>
                             <input asp-for="RegisterData.LastName" class="form-control form-control-lg" required />
                         </div>
-                    </div>
-
-                    <!-- КОМПАНИЯ (для работодателя) -->
-                    <div class="form-group mb-3" id="companyGroup" style="display:none;">
-                        <label asp-for="RegisterData.CompanyName" class="form-label">
-                            <i class="fas fa-building me-2"></i>Название компании
-                        </label>
-                        <input asp-for="RegisterData.CompanyName" class="form-control form-control-lg" 
-                               placeholder="ООО Ромашка" />
                     </div>
 
                     <!-- ПАРОЛИ -->
@@ -194,24 +174,6 @@
             icon.classList.toggle('fa-eye');
             icon.classList.toggle('fa-eye-slash');
         });
-
-        // Показ/скрытие поля компании
-        document.querySelectorAll('input[name="RegisterData.Role"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                const companyGroup = document.getElementById('companyGroup');
-                const companyInput = document.querySelector('input[name="RegisterData.CompanyName"]');
-                
-                if (this.value === 'employer') {
-                    companyGroup.style.display = 'block';
-                    companyInput.required = true;
-                } else {
-                    companyGroup.style.display = 'none';
-                    companyInput.required = false;
-                    companyInput.value = '';
-                }
-            });
-        });
-
 
         let emailTimeout;
         document.querySelector('input[name="RegisterData.Email"]').addEventListener('input', function() {

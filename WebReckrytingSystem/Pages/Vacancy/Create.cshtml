@@ -2,6 +2,7 @@
 @model WebReckrytingSystem.Pages.Vacancy.CreateModel
 @{
     ViewData["Title"] = "Создать вакансию";
+    Layout = "/Pages/Admin/_AdminLayout.cshtml";
 }
 
 <div class="container mt-5">
@@ -145,7 +146,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mt-4">
-                            <a href="/Account/EmployerDashboard" class="btn btn-outline-secondary rounded-pill px-4">
+                            <a href="/Admin/Vacancies/Vacancies" class="btn btn-outline-secondary rounded-pill px-4">
                                 <i class="fas fa-arrow-left me-2"></i>Назад
                             </a>
                             <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5">

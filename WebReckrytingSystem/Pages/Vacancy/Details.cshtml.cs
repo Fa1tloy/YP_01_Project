@@ -46,7 +46,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
                                        s.VacancyCompanyName == companyName &&
                                        s.VacancyTitle == title);
 
-                    // Проверяем, есть ли уже чат с работодателем по этой вакансии
+                    // Проверяем, есть ли уже чат с администратором по этой вакансии
                     HasExistingChat = await _context.ChatMessages
                         .AnyAsync(m => (m.SenderEmail == userEmail && m.RecipientEmail == Vacancy.AuthorEmail) ||
                                        (m.SenderEmail == Vacancy.AuthorEmail && m.RecipientEmail == userEmail));
@@ -104,7 +104,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 AppliedAt = DateTime.UtcNow
             };
 
-            // Создаем уведомление для работодателя
+            // Создаем уведомление для администратора, который ведет вакансию
             var notification = new Notification
             {
                 RecipientEmail = Vacancy.AuthorEmail,
@@ -121,7 +121,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
             {
                 SenderEmail = studentEmail,
                 RecipientEmail = Vacancy.AuthorEmail,
-                Message = $"Здравствуйте! Меня заинтересовала ваша вакансия \"{Vacancy.Title}\".",
+                Message = $"Здравствуйте! Меня заинтересовала вакансия \"{Vacancy.Title}\".",
                 VacancyCompanyName = Vacancy.CompanyName,
                 VacancyTitle = Vacancy.Title,
                 SentAt = DateTime.UtcNow,
@@ -133,7 +133,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
             _context.ChatMessages.Add(chatMessage);
             await _context.SaveChangesAsync();
 
-            StatusMessage = "Отклик отправлен! Работодатель получил уведомление, и чат создан.";
+            StatusMessage = "Отклик отправлен! Администратор получил уведомление, и чат создан.";
             return RedirectToPage(new { companyName, title });
         }
 
