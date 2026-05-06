@@ -1,4 +1,4 @@
-
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -27,7 +27,7 @@ namespace WebReckrytingSystem.Pages.Admin
         public string? SearchCompany { get; set; }
 
         [BindProperty(SupportsGet = true)]
-        public int Page { get; set; } = 1;
+        public int PageNumber { get; set; } = 1;
 
         public int PageSize { get; set; } = 10;
 
@@ -38,8 +38,8 @@ namespace WebReckrytingSystem.Pages.Admin
                 .Include(v => v.Author)
                 .AsQueryable();
 
-            // Фильтры
-            if (!string.IsNullOrWhiteSpace(SearchTitle))
+                .Skip((PageNumber - 1) * PageSize)
+                PageNumber = this.PageNumber,
                 query = query.Where(v => v.Title.Contains(SearchTitle));
 
             if (!string.IsNullOrWhiteSpace(SearchCompany))

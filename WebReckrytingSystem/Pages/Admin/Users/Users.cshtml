@@ -88,19 +88,19 @@
                     @if (Model.Users.HasPreviousPage)
                     {
                         <li class="page-item">
-                            <a class="page-link" asp-route-page="@(Model.Users.Page - 1)">Назад</a>
+                            <a class="page-link" asp-route-PageNumber="@(Model.Users.PageNumber - 1)" asp-route-SearchEmail="@Model.SearchEmail" asp-route-FilterRole="@Model.FilterRole">Назад</a>
                         </li>
                     }
                     @for (int i = 1; i <= Model.Users.TotalPages; i++)
                     {
-                        <li class="page-item @(i == Model.Users.Page ? "active" : "")">
-                            <a class="page-link" asp-route-page="@i">@i</a>
+                        <li class="page-item @(i == Model.Users.PageNumber ? "active" : "")">
+                            <a class="page-link" asp-route-PageNumber="@i" asp-route-SearchEmail="@Model.SearchEmail" asp-route-FilterRole="@Model.FilterRole">@i</a>
                         </li>
                     }
                     @if (Model.Users.HasNextPage)
                     {
                         <li class="page-item">
-                            <a class="page-link" asp-route-page="@(Model.Users.Page + 1)">Вперед</a>
+                            <a class="page-link" asp-route-PageNumber="@(Model.Users.PageNumber + 1)" asp-route-SearchEmail="@Model.SearchEmail" asp-route-FilterRole="@Model.FilterRole">Вперед</a>
                         </li>
                     }
                 </ul>

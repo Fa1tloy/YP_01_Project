@@ -97,7 +97,24 @@
         {
             <nav aria-label="Page navigation">
                 <ul class="pagination justify-content-center">
-                    <!-- ... такая же пагинация как в Users ... -->
+                    @if (Model.Companies.HasPreviousPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-route-PageNumber="@(Model.Companies.PageNumber - 1)" asp-route-SearchName="@Model.SearchName" asp-route-FilterStatus="@Model.FilterStatus">Назад</a>
+                        </li>
+                    }
+                    @for (int i = 1; i <= Model.Companies.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.Companies.PageNumber ? "active" : "")">
+                            <a class="page-link" asp-route-PageNumber="@i" asp-route-SearchName="@Model.SearchName" asp-route-FilterStatus="@Model.FilterStatus">@i</a>
+                        </li>
+                    }
+                    @if (Model.Companies.HasNextPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-route-PageNumber="@(Model.Companies.PageNumber + 1)" asp-route-SearchName="@Model.SearchName" asp-route-FilterStatus="@Model.FilterStatus">Вперед</a>
+                        </li>
+                    }
                 </ul>
             </nav>
         }

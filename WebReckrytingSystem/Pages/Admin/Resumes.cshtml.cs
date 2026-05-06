@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -29,7 +30,7 @@ namespace WebReckrytingSystem.Pages.Admin
         public string? FilterStatus { get; set; }
 
         [BindProperty(SupportsGet = true)]
-        public int Page { get; set; } = 1;
+        public int PageNumber { get; set; } = 1;
 
         public int PageSize { get; set; } = 10;
 
@@ -39,8 +40,8 @@ namespace WebReckrytingSystem.Pages.Admin
                 .Include(r => r.User)
                 .AsQueryable();
 
-            // Фильтры
-            if (!string.IsNullOrWhiteSpace(SearchEmail))
+                .Skip((PageNumber - 1) * PageSize)
+                PageNumber = this.PageNumber,
                 query = query.Where(r => r.UserEmail.Contains(SearchEmail));
 
             if (!string.IsNullOrWhiteSpace(SearchPosition))
@@ -74,11 +75,11 @@ namespace WebReckrytingSystem.Pages.Admin
             {
                 _context.Resumes.Remove(resume);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Резюме успешно удалено";
+                TempData["SuccessMessage"] = "ГђГҐГ§ГѕГ¬ГҐ ГіГ±ГЇГҐГёГ­Г® ГіГ¤Г Г«ГҐГ­Г®";
             }
             else
             {
-                TempData["ErrorMessage"] = "Резюме не найдено";
+                TempData["ErrorMessage"] = "ГђГҐГ§ГѕГ¬ГҐ Г­ГҐ Г­Г Г©Г¤ГҐГ­Г®";
             }
             return RedirectToPage();
         }
@@ -90,7 +91,7 @@ namespace WebReckrytingSystem.Pages.Admin
             {
                 resume.IsPublished = !resume.IsPublished;
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = resume.IsPublished ? "Резюме опубликовано" : "Резюме снято с публикации";
+                TempData["SuccessMessage"] = resume.IsPublished ? "ГђГҐГ§ГѕГ¬ГҐ Г®ГЇГіГЎГ«ГЁГЄГ®ГўГ Г­Г®" : "ГђГҐГ§ГѕГ¬ГҐ Г±Г­ГїГІГ® Г± ГЇГіГЎГ«ГЁГЄГ Г¶ГЁГЁ";
             }
             return RedirectToPage();
         }
