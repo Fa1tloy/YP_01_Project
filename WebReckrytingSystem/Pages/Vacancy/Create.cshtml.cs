@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace WebReckrytingSystem.Pages.Vacancy
 {
-    [Authorize(Roles = "employer")]
+    [Authorize(Roles = "admin")]
     public class CreateModel : PageModel
     {
         private readonly IVacancyService _vacancyService;
@@ -41,12 +41,6 @@ namespace WebReckrytingSystem.Pages.Vacancy
             if (string.IsNullOrEmpty(userEmail))
                 return RedirectToPage("/Account/Login");
 
-            var user = _context.Users.FirstOrDefault(u => u.Email == userEmail);
-            if (!string.IsNullOrWhiteSpace(user?.CompanyName))
-            {
-                VacancyData.CompanyName = user.CompanyName;
-            }
-
             LoadSuggestions();
             return Page();
         }
@@ -71,7 +65,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 if (result.IsSuccess)
                 {
                     TempData["SuccessMessage"] = "Вакансия успешно создана и опубликована!";
-                    return RedirectToPage("/Account/EmployerDashboard");
+                    return RedirectToPage("/Admin/Vacancies/Vacancies");
                 }
 
                 var errorMessage = string.IsNullOrWhiteSpace(result.Message)

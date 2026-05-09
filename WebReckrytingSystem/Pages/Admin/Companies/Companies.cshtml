@@ -1,4 +1,4 @@
-@page
+﻿@page
 @model WebReckrytingSystem.Pages.Admin.Companies.CompaniesModel
 @{
     ViewData["Title"] = "Компании";
@@ -11,6 +11,42 @@
         <span class="badge bg-light text-success">@Model.Companies.TotalCount</span>
     </div>
     <div class="card-body">
+
+        @if (TempData["SuccessMessage"] is string successMessage)
+        {
+            <div class="alert alert-success">@successMessage</div>
+        }
+
+        <div class="card border-success mb-4">
+            <div class="card-header bg-light fw-bold">
+                <i class="fas fa-plus-circle me-2"></i>Создать компанию
+            </div>
+            <div class="card-body">
+                <form method="post" asp-page-handler="Create" class="row g-3">
+                    <div class="col-md-4">
+                        <label asp-for="CreateCompany.Name" class="form-label">Название *</label>
+                        <input asp-for="CreateCompany.Name" class="form-control" placeholder="Название компании" required />
+                        <span asp-validation-for="CreateCompany.Name" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="CreateCompany.Description" class="form-label">Описание</label>
+                        <input asp-for="CreateCompany.Description" class="form-control" placeholder="Краткое описание" />
+                        <span asp-validation-for="CreateCompany.Description" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="CreateCompany.Website" class="form-label">Веб-сайт</label>
+                        <input asp-for="CreateCompany.Website" class="form-control" placeholder="https://example.com" />
+                        <span asp-validation-for="CreateCompany.Website" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="submit" class="btn btn-success w-100" title="Создать компанию">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Фильтры -->
         <form method="get" class="row g-3 mb-4">
             <div class="col-md-5">
@@ -110,4 +146,8 @@
         if (string.IsNullOrEmpty(text)) return "";
         return text.Length <= maxLength ? text : text.Substring(0, maxLength) + "...";
     }
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

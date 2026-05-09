@@ -1,4 +1,4 @@
-@page "{companyName}/{title}"
+﻿@page "{companyName}/{title}"
 @using System.Security.Claims
 @model WebReckrytingSystem.Pages.Vacancy.DetailsModel
 @{
@@ -39,7 +39,7 @@
             <div class="card-header bg-white border-0 pt-4 px-4">
                 <div class="d-flex align-items-center gap-3">
                     <img src="@(string.IsNullOrWhiteSpace(Model.Vacancy.Author?.AvatarUrl) ? "/images/rabotodatel.jpg" : Model.Vacancy.Author.AvatarUrl)"
-                         alt="Аватар работодателя @Model.Vacancy.CompanyName"
+                         alt="Аватар администратора вакансии @Model.Vacancy.CompanyName"
                          class="rounded-circle border"
                          style="width: 80px; height: 80px; object-fit: cover; background-color: #f8f9fa;">
                     <div>
@@ -264,7 +264,7 @@
 
                                 <!-- КОНТАКТЫ -->
                                 <h5 class="fw-bold mb-3">
-                                    <i class="fas fa-address-card me-2 text-primary"></i>Контакты
+                                    <i class="fas fa-address-card me-2 text-primary"></i>Контакты администратора
                                 </h5>
 
                                 <div class="vstack gap-2">
@@ -295,7 +295,7 @@
                                             <input type="hidden" name="companyName" value="@Model.Vacancy.CompanyName" />
                                             <input type="hidden" name="title" value="@Model.Vacancy.Title" />
                                             <button type="submit" class="btn btn-success w-100 py-3 fw-semibold">
-                                                <i class="fas fa-paper-plane me-2"></i>Откликнуться на вакансию
+                                                <i class="fas fa-paper-plane me-2"></i>Откликнуться администратору
                                             </button>
                                         </form>
 

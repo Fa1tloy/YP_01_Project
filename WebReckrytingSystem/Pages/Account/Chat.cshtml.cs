@@ -192,6 +192,6 @@ namespace WebReckrytingSystem.Pages.Account
         }
 
         private static string GetDefaultAvatar(string? role) =>
-            role == Models.User.ROLE_EMPLOYER ? "/images/rabotodatel.jpg" : "/images/student.png";
+            role == Models.User.ROLE_EMPLOYER || role == Models.User.ROLE_ADMIN ? "/images/rabotodatel.jpg" : "/images/student.png";
     }
 }
