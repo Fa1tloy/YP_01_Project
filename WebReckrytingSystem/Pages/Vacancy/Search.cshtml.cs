@@ -85,8 +85,6 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 AddIfNotEmpty(query, "WorkSchedule", SearchData.WorkSchedule);
                 AddIfNotNull(query, "WorkHoursPerDay", SearchData.WorkHoursPerDay);
                 AddIfNotEmpty(query, "WorkFormat", SearchData.WorkFormat);
-                AddIfNotEmpty(query, "SalaryPeriod", SearchData.SalaryPeriod);
-                AddIfNotEmpty(query, "PaymentFrequency", SearchData.PaymentFrequency);
                 AddIfNotEmpty(query, "Specialty", SearchData.Specialty);
                 query.Add("Page", SearchData.Page.ToString());
                 query.Add("PageSize", SearchData.PageSize.ToString());
