@@ -164,16 +164,6 @@ namespace WebReckrytingSystem.Services
                 filtered = filtered.Where(v => v.WorkFormat == model.WorkFormat);
             }
 
-            if (!string.IsNullOrWhiteSpace(model.SalaryPeriod))
-            {
-                filtered = filtered.Where(v => v.SalaryPeriod == model.SalaryPeriod);
-            }
-
-            if (!string.IsNullOrWhiteSpace(model.PaymentFrequency))
-            {
-                filtered = filtered.Where(v => v.PaymentFrequency == model.PaymentFrequency);
-            }
-
             if (!string.IsNullOrWhiteSpace(model.Specialty))
             {
                 filtered = filtered.Where(v => v.Specialty == model.Specialty);

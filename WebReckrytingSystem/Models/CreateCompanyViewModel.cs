@@ -13,7 +13,6 @@ namespace WebReckrytingSystem.Models
         [Display(Name = "Описание компании")]
         public string? Description { get; set; }
 
-        [Url(ErrorMessage = "Введите корректный URL")]
         [Display(Name = "Веб-сайт")]
         public string? Website { get; set; }
     }

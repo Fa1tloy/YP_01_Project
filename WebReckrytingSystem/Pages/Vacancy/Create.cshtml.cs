@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 using WebReckrytingSystem.Models;
 using WebReckrytingSystem.Services;
@@ -18,7 +19,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
         [BindProperty]
         public CreateVacancyViewModel VacancyData { get; set; } = new();
 
-        public List<string> CompanySuggestions { get; set; } = new();
+        public List<SelectListItem> CompanyOptions { get; set; } = new();
 
         public IReadOnlyList<string> Specialties => SpecialtyCatalog.All;
 
@@ -86,9 +87,13 @@ namespace WebReckrytingSystem.Pages.Vacancy
 
         private void LoadSuggestions()
         {
-            CompanySuggestions = _context.Companies
-                .Select(c => c.Name)
-                .OrderBy(n => n)
+            CompanyOptions = _context.Companies
+                .OrderBy(c => c.Name)
+                .Select(c => new SelectListItem
+                {
+                    Value = c.Name,
+                    Text = c.Name
+                })
                 .ToList();
         }
     }
