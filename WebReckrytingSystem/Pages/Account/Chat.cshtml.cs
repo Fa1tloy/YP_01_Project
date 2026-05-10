@@ -36,6 +36,7 @@ namespace WebReckrytingSystem.Pages.Account
         public class ConversationItem
         {
             public string PeerEmail { get; set; } = string.Empty;
+            public string PeerAvatarUrl { get; set; } = "/images/student.png";
             public string? VacancyCompanyName { get; set; }
             public string? VacancyTitle { get; set; }
             public string LastMessage { get; set; } = string.Empty;
@@ -102,6 +103,7 @@ namespace WebReckrytingSystem.Pages.Account
             var conversations = Conversations.Select(c => new
             {
                 peerEmail = c.PeerEmail,
+                peerAvatarUrl = c.PeerAvatarUrl,
                 vacancyCompanyName = c.VacancyCompanyName,
                 vacancyTitle = c.VacancyTitle,
                 lastMessage = c.LastMessage,
@@ -151,6 +153,21 @@ namespace WebReckrytingSystem.Pages.Account
                 .OrderByDescending(x => x.LastSentAt)
                 .ToList();
 
+            var peerEmails = Conversations.Select(c => c.PeerEmail).Distinct().ToList();
+            var users = await _context.Users
+                .Where(u => peerEmails.Contains(u.Email))
+                .ToDictionaryAsync(u => u.Email, u => u);
+
+            foreach (var conversation in Conversations)
+            {
+                if (users.TryGetValue(conversation.PeerEmail, out var peerUser))
+                {
+                    conversation.PeerAvatarUrl = !string.IsNullOrWhiteSpace(peerUser.AvatarUrl)
+                        ? peerUser.AvatarUrl
+                        : GetDefaultAvatar(peerUser.Role);
+                }
+            }
+
             if (string.IsNullOrWhiteSpace(Peer) && Conversations.Any())
             {
                 var first = Conversations.First();
@@ -173,5 +190,8 @@ namespace WebReckrytingSystem.Pages.Account
                 Messages = await query.OrderBy(m => m.SentAt).ToListAsync();
             }
         }
+
+        private static string GetDefaultAvatar(string? role) =>
+            role == Models.User.ROLE_EMPLOYER || role == Models.User.ROLE_ADMIN ? "/images/rabotodatel.jpg" : "/images/student.png";
     }
 }

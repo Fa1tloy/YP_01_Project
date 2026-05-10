@@ -50,7 +50,7 @@
                     <div class="card-body text-center p-4">
                         <!-- Аватар -->
                         <div class="position-relative d-inline-block mb-4">
-                            <img src="/images/student.png"
+                            <img src="@(string.IsNullOrWhiteSpace(Model.Resume.User?.AvatarUrl) ? "/images/student.png" : Model.Resume.User.AvatarUrl)"
                                  alt="@Model.Resume.User?.FirstName @Model.Resume.User?.LastName"
                                  class="rounded-circle border border-3 border-primary"
                                  style="width: 120px; height: 120px; object-fit: cover;">

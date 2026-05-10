@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 using WebReckrytingSystem.Models;
 using WebReckrytingSystem.Services;
@@ -8,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace WebReckrytingSystem.Pages.Vacancy
 {
-    [Authorize(Roles = "employer")]
+    [Authorize(Roles = "admin")]
     public class CreateModel : PageModel
     {
         private readonly IVacancyService _vacancyService;
@@ -18,7 +19,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
         [BindProperty]
         public CreateVacancyViewModel VacancyData { get; set; } = new();
 
-        public List<string> CompanySuggestions { get; set; } = new();
+        public List<SelectListItem> CompanyOptions { get; set; } = new();
 
         public IReadOnlyList<string> Specialties => SpecialtyCatalog.All;
 
@@ -40,12 +41,6 @@ namespace WebReckrytingSystem.Pages.Vacancy
             var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
             if (string.IsNullOrEmpty(userEmail))
                 return RedirectToPage("/Account/Login");
-
-            var user = _context.Users.FirstOrDefault(u => u.Email == userEmail);
-            if (!string.IsNullOrWhiteSpace(user?.CompanyName))
-            {
-                VacancyData.CompanyName = user.CompanyName;
-            }
 
             LoadSuggestions();
             return Page();
@@ -71,7 +66,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 if (result.IsSuccess)
                 {
                     TempData["SuccessMessage"] = "Вакансия успешно создана и опубликована!";
-                    return RedirectToPage("/Account/EmployerDashboard");
+                    return RedirectToPage("/Admin/Vacancies/Vacancies");
                 }
 
                 var errorMessage = string.IsNullOrWhiteSpace(result.Message)
@@ -92,9 +87,13 @@ namespace WebReckrytingSystem.Pages.Vacancy
 
         private void LoadSuggestions()
         {
-            CompanySuggestions = _context.Companies
-                .Select(c => c.Name)
-                .OrderBy(n => n)
+            CompanyOptions = _context.Companies
+                .OrderBy(c => c.Name)
+                .Select(c => new SelectListItem
+                {
+                    Value = c.Name,
+                    Text = c.Name
+                })
                 .ToList();
         }
     }

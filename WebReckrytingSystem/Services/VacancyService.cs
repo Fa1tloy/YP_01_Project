@@ -33,10 +33,10 @@ namespace WebReckrytingSystem.Services
 
             // 1. Проверка прав доступа
             var user = _userRepository.FindByEmail(authorEmail);
-            if (user == null || user.Role != "employer")
+            if (user == null || user.Role != User.ROLE_ADMIN)
             {
-                _logger.LogWarning($"Попытка создания вакансии не-работодателем: {authorEmail}");
-                return ServiceResult<Vacancy>.Error("Только работодатели могут создавать вакансии");
+                _logger.LogWarning($"Попытка создания вакансии не-администратором: {authorEmail}");
+                return ServiceResult<Vacancy>.Error("Только администратор может создавать вакансии");
             }
 
             // 2. Валидация данных вакансии
@@ -154,10 +154,10 @@ namespace WebReckrytingSystem.Services
 
             // 1. Проверка прав доступа
             var user = _userRepository.FindByEmail(userEmail);
-            if (user == null || user.Role != "employer")
+            if (user == null || user.Role != User.ROLE_ADMIN)
             {
-                _logger.LogWarning($"Попытка редактирования вакансии не-работодателем: {userEmail}");
-                return ServiceResult<Vacancy>.Error("Только работодатели могут редактировать вакансии");
+                _logger.LogWarning($"Попытка редактирования вакансии не-администратором: {userEmail}");
+                return ServiceResult<Vacancy>.Error("Только администратор может редактировать вакансии");
             }
 
             // 2. Поиск вакансии
@@ -168,14 +168,7 @@ namespace WebReckrytingSystem.Services
                 return ServiceResult<Vacancy>.Error("Вакансия не найдена");
             }
 
-            // 3. Проверка авторства
-            if (existingVacancy.AuthorEmail != userEmail)
-            {
-                _logger.LogWarning($"Попытка редактирования чужой вакансии. Автор: {existingVacancy.AuthorEmail}, Пользователь: {userEmail}");
-                return ServiceResult<Vacancy>.Error("Вы можете редактировать только свои вакансии");
-            }
-
-            // 4. Проверка компании
+            // 3. Проверка компании
             var company = _companyRepository.FindByName(model.CompanyName.Trim());
             if (company == null)
             {
@@ -183,7 +176,7 @@ namespace WebReckrytingSystem.Services
                 return ServiceResult<Vacancy>.Error("Компания не найдена");
             }
 
-            // 5. Проверка дубликатов (если изменилось название)
+            // 4. Проверка дубликатов (если изменилось название)
             if (!string.Equals(existingVacancy.Title, model.Title.Trim(), StringComparison.OrdinalIgnoreCase))
             {
                 var duplicateVacancy = _vacancyRepository.GetByCompanyAndTitle(model.CompanyName, model.Title);
@@ -194,7 +187,7 @@ namespace WebReckrytingSystem.Services
                 }
             }
 
-            // 6. Валидация данных вакансии
+            // 5. Валидация данных вакансии
             var validationResult = ValidateVacancyData(model);
             if (!validationResult.IsSuccess)
             {
@@ -204,7 +197,7 @@ namespace WebReckrytingSystem.Services
 
             try
             {
-                // 7. Обновление вакансии
+                // 6. Обновление вакансии
                 existingVacancy.CompanyName = model.CompanyName.Trim();
                 existingVacancy.Region = model.Region.Trim();
                 existingVacancy.Title = model.Title.Trim();

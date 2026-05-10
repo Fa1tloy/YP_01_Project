@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WebReckrytingSystem.Migrations
 {
     /// <inheritdoc />
-    public partial class AddNotificationCreatedAt : Migration
+    public partial class initialcrea : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

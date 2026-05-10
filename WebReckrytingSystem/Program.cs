@@ -121,6 +121,42 @@ PRIMARY KEY (`id`)" );
 `is_read` TINYINT(1) NOT NULL DEFAULT 0,
 PRIMARY KEY (`id`)" );
 
+    EnsureTableExists(connection, "companies", @"`name` VARCHAR(255) NOT NULL,
+`description` TEXT NULL,
+`website` TEXT NULL,
+`logo_url` TEXT NULL,
+`verified` TINYINT(1) NOT NULL DEFAULT 0,
+PRIMARY KEY (`name`)" );
+
+    EnsureTableExists(connection, "vacancies", @"`company_name` VARCHAR(255) NOT NULL,
+`title` VARCHAR(255) NOT NULL,
+`region` VARCHAR(100) NOT NULL DEFAULT '',
+`description` TEXT NOT NULL,
+`requirements` TEXT NOT NULL,
+`salary_from` INT NULL,
+`salary_to` INT NULL,
+`employment_type` VARCHAR(50) NOT NULL,
+`work_schedule` VARCHAR(50) NOT NULL,
+`work_hours_per_day` INT NULL,
+`work_format` VARCHAR(50) NOT NULL DEFAULT '',
+`salary_period` VARCHAR(20) NOT NULL DEFAULT '',
+`payment_frequency` VARCHAR(50) NOT NULL DEFAULT '',
+`specialty` VARCHAR(255) NOT NULL DEFAULT '',
+`author_email` VARCHAR(255) NOT NULL,
+PRIMARY KEY (`company_name`, `title`)" );
+
+    EnsureColumnExists(connection, "companies", "description", "TEXT NULL");
+    EnsureColumnExists(connection, "companies", "website", "TEXT NULL");
+    EnsureColumnExists(connection, "companies", "logo_url", "TEXT NULL");
+    EnsureColumnExists(connection, "companies", "verified", "TINYINT(1) NOT NULL DEFAULT 0");
+
+    EnsureColumnExists(connection, "vacancies", "region", "VARCHAR(100) NOT NULL DEFAULT ''");
+    EnsureColumnExists(connection, "vacancies", "work_hours_per_day", "INT NULL");
+    EnsureColumnExists(connection, "vacancies", "work_format", "VARCHAR(50) NOT NULL DEFAULT ''");
+    EnsureColumnExists(connection, "vacancies", "salary_period", "VARCHAR(20) NOT NULL DEFAULT ''");
+    EnsureColumnExists(connection, "vacancies", "payment_frequency", "VARCHAR(50) NOT NULL DEFAULT ''");
+    EnsureColumnExists(connection, "vacancies", "specialty", "VARCHAR(255) NOT NULL DEFAULT ''");
+
     EnsureColumnExists(connection, "users", "company_name", "VARCHAR(255) NULL");
 
     EnsureColumnExists(connection, "resumes", "city", "VARCHAR(100) NOT NULL DEFAULT ''");

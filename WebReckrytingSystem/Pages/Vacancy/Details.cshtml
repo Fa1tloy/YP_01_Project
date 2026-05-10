@@ -1,4 +1,4 @@
-@page "{companyName}/{title}"
+﻿@page "{companyName}/{title}"
 @using System.Security.Claims
 @model WebReckrytingSystem.Pages.Vacancy.DetailsModel
 @{
@@ -38,9 +38,9 @@
             <!-- ШАПКА С ЛОГОТИПОМ -->
             <div class="card-header bg-white border-0 pt-4 px-4">
                 <div class="d-flex align-items-center gap-3">
-                    <img src="@(string.IsNullOrWhiteSpace(Model.Vacancy.Company?.LogoUrl) ? "/images/rabotodatel.jpg" : Model.Vacancy.Company.LogoUrl)"
-                         alt="Логотип @Model.Vacancy.CompanyName"
-                         class="rounded-3 border"
+                    <img src="@(string.IsNullOrWhiteSpace(Model.Vacancy.Author?.AvatarUrl) ? "/images/rabotodatel.jpg" : Model.Vacancy.Author.AvatarUrl)"
+                         alt="Аватар администратора вакансии @Model.Vacancy.CompanyName"
+                         class="rounded-circle border"
                          style="width: 80px; height: 80px; object-fit: cover; background-color: #f8f9fa;">
                     <div>
                         <h1 class="h3 mb-1 fw-bold">@Model.Vacancy.Title</h1>
@@ -85,19 +85,6 @@
                                             <span class="text-secondary">Зарплата не указана</span>
                                         }
                                     </h2>
-                                </div>
-                                <div class="text-end">
-                                    <span class="badge bg-light text-dark rounded-pill px-3 py-2">
-                                        @(Model.Vacancy.SalaryPeriod switch
-                                        {
-                                            "month" => "в месяц",
-                                            "hour" => "в час",
-                                            "shift" => "за смену",
-                                            "service" => "за услугу",
-                                            "rotation" => "за вахту",
-                                            _ => Model.Vacancy.SalaryPeriod
-                                        })
-                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -234,37 +221,13 @@
                                             </div>
                                         </div>
                                     }
-
-                                    <!-- Частота выплат -->
-                                    @if (!string.IsNullOrWhiteSpace(Model.Vacancy.PaymentFrequency))
-                                    {
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-white p-2 rounded-3 me-3" style="width: 40px; height: 40px;">
-                                                <i class="fas fa-credit-card text-primary"></i>
-                                            </div>
-                                            <div>
-                                                <div class="small text-muted">Частота выплат</div>
-                                                <div class="fw-semibold">
-                                                    @(Model.Vacancy.PaymentFrequency switch
-                                                    {
-                                                        "weekly" => "Еженедельно",
-                                                        "biweekly" => "Раз в 2 недели",
-                                                        "monthly" => "Ежемесячно",
-                                                        "after_shift" => "После смены",
-                                                        "contract" => "По договоренности",
-                                                        _ => Model.Vacancy.PaymentFrequency
-                                                    })
-                                                </div>
-                                            </div>
-                                        </div>
-                                    }
                                 </div>
 
                                 <hr class="my-4">
 
                                 <!-- КОНТАКТЫ -->
                                 <h5 class="fw-bold mb-3">
-                                    <i class="fas fa-address-card me-2 text-primary"></i>Контакты
+                                    <i class="fas fa-address-card me-2 text-primary"></i>Контакты администратора
                                 </h5>
 
                                 <div class="vstack gap-2">
@@ -295,7 +258,7 @@
                                             <input type="hidden" name="companyName" value="@Model.Vacancy.CompanyName" />
                                             <input type="hidden" name="title" value="@Model.Vacancy.Title" />
                                             <button type="submit" class="btn btn-success w-100 py-3 fw-semibold">
-                                                <i class="fas fa-paper-plane me-2"></i>Откликнуться на вакансию
+                                                <i class="fas fa-paper-plane me-2"></i>Откликнуться администратору
                                             </button>
                                         </form>
 
