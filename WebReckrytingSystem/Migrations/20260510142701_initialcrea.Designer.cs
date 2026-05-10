@@ -12,8 +12,8 @@ using WebReckrytingSystem.Models;
 namespace WebReckrytingSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260501042733_AddNotificationCreatedAt")]
-    partial class AddNotificationCreatedAt
+    [Migration("20260510142701_initialcrea")]
+    partial class initialcrea
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -59,6 +59,7 @@ namespace WebReckrytingSystem.Migrations
                     b.Property<DateTime>("SentAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp")
+                        .HasColumnName("SentAt")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("VacancyCompanyName")
@@ -209,6 +210,7 @@ namespace WebReckrytingSystem.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp")
+                        .HasColumnName("CreatedAt")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<bool>("IsRead")

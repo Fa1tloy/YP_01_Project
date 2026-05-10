@@ -56,6 +56,7 @@ namespace WebReckrytingSystem.Migrations
                     b.Property<DateTime>("SentAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp")
+                        .HasColumnName("SentAt")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("VacancyCompanyName")
@@ -206,6 +207,7 @@ namespace WebReckrytingSystem.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp")
+                        .HasColumnName("CreatedAt")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<bool>("IsRead")
