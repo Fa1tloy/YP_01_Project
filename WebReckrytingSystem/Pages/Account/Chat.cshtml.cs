@@ -47,9 +47,7 @@ namespace WebReckrytingSystem.Pages.Account
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             if (string.IsNullOrWhiteSpace(userEmail))
-            {
                 return RedirectToPage("/Account/Login");
-            }
 
             CurrentUserEmail = userEmail;
             await LoadDataAsync();
@@ -60,9 +58,7 @@ namespace WebReckrytingSystem.Pages.Account
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             if (string.IsNullOrWhiteSpace(userEmail))
-            {
                 return RedirectToPage("/Account/Login");
-            }
 
             CurrentUserEmail = userEmail;
 
@@ -85,13 +81,34 @@ namespace WebReckrytingSystem.Pages.Account
             return RedirectToPage(new { peer = Peer, companyName = CompanyName, title = Title });
         }
 
+        public async Task<IActionResult> OnPostDeleteConversationAsync(string peer, string? companyName, string? title)
+        {
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrWhiteSpace(userEmail))
+                return RedirectToPage("/Account/Login");
+
+            // Удаляем все сообщения между текущим пользователем и собеседником по указанной вакансии (если задана)
+            var messagesToDelete = _context.ChatMessages.Where(m =>
+                ((m.SenderEmail == userEmail && m.RecipientEmail == peer) ||
+                 (m.SenderEmail == peer && m.RecipientEmail == userEmail)));
+
+            if (!string.IsNullOrWhiteSpace(companyName))
+                messagesToDelete = messagesToDelete.Where(m => m.VacancyCompanyName == companyName);
+            if (!string.IsNullOrWhiteSpace(title))
+                messagesToDelete = messagesToDelete.Where(m => m.VacancyTitle == title);
+
+            _context.ChatMessages.RemoveRange(messagesToDelete);
+            await _context.SaveChangesAsync();
+
+            // Редирект на страницу чатов без активного диалога
+            return RedirectToPage();
+        }
+
         public async Task<IActionResult> OnGetUpdatesAsync(string? peer, string? companyName, string? title)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             if (string.IsNullOrWhiteSpace(userEmail))
-            {
                 return new UnauthorizedResult();
-            }
 
             CurrentUserEmail = userEmail;
             Peer = peer;

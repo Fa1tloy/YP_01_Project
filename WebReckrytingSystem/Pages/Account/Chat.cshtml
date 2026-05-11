@@ -40,14 +40,28 @@
 
         <div class="col-lg-8">
                 <div class="card shadow-sm">
-                <div class="card-header bg-transparent">
-                    <div id="chatPeer" class="fw-semibold">@(Model.Peer ?? "Выберите чат")</div>
-                    <div id="chatTitle" class="small text-muted">
-                        @if (!string.IsNullOrWhiteSpace(Model.Title))
-                        {
-                            <text>Вакансия: @Model.Title</text>
-                        }
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <div>
+                        <div id="chatPeer" class="fw-semibold">@(Model.Peer ?? "Выберите чат")</div>
+                        <div id="chatTitle" class="small text-muted">
+                            @if (!string.IsNullOrWhiteSpace(Model.Title))
+                            {
+                                <text>Вакансия: @Model.Title</text>
+                            }
+                        </div>
                     </div>
+                    @if (!string.IsNullOrWhiteSpace(Model.Peer))
+                    {
+                        <form method="post" asp-page-handler="DeleteConversation"
+                              onsubmit="return confirm('Удалить всю переписку с этим пользователем?');">
+                            <input type="hidden" name="peer" value="@Model.Peer" />
+                            <input type="hidden" name="companyName" value="@Model.CompanyName" />
+                            <input type="hidden" name="title" value="@Model.Title" />
+                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill" title="Удалить чат">
+                                <i class="fas fa-trash"></i> <span class="d-none d-md-inline">Удалить чат</span>
+                            </button>
+                        </form>
+                    }
                 </div>
                 <div id="messagesContainer" class="card-body" style="max-height: 450px; overflow-y: auto;">
                     @if (!Model.Messages.Any())

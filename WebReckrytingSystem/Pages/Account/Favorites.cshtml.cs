@@ -62,12 +62,37 @@ namespace WebReckrytingSystem.Pages.Account
             return Page();
         }
 
+        // Удаление сохранённой вакансии
+        public async Task<IActionResult> OnPostDeleteVacancyAsync(int id)
+        {
+            var saved = await _context.SavedVacancies.FindAsync(id);
+            if (saved != null)
+            {
+                _context.SavedVacancies.Remove(saved);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Вакансия удалена из избранного";
+            }
+            return RedirectToPage();
+        }
+
+        // Удаление сохранённого резюме
+        public async Task<IActionResult> OnPostDeleteResumeAsync(int id)
+        {
+            var saved = await _context.SavedResumes.FindAsync(id);
+            if (saved != null)
+            {
+                _context.SavedResumes.Remove(saved);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Резюме удалено из избранного";
+            }
+            return RedirectToPage();
+        }
+
         private static bool IsSavedResumesSchemaIssue(MySqlException ex)
         {
             var isTableMissing = ex.Message.Contains("saved_resumes", StringComparison.OrdinalIgnoreCase)
                                  && ex.Message.Contains("doesn't exist", StringComparison.OrdinalIgnoreCase);
             var isCollationMismatch = ex.Message.Contains("Illegal mix of collations", StringComparison.OrdinalIgnoreCase);
-
             return isTableMissing || isCollationMismatch;
         }
 

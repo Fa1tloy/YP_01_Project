@@ -7,6 +7,11 @@
 <div class="container py-5 mt-5">
     <h1 class="h3 mb-4">Избранное</h1>
 
+    @if (!string.IsNullOrEmpty(TempData["SuccessMessage"]?.ToString()))
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
     @if (User.IsInRole("job_seeker"))
     {
         if (Model.SavedVacancies.Any())
@@ -14,13 +19,21 @@
             <div class="list-group">
                 @foreach (var item in Model.SavedVacancies)
                 {
-                    <a asp-page="/Vacancy/Details" asp-route-companyName="@item.Vacancy.CompanyName" asp-route-title="@item.Vacancy.Title" class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">@item.Vacancy.Title</h5>
-                            <small>@item.SavedAt.ToLocalTime().ToString("dd.MM.yyyy")</small>
-                        </div>
-                        <p class="mb-1">@item.Vacancy.CompanyName</p>
-                    </a>
+                    <div class="list-group-item d-flex justify-content-between align-items-start">
+                        <a asp-page="/Vacancy/Details" asp-route-companyName="@item.Vacancy?.CompanyName" asp-route-title="@item.Vacancy?.Title" class="text-decoration-none flex-grow-1 me-3">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">@(item.Vacancy?.Title ?? "Без названия")</h5>
+                                <small>@item.SavedAt.ToLocalTime().ToString("dd.MM.yyyy")</small>
+                            </div>
+                            <p class="mb-1">@(item.Vacancy?.CompanyName ?? "")</p>
+                        </a>
+                        <form method="post" asp-page-handler="DeleteVacancy" class="d-inline" onsubmit="return confirm('Удалить вакансию из избранного?')">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить из избранного">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
                 }
             </div>
         }
@@ -36,13 +49,21 @@
             <div class="list-group">
                 @foreach (var item in Model.SavedResumes)
                 {
-                    <a asp-page="/Resume/Details" asp-route-userEmail="@item.Resume.UserEmail" class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">@item.Resume.DesiredPosition</h5>
-                            <small>@item.SavedAt.ToLocalTime().ToString("dd.MM.yyyy")</small>
-                        </div>
-                        <p class="mb-1">@item.Resume.User?.FirstName @item.Resume.User?.LastName</p>
-                    </a>
+                    <div class="list-group-item d-flex justify-content-between align-items-start">
+                        <a asp-page="/Resume/Details" asp-route-userEmail="@item.Resume?.UserEmail" class="text-decoration-none flex-grow-1 me-3">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">@(item.Resume?.DesiredPosition ?? "Без названия")</h5>
+                                <small>@item.SavedAt.ToLocalTime().ToString("dd.MM.yyyy")</small>
+                            </div>
+                            <p class="mb-1">@(item.Resume?.User?.FirstName) @(item.Resume?.User?.LastName)</p>
+                        </a>
+                        <form method="post" asp-page-handler="DeleteResume" class="d-inline" onsubmit="return confirm('Удалить резюме из избранного?')">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить из избранного">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
                 }
             </div>
         }
