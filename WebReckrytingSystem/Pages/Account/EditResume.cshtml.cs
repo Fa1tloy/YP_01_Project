@@ -11,15 +11,17 @@ namespace WebReckrytingSystem.Pages.Account
     public class EditResumeModel : PageModel
     {
         private readonly IResumeService _resumeService;
+        private readonly ISpecialtyService _specialtyService;
 
-        public EditResumeModel(IResumeService resumeService)
+        public EditResumeModel(IResumeService resumeService, ISpecialtyService specialtyService)
         {
             _resumeService = resumeService;
+            _specialtyService = specialtyService;
         }
 
         [BindProperty]
         public CreateResumeViewModel ResumeData { get; set; } = new();
-        public IReadOnlyList<string> Specialties => SpecialtyCatalog.All;
+        public IReadOnlyList<string> Specialties { get; set; } = new List<string>();
         public IReadOnlyList<string> DriverLicenseCategories => DriverLicenseCategoryCatalog.All;
 
         public string? SuccessMessage { get; set; }
@@ -28,15 +30,13 @@ namespace WebReckrytingSystem.Pages.Account
         public IActionResult OnGet()
         {
             if (User.FindFirst(ClaimTypes.Role)?.Value != "job_seeker")
-            {
                 return RedirectToPage("/AccessDenied");
-            }
 
             var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
             if (string.IsNullOrWhiteSpace(userEmail))
-            {
                 return RedirectToPage("/Account/Login");
-            }
+
+            Specialties = _specialtyService.GetAllNames();
 
             var existingResume = _resumeService.GetUserResume(userEmail);
             if (existingResume == null)
@@ -64,11 +64,11 @@ namespace WebReckrytingSystem.Pages.Account
                 }
             }
 
+            Specialties = _specialtyService.GetAllNames();
             ModelState.Remove("ResumeData.Skills");
+
             if (!ModelState.IsValid)
-            {
                 return Page();
-            }
 
             var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
             if (string.IsNullOrWhiteSpace(userEmail))

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WebReckrytingSystem.Migrations
 {
     /// <inheritdoc />
-    public partial class initialcrea : Migration
+    public partial class inittt : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -149,6 +149,21 @@ namespace WebReckrytingSystem.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "specialties",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    name = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_specialties", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "users",
                 columns: table => new
                 {
@@ -243,17 +258,12 @@ namespace WebReckrytingSystem.Migrations
                     requirements = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     salary_from = table.Column<int>(type: "int", nullable: true),
-                    salary_to = table.Column<int>(type: "int", nullable: true),
                     employment_type = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     work_schedule = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     work_hours_per_day = table.Column<int>(type: "int", nullable: true),
                     work_format = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    salary_period = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    payment_frequency = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     specialty = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -322,6 +332,12 @@ namespace WebReckrytingSystem.Migrations
                 columns: new[] { "vacancy_company_name", "vacancy_title" });
 
             migrationBuilder.CreateIndex(
+                name: "IX_specialties_name",
+                table: "specialties",
+                column: "name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_users_company_name",
                 table: "users",
                 column: "company_name");
@@ -355,6 +371,9 @@ namespace WebReckrytingSystem.Migrations
 
             migrationBuilder.DropTable(
                 name: "saved_vacancies");
+
+            migrationBuilder.DropTable(
+                name: "specialties");
 
             migrationBuilder.DropTable(
                 name: "vacancies");

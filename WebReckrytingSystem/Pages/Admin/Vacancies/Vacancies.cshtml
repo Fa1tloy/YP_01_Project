@@ -51,11 +51,7 @@
                             <td><strong>@vacancy.Title</strong></td>
                             <td>@vacancy.CompanyName</td>
                             <td>
-                                @if (vacancy.SalaryFrom.HasValue && vacancy.SalaryTo.HasValue)
-                                {
-                                    <text>@vacancy.SalaryFrom.Value.ToString("N0") – @vacancy.SalaryTo.Value.ToString("N0") ₽</text>
-                                }
-                                else if (vacancy.SalaryFrom.HasValue)
+                                @if (vacancy.SalaryFrom.HasValue)
                                 {
                                     <text>от @vacancy.SalaryFrom.Value.ToString("N0") ₽</text>
                                 }
@@ -94,7 +90,24 @@
         {
             <nav aria-label="Page navigation">
                 <ul class="pagination justify-content-center">
-                    <!-- ... пагинация ... -->
+                    @if (Model.Vacancies.HasPreviousPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-route-page="@(Model.Vacancies.Page - 1)">Назад</a>
+                        </li>
+                    }
+                    @for (int i = 1; i <= Model.Vacancies.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.Vacancies.Page ? "active" : "")">
+                            <a class="page-link" asp-route-page="@i">@i</a>
+                        </li>
+                    }
+                    @if (Model.Vacancies.HasNextPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-route-page="@(Model.Vacancies.Page + 1)">Вперед</a>
+                        </li>
+                    }
                 </ul>
             </nav>
         }

@@ -1,5 +1,6 @@
 @page
 @model WebReckrytingSystem.Pages.Admin.VacancyDetailsModel
+@using WebReckrytingSystem.Helpers
 @{
     ViewData["Title"] = "Детали вакансии";
     Layout = "_AdminLayout";
@@ -17,19 +18,77 @@ else
             <span class="badge bg-secondary">@Model.Vacancy.CompanyName</span>
         </div>
         <div class="card-body">
-            <p><strong>Автор:</strong> @Model.Vacancy.AuthorEmail</p>
-            <p><strong>Регион:</strong> @Model.Vacancy.Region</p>
-            <p><strong>Занятость:</strong> @Model.Vacancy.EmploymentType</p>
-            <p><strong>График:</strong> @Model.Vacancy.WorkSchedule</p>
-            <p><strong>Описание:</strong><br/>@Model.Vacancy.Description</p>
-            <p><strong>Требования:</strong><br/>@Model.Vacancy.Requirements</p>
+            <div class="row mb-4">
+                <div class="col-md-3 text-center">
+                    <img src="@(Model.Vacancy.Company?.LogoUrl ?? "/images/rabotodatel.jpg")"
+                         alt="Логотип @Model.Vacancy.CompanyName"
+                         class="img-thumbnail rounded-3 mb-3"
+                         style="max-width: 150px; max-height: 150px; object-fit: contain;" />
+                    <br />
+                    <a asp-page="/Vacancy/Details"
+                           asp-route-companyName="@Model.Vacancy.CompanyName"
+                           asp-route-title="@Model.Vacancy.Title"
+                           target="_blank"
+                           class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-external-link-alt me-1"></i> Посмотреть как соискатель
+                    </a>
+                </div>
+                <div class="col-md-9">
+                    <table class="table table-sm table-borderless">
+                        <tr><td class="text-muted">Автор:</td><td>@Model.Vacancy.AuthorEmail</td></tr>
+                        <tr><td class="text-muted">Регион:</td><td>@Model.Vacancy.Region</td></tr>
+                        <tr><td class="text-muted">Тип занятости:</td><td>@ViewHelper.GetEmploymentTypeDisplay(Model.Vacancy.EmploymentType)</td></tr>
+                        <tr><td class="text-muted">График работы:</td><td>@ViewHelper.GetWorkScheduleDisplay(Model.Vacancy.WorkSchedule)</td></tr>
+                        @if (Model.Vacancy.SalaryFrom.HasValue)
+                        {
+                            <tr><td class="text-muted">Зарплата от:</td><td>@Model.Vacancy.SalaryFrom.Value.ToString("N0") ₽</td></tr>
+                        }
+                        else
+                        {
+                            <tr><td class="text-muted">Зарплата:</td><td>Не указана</td></tr>
+                        }
+                        @if (Model.Vacancy.WorkHoursPerDay.HasValue)
+                        {
+                            <tr><td class="text-muted">Рабочие часы в день:</td><td>@Model.Vacancy.WorkHoursPerDay ч</td></tr>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.Vacancy.WorkFormat))
+                        {
+                            <tr><td class="text-muted">Формат работы:</td><td>@GetWorkFormatDisplay(Model.Vacancy.WorkFormat)</td></tr>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.Vacancy.Specialty))
+                        {
+                            <tr><td class="text-muted">Специальность:</td><td>@Model.Vacancy.Specialty</td></tr>
+                        }
+                    </table>
+                </div>
+            </div>
 
-            <div class="d-flex gap-2">
-                <a asp-page="/Admin/VacancyEdit" asp-route-companyName="@Model.Vacancy.CompanyName" asp-route-title="@Model.Vacancy.Title" class="btn btn-warning">
+            <h6 class="fw-bold">Описание</h6>
+            <p class="text-secondary">@Model.Vacancy.Description</p>
+
+            <h6 class="fw-bold">Требования</h6>
+            <p class="text-secondary">@Model.Vacancy.Requirements</p>
+
+            <div class="d-flex gap-2 mt-4">
+                <a asp-page="/Admin/VacancyEdit"
+                       asp-route-companyName="@Model.Vacancy.CompanyName"
+                       asp-route-title="@Model.Vacancy.Title"
+                       class="btn btn-warning">
                     <i class="fas fa-edit me-1"></i>Редактировать
                 </a>
                 <a asp-page="/Admin/Vacancies/Vacancies" class="btn btn-outline-secondary">Назад</a>
             </div>
         </div>
     </div>
+}
+
+@functions {
+    string GetWorkFormatDisplay(string workFormat) => workFormat switch
+    {
+        "office" => "В офисе",
+        "remote" => "Удалённо",
+        "travel" => "Разъездной",
+        "hybrid" => "Гибрид",
+        _ => workFormat
+    };
 }

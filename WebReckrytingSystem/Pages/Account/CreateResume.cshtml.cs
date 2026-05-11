@@ -10,17 +10,21 @@ namespace WebReckrytingSystem.Pages.Account
     public class CreateResumeModel : PageModel
     {
         private readonly IResumeService _resumeService;
+        private readonly ISpecialtyService _specialtyService;
         private readonly ILogger<CreateResumeModel> _logger;
 
-        public CreateResumeModel(IResumeService resumeService, ILogger<CreateResumeModel> logger)
+        public CreateResumeModel(IResumeService resumeService,
+                                 ISpecialtyService specialtyService,
+                                 ILogger<CreateResumeModel> logger)
         {
             _resumeService = resumeService;
+            _specialtyService = specialtyService;
             _logger = logger;
         }
 
         [BindProperty]
         public CreateResumeViewModel ResumeData { get; set; } = new();
-        public IReadOnlyList<string> Specialties => SpecialtyCatalog.All;
+        public IReadOnlyList<string> Specialties { get; set; } = new List<string>();
         public IReadOnlyList<string> DriverLicenseCategories => DriverLicenseCategoryCatalog.All;
 
         public string? SuccessMessage { get; set; }
@@ -29,17 +33,18 @@ namespace WebReckrytingSystem.Pages.Account
         public IActionResult OnGet()
         {
             if (User.FindFirst(ClaimTypes.Role)?.Value != "job_seeker")
-            {
                 return RedirectToPage("/AccessDenied");
-            }
+
+            Specialties = _specialtyService.GetAllNames();
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
+            Specialties = _specialtyService.GetAllNames();
+
             _logger.LogInformation("=== НАЧАЛО ОБРАБОТКИ POST ===");
 
-            // Читаем скрытое поле навыков
             var skillsHidden = Request.Form["SkillsHidden"].FirstOrDefault();
             _logger.LogInformation($"Получен SkillsHidden: {skillsHidden}");
 
@@ -95,7 +100,6 @@ namespace WebReckrytingSystem.Pages.Account
             }
         }
 
-        // Методы для AJAX остаются без изменений
         public IActionResult OnPostAddSkill([FromBody] string skill)
         {
             if (string.IsNullOrWhiteSpace(skill))

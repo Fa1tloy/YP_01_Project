@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿// Services/VacancySearchService.cs
+using Microsoft.Extensions.Logging;
 using WebReckrytingSystem.Data;
 using WebReckrytingSystem.Models;
 
@@ -63,12 +64,6 @@ namespace WebReckrytingSystem.Services
             if (model.SalaryFrom.HasValue && model.SalaryFrom < 0)
                 return ServiceResult.Error("Зарплата не может быть отрицательной");
 
-            if (model.SalaryTo.HasValue && model.SalaryTo < 0)
-                return ServiceResult.Error("Зарплата не может быть отрицательной");
-
-            if (model.SalaryFrom.HasValue && model.SalaryTo.HasValue && model.SalaryFrom > model.SalaryTo)
-                return ServiceResult.Error("Зарплата 'от' не может быть больше зарплаты 'до'");
-
             // Валидация типов
             if (!string.IsNullOrEmpty(model.EmploymentType))
             {
@@ -129,17 +124,11 @@ namespace WebReckrytingSystem.Services
                     v.Region.Contains(model.Region, StringComparison.OrdinalIgnoreCase));
             }
 
-            // Фильтр по зарплате
+            // Фильтр по зарплате от (SalaryFrom)
             if (model.SalaryFrom.HasValue)
             {
                 filtered = filtered.Where(v =>
-                    v.SalaryTo >= model.SalaryFrom || v.SalaryFrom >= model.SalaryFrom);
-            }
-
-            if (model.SalaryTo.HasValue)
-            {
-                filtered = filtered.Where(v =>
-                    v.SalaryFrom <= model.SalaryTo || (v.SalaryTo.HasValue && v.SalaryTo <= model.SalaryTo));
+                    v.SalaryFrom >= model.SalaryFrom);
             }
 
             // Фильтр по типу занятости
@@ -230,12 +219,10 @@ namespace WebReckrytingSystem.Services
 
         public ServiceResult<SearchResult<Vacancy>> GetSimilarVacancies(Vacancy vacancy, int count = 5)
         {
-            // Базовая реализация поиска похожих вакансий
             try
             {
                 var allVacancies = _vacancyRepository.GetPublishedVacancies();
 
-                // Исключаем текущую вакансию
                 var similarVacancies = allVacancies
                     .Where(v => v.CompanyName != vacancy.CompanyName || v.Title != vacancy.Title)
                     .Take(count)

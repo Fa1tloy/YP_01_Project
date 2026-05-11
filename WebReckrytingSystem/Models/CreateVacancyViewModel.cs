@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿// Models/CreateVacancyViewModel.cs
+using System.ComponentModel.DataAnnotations;
 
 namespace WebReckrytingSystem.Models
 {
@@ -32,10 +33,6 @@ namespace WebReckrytingSystem.Models
         [Display(Name = "Доход от (руб.)")]
         public int? SalaryFrom { get; set; }
 
-        [Range(0, 9999999, ErrorMessage = "Зарплата должна быть в диапазоне от 0 до 9 999 999")]
-        [Display(Name = "Зарплата до (руб.)")]
-        public int? SalaryTo { get; set; }
-
         [Required(ErrorMessage = "Тип занятости обязателен")]
         [Display(Name = "Тип занятости")]
         public string EmploymentType { get; set; } = string.Empty;
@@ -51,14 +48,6 @@ namespace WebReckrytingSystem.Models
         [Display(Name = "Формат работы")]
         [StringLength(50)]
         public string WorkFormat { get; set; } = string.Empty;
-
-        [Display(Name = "Период дохода")]
-        [StringLength(20)]
-        public string SalaryPeriod { get; set; } = string.Empty;
-
-        [Display(Name = "Частота выплат")]
-        [StringLength(50)]
-        public string PaymentFrequency { get; set; } = string.Empty;
 
         [Display(Name = "Специальность")]
         [StringLength(255)]

@@ -1,17 +1,21 @@
+// Pages/Resume/Search.cshtml.cs
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using WebReckrytingSystem.Models;
+using WebReckrytingSystem.Services;
 
 namespace WebReckrytingSystem.Pages.Resume
 {
     public class SearchModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly ISpecialtyService _specialtyService;
 
-        public SearchModel(ApplicationDbContext context)
+        public SearchModel(ApplicationDbContext context, ISpecialtyService specialtyService)
         {
             _context = context;
+            _specialtyService = specialtyService;
         }
 
         [BindProperty(SupportsGet = true)]
@@ -58,7 +62,8 @@ namespace WebReckrytingSystem.Pages.Resume
 
         [BindProperty(SupportsGet = true)]
         public List<string> DriverLicenseCategories { get; set; } = new();
-        public IReadOnlyList<string> Specialties => SpecialtyCatalog.All;
+
+        public IReadOnlyList<string> Specialties => _specialtyService.GetAllNames();
         public IReadOnlyList<string> AvailableDriverLicenseCategories => DriverLicenseCategoryCatalog.All;
 
         public List<Models.Resume> Resumes { get; set; } = new();
@@ -84,7 +89,6 @@ namespace WebReckrytingSystem.Pages.Resume
             {
                 query = query.Where(r => r.Specialty == Specialty);
             }
-
 
             if (!string.IsNullOrWhiteSpace(City))
             {
@@ -126,7 +130,6 @@ namespace WebReckrytingSystem.Pages.Resume
                 query = query.Where(r => r.Skills != null && r.Skills.Contains(Skills));
             }
 
-
             if (!string.IsNullOrWhiteSpace(Gender))
             {
                 query = query.Where(r => r.Gender == Gender);
@@ -141,7 +144,6 @@ namespace WebReckrytingSystem.Pages.Resume
             {
                 query = query.Where(r => r.SalaryExpectations.HasValue && r.SalaryExpectations <= SalaryExpectationsTo);
             }
-
 
             if (!string.IsNullOrWhiteSpace(HasCar))
             {

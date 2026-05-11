@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.WebUtilities; // Для QueryBuilder
+using Microsoft.AspNetCore.WebUtilities;
 using WebReckrytingSystem.Models;
 using WebReckrytingSystem.Services;
 
@@ -10,11 +10,15 @@ namespace WebReckrytingSystem.Pages.Vacancy
     public class SearchModel : PageModel
     {
         private readonly IVacancySearchService _vacancySearchService;
+        private readonly ISpecialtyService _specialtyService;
         private readonly ILogger<SearchModel> _logger;
 
-        public SearchModel(IVacancySearchService vacancySearchService, ILogger<SearchModel> logger)
+        public SearchModel(IVacancySearchService vacancySearchService,
+                           ISpecialtyService specialtyService,
+                           ILogger<SearchModel> logger)
         {
             _vacancySearchService = vacancySearchService ?? throw new ArgumentNullException(nameof(vacancySearchService));
+            _specialtyService = specialtyService ?? throw new ArgumentNullException(nameof(specialtyService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -22,16 +26,18 @@ namespace WebReckrytingSystem.Pages.Vacancy
         public SearchVacancyViewModel SearchData { get; set; } = new() { Page = 1, PageSize = 10 };
 
         public SearchResult<WebReckrytingSystem.Models.Vacancy> SearchResult { get; set; } = new();
+        public IReadOnlyList<string> Specialties { get; set; } = new List<string>();
         public string SuccessMessage { get; set; } = string.Empty;
         public string ErrorMessage { get; set; } = string.Empty;
 
         public async Task<IActionResult> OnGetAsync()
         {
+            Specialties = _specialtyService.GetAllNames();
+
             try
             {
                 _logger.LogInformation("🎯 Поиск вакансий: Запрос с параметрами {@SearchData}", SearchData);
 
-                // Всегда выполняем поиск - даже без параметров показываем все вакансии
                 var result = _vacancySearchService.SearchVacancies(SearchData);
 
                 if (result.IsSuccess && result.Data != null)
@@ -45,8 +51,6 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 {
                     ErrorMessage = result.Message;
                     _logger.LogWarning("⚠️ Поиск не дал результатов: {Message}", ErrorMessage);
-
-                    // Возвращаем пустой результат, чтобы страница не падала
                     SearchResult = CreateEmptyResult();
                 }
 
@@ -63,6 +67,8 @@ namespace WebReckrytingSystem.Pages.Vacancy
 
         public IActionResult OnPost()
         {
+            Specialties = _specialtyService.GetAllNames();
+
             if (!ModelState.IsValid)
             {
                 _logger.LogWarning("⚠️ Форма поиска не валидна");
@@ -74,13 +80,11 @@ namespace WebReckrytingSystem.Pages.Vacancy
             {
                 _logger.LogInformation("📝 Пользователь ищет: {@SearchData}", SearchData);
 
-                // Строим query string
                 var query = new QueryBuilder();
                 AddIfNotEmpty(query, "Keywords", SearchData.Keywords);
                 AddIfNotEmpty(query, "CompanyName", SearchData.CompanyName);
                 AddIfNotEmpty(query, "Region", SearchData.Region);
                 AddIfNotNull(query, "SalaryFrom", SearchData.SalaryFrom);
-                AddIfNotNull(query, "SalaryTo", SearchData.SalaryTo);
                 AddIfNotEmpty(query, "EmploymentType", SearchData.EmploymentType);
                 AddIfNotEmpty(query, "WorkSchedule", SearchData.WorkSchedule);
                 AddIfNotNull(query, "WorkHoursPerDay", SearchData.WorkHoursPerDay);
@@ -102,7 +106,6 @@ namespace WebReckrytingSystem.Pages.Vacancy
             }
         }
 
-        // Вспомогательные методы
         private void AddIfNotEmpty(QueryBuilder query, string key, string? value)
         {
             if (!string.IsNullOrWhiteSpace(value))
@@ -123,7 +126,6 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 TotalCount = 0,
                 Page = SearchData.Page,
                 PageSize = SearchData.PageSize
-                // TotalPages, HasPreviousPage, HasNextPage вычисляются сами!
             };
         }
     }

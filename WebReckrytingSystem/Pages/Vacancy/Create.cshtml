@@ -17,7 +17,6 @@
 
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-pill @(ViewData.ModelState.ErrorCount > 0 ? "" : "d-none")"></div>
 
-
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <label asp-for="VacancyData.Region" class="form-label fw-600">Регион</label>
@@ -84,16 +83,11 @@
                                 </select>
                             </div>
 
+                            <!-- Только "Доход от" -->
                             <div class="col-md-6">
                                 <label asp-for="VacancyData.SalaryFrom" class="form-label fw-600">Доход от (₽)</label>
                                 <input asp-for="VacancyData.SalaryFrom" type="number" class="form-control rounded-pill" min="0" max="9999999" placeholder="60000" />
                                 <span asp-validation-for="VacancyData.SalaryFrom" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label asp-for="VacancyData.SalaryTo" class="form-label fw-600">Доход до (₽)</label>
-                                <input asp-for="VacancyData.SalaryTo" type="number" class="form-control rounded-pill" min="0" max="9999999" placeholder="90000" />
-                                <span asp-validation-for="VacancyData.SalaryTo" class="text-danger small"></span>
                             </div>
 
                             <div class="col-md-6">

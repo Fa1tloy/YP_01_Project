@@ -120,6 +120,9 @@
                                         </button>
                                     </form>
                                 }
+                                <a asp-page="/Admin/Companies/Edit" asp-route-name="@company.Name" class="btn btn-sm btn-warning" title="Редактировать">
+                                    <i class="fas fa-edit"></i>
+                                </a>
                                 <a asp-page="/Admin/CompanyDetails" asp-route-name="@company.Name" class="btn btn-sm btn-info">
                                     <i class="fas fa-eye"></i>
                                 </a>

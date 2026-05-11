@@ -7,11 +7,13 @@ namespace WebReckrytingSystem.Services
 {
     public class ResumeService : IResumeService
     {
+        private readonly ISpecialtyService _specialtyService;
         private readonly IResumeRepository _resumeRepository;
 
-        public ResumeService(IResumeRepository resumeRepository)
+        public ResumeService(IResumeRepository resumeRepository, ISpecialtyService specialtyService)
         {
             _resumeRepository = resumeRepository;
+            _specialtyService = specialtyService;
         }
 
         public ServiceResult<Resume> CreateResume(string userEmail, CreateResumeViewModel model)
@@ -110,7 +112,7 @@ namespace WebReckrytingSystem.Services
             if (model.Skills.Any(string.IsNullOrWhiteSpace))
                 return ServiceResult.Error("Навык не может быть пустым");
 
-            if (!SpecialtyCatalog.All.Contains(model.Specialty))
+            if (!_specialtyService.GetAllNames().Contains(model.Specialty))
                 return ServiceResult.Error("Выберите специальность из списка");
 
             if (model.DriverLicenseCategories.Any(c => !DriverLicenseCategoryCatalog.All.Contains(c)))

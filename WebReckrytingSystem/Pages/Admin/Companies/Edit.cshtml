@@ -1,0 +1,50 @@
+﻿@page
+@model WebReckrytingSystem.Pages.Admin.Companies.EditModel
+@{
+    ViewData["Title"] = "Редактирование компании";
+    Layout = "_AdminLayout";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-warning text-white">
+        <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Редактирование компании</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger @(ViewData.ModelState.ErrorCount > 0 ? "" : "d-none")"></div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Название</label>
+                <input asp-for="Company.Name" class="form-control" disabled />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Company.Description" class="form-label fw-bold">Описание</label>
+                <textarea asp-for="Company.Description" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Company.Description" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Company.Website" class="form-label fw-bold">Веб-сайт</label>
+                <input asp-for="Company.Website" class="form-control" placeholder="https://example.com" />
+                <span asp-validation-for="Company.Website" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3 form-check">
+                <input asp-for="Company.Verified" class="form-check-input" />
+                <label asp-for="Company.Verified" class="form-check-label fw-bold">Верифицирована</label>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-warning">
+                    <i class="fas fa-save me-1"></i> Сохранить
+                </button>
+                <a asp-page="/Admin/Companies/Companies" class="btn btn-outline-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

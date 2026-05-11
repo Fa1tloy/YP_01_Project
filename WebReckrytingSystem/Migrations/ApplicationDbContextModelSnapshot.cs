@@ -464,6 +464,28 @@ namespace WebReckrytingSystem.Migrations
                     b.ToTable("saved_vacancies", (string)null);
                 });
 
+            modelBuilder.Entity("WebReckrytingSystem.Models.Specialty", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("specialties", (string)null);
+                });
+
             modelBuilder.Entity("WebReckrytingSystem.Models.User", b =>
                 {
                     b.Property<string>("Email")
@@ -540,12 +562,6 @@ namespace WebReckrytingSystem.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("employment_type");
 
-                    b.Property<string>("PaymentFrequency")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("payment_frequency");
-
                     b.Property<string>("Region")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -560,16 +576,6 @@ namespace WebReckrytingSystem.Migrations
                     b.Property<int?>("SalaryFrom")
                         .HasColumnType("int")
                         .HasColumnName("salary_from");
-
-                    b.Property<string>("SalaryPeriod")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("salary_period");
-
-                    b.Property<int?>("SalaryTo")
-                        .HasColumnType("int")
-                        .HasColumnName("salary_to");
 
                     b.Property<string>("Specialty")
                         .IsRequired()

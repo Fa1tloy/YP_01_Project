@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿// Services/VacancyService.cs
+using Microsoft.Extensions.Logging;
 using WebReckrytingSystem.Data;
 using WebReckrytingSystem.Models;
 
@@ -23,7 +24,6 @@ namespace WebReckrytingSystem.Services
             _userRepository = userRepository;
             _companyService = companyService;
             _logger = logger;
-      
         }
 
         public ServiceResult<Vacancy> CreateVacancy(string authorEmail, CreateVacancyViewModel model)
@@ -76,13 +76,10 @@ namespace WebReckrytingSystem.Services
                     Description = model.Description.Trim(),
                     Requirements = model.Requirements.Trim(),
                     SalaryFrom = model.SalaryFrom,
-                    SalaryTo = model.SalaryTo,
                     EmploymentType = model.EmploymentType,
                     WorkSchedule = model.WorkSchedule,
                     WorkHoursPerDay = model.WorkHoursPerDay,
                     WorkFormat = model.WorkFormat.Trim(),
-                    SalaryPeriod = model.SalaryPeriod.Trim(),
-                    PaymentFrequency = model.PaymentFrequency.Trim(),
                     Specialty = model.Specialty.Trim(),
                     AuthorEmail = authorEmail
                 };
@@ -113,14 +110,8 @@ namespace WebReckrytingSystem.Services
                 return ServiceResult.Error("Требования к кандидату обязательны");
 
             // Валидация зарплаты
-            if (model.SalaryFrom.HasValue && model.SalaryTo.HasValue)
-            {
-                if (model.SalaryFrom.Value > model.SalaryTo.Value)
-                    return ServiceResult.Error("Зарплата 'от' не может быть больше зарплаты 'до'");
-
-                if (model.SalaryFrom.Value < 0 || model.SalaryTo.Value < 0)
-                    return ServiceResult.Error("Зарплата не может быть отрицательной");
-            }
+            if (model.SalaryFrom.HasValue && model.SalaryFrom.Value < 0)
+                return ServiceResult.Error("Зарплата не может быть отрицательной");
 
             // Валидация типов
             var validEmploymentTypes = new[] { "full", "part", "project", "internship" };
@@ -129,24 +120,15 @@ namespace WebReckrytingSystem.Services
 
             var validWorkSchedules = new[] { "full_day", "shifts", "flexible", "remote", "shift_work" };
             var validWorkFormats = new[] { "office", "remote", "travel", "hybrid" };
-            var validSalaryPeriods = new[] { "month", "hour", "shift", "service", "rotation" };
-            var validPaymentFrequencies = new[] { "weekly", "biweekly", "monthly", "after_shift", "contract" };
             if (!validWorkSchedules.Contains(model.WorkSchedule))
                 return ServiceResult.Error("Недопустимый график работы");
 
             if (!string.IsNullOrWhiteSpace(model.WorkFormat) && !validWorkFormats.Contains(model.WorkFormat))
                 return ServiceResult.Error("Недопустимый формат работы");
 
-            if (!string.IsNullOrWhiteSpace(model.SalaryPeriod) && !validSalaryPeriods.Contains(model.SalaryPeriod))
-                return ServiceResult.Error("Недопустимый период дохода");
-
-            if (!string.IsNullOrWhiteSpace(model.PaymentFrequency) && !validPaymentFrequencies.Contains(model.PaymentFrequency))
-                return ServiceResult.Error("Недопустимая частота выплат");
-
             return ServiceResult.Success("Валидация пройдена");
         }
 
-        // VacancyService.cs - добавляю метод UpdateVacancy
         public ServiceResult<Vacancy> UpdateVacancy(string companyName, string title, string userEmail, CreateVacancyViewModel model)
         {
             _logger.LogInformation($"Обновление вакансии: {companyName} - {title} пользователем: {userEmail}");
@@ -204,13 +186,10 @@ namespace WebReckrytingSystem.Services
                 existingVacancy.Description = model.Description.Trim();
                 existingVacancy.Requirements = model.Requirements.Trim();
                 existingVacancy.SalaryFrom = model.SalaryFrom;
-                existingVacancy.SalaryTo = model.SalaryTo;
                 existingVacancy.EmploymentType = model.EmploymentType;
                 existingVacancy.WorkSchedule = model.WorkSchedule;
                 existingVacancy.WorkHoursPerDay = model.WorkHoursPerDay;
                 existingVacancy.WorkFormat = model.WorkFormat.Trim();
-                existingVacancy.SalaryPeriod = model.SalaryPeriod.Trim();
-                existingVacancy.PaymentFrequency = model.PaymentFrequency.Trim();
                 existingVacancy.Specialty = model.Specialty.Trim();
 
                 _logger.LogInformation("Сохранение обновленной вакансии в репозиторий");
@@ -226,7 +205,6 @@ namespace WebReckrytingSystem.Services
             }
         }
 
-        // Уже существующий метод GetVacancy - убедимся что он есть
         public Vacancy? GetVacancy(string companyName, string title)
         {
             return _vacancyRepository.GetByCompanyAndTitle(companyName, title);

@@ -6,7 +6,6 @@
 }
 
 <div class="container py-5" style="padding-top: 104px !important;">
-    <!-- КНОПКА НАЗАД С ОТСТУПОМ -->
     <div class="mb-4" style="margin-top: 20px;">
         <a href="javascript:history.back()" class="btn btn-outline-secondary rounded-pill px-4" id="backButton">
             <i class="fas fa-arrow-left me-2"></i>Назад
@@ -35,11 +34,10 @@
     else
     {
         <div class="card border-0 shadow-lg">
-            <!-- ШАПКА С ЛОГОТИПОМ -->
             <div class="card-header bg-white border-0 pt-4 px-4">
                 <div class="d-flex align-items-center gap-3">
-                    <img src="@(string.IsNullOrWhiteSpace(Model.Vacancy.Author?.AvatarUrl) ? "/images/rabotodatel.jpg" : Model.Vacancy.Author.AvatarUrl)"
-                         alt="Аватар администратора вакансии @Model.Vacancy.CompanyName"
+                    <img src="@(Model.Vacancy.Company?.LogoUrl ?? "/images/rabotodatel.jpg")"
+                         alt="Логотип @Model.Vacancy.CompanyName"
                          class="rounded-circle border"
                          style="width: 80px; height: 80px; object-fit: cover; background-color: #f8f9fa;">
                     <div>
@@ -58,27 +56,16 @@
             </div>
 
             <div class="card-body p-4">
-                <!-- СЕТКА С ИНФОРМАЦИЕЙ -->
                 <div class="row g-4">
-                    <!-- ЛЕВАЯ КОЛОНКА - ОСНОВНАЯ ИНФОРМАЦИЯ -->
                     <div class="col-lg-8">
-                        <!-- ЗАРПЛАТА -->
                         <div class="bg-light rounded-4 p-4 mb-4">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
                                     <span class="text-muted small">Зарплата</span>
                                     <h2 class="text-success fw-bold mb-0">
-                                        @if (Model.Vacancy.SalaryFrom.HasValue && Model.Vacancy.SalaryTo.HasValue)
-                                        {
-                                            @:@Model.Vacancy.SalaryFrom.Value.ToString("N0") – @Model.Vacancy.SalaryTo.Value.ToString("N0") ₽
-                                        }
-                                        else if (Model.Vacancy.SalaryFrom.HasValue)
+                                        @if (Model.Vacancy.SalaryFrom.HasValue)
                                         {
                                             @:от @Model.Vacancy.SalaryFrom.Value.ToString("N0") ₽
-                                        }
-                                        else if (Model.Vacancy.SalaryTo.HasValue)
-                                        {
-                                            @:до @Model.Vacancy.SalaryTo.Value.ToString("N0") ₽
                                         }
                                         else
                                         {
@@ -89,7 +76,6 @@
                             </div>
                         </div>
 
-                        <!-- ОПИСАНИЕ -->
                         <div class="mb-5">
                             <h5 class="fw-bold mb-3">
                                 <i class="fas fa-align-left text-primary me-2"></i>Описание вакансии
@@ -97,7 +83,6 @@
                             <div class="text-secondary" style="white-space: pre-line;">@Model.Vacancy.Description</div>
                         </div>
 
-                        <!-- ТРЕБОВАНИЯ -->
                         <div class="mb-5">
                             <h5 class="fw-bold mb-3">
                                 <i class="fas fa-clipboard-check text-primary me-2"></i>Требования к кандидату
@@ -106,7 +91,6 @@
                         </div>
                     </div>
 
-                    <!-- ПРАВАЯ КОЛОНКА - ДЕТАЛИ -->
                     <div class="col-lg-4">
                         <div class="card border-0 bg-light rounded-4 sticky-top" style="top: 100px;">
                             <div class="card-body p-4">
@@ -115,7 +99,6 @@
                                 </h5>
 
                                 <div class="vstack gap-3">
-                                    <!-- Тип занятости -->
                                     <div class="d-flex align-items-center">
                                         <div class="bg-white p-2 rounded-3 me-3" style="width: 40px; height: 40px;">
                                             <i class="fas fa-clock text-primary"></i>
@@ -136,7 +119,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- График работы -->
                                     <div class="d-flex align-items-center">
                                         <div class="bg-white p-2 rounded-3 me-3" style="width: 40px; height: 40px;">
                                             <i class="fas fa-calendar-alt text-primary"></i>
@@ -157,7 +139,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Часы в день -->
                                     @if (Model.Vacancy.WorkHoursPerDay.HasValue)
                                     {
                                         <div class="d-flex align-items-center">
@@ -171,7 +152,6 @@
                                         </div>
                                     }
 
-                                    <!-- Формат работы -->
                                     @if (!string.IsNullOrWhiteSpace(Model.Vacancy.WorkFormat))
                                     {
                                         <div class="d-flex align-items-center">
@@ -194,7 +174,6 @@
                                         </div>
                                     }
 
-                                    <!-- Регион -->
                                     @if (!string.IsNullOrWhiteSpace(Model.Vacancy.Region))
                                     {
                                         <div class="d-flex align-items-center">
@@ -208,7 +187,6 @@
                                         </div>
                                     }
 
-                                    <!-- Специальность -->
                                     @if (!string.IsNullOrWhiteSpace(Model.Vacancy.Specialty))
                                     {
                                         <div class="d-flex align-items-center">
@@ -223,37 +201,29 @@
                                     }
                                 </div>
 
-                                <hr class="my-4">
-
-                                <!-- КОНТАКТЫ -->
-                                <h5 class="fw-bold mb-3">
-                                    <i class="fas fa-address-card me-2 text-primary"></i>Контакты администратора
-                                </h5>
-
-                                <div class="vstack gap-2">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-envelope text-primary me-3" style="width: 20px;"></i>
-                                        <a href="mailto:@Model.Vacancy.AuthorEmail" class="text-decoration-none">@Model.Vacancy.AuthorEmail</a>
-                                    </div>
-
-                                    @if (!string.IsNullOrWhiteSpace(Model.Vacancy.Company?.Website))
-                                    {
+                                <!-- САЙТ КОМПАНИИ (отображается только если сайт указан) -->
+                                @if (!string.IsNullOrWhiteSpace(Model.Vacancy.Company?.Website))
+                                {
+                                    <hr class="my-4">
+                                    <h5 class="fw-bold mb-3">
+                                        <i class="fas fa-globe me-2 text-primary"></i>Сайт компании
+                                    </h5>
+                                    <div class="vstack gap-2">
                                         <div class="d-flex align-items-center">
                                             <i class="fas fa-globe text-primary me-3" style="width: 20px;"></i>
                                             <a href="@Model.Vacancy.Company.Website" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
                                                 @Model.Vacancy.Company.Website
                                             </a>
                                         </div>
-                                    }
-                                </div>
+                                    </div>
+                                }
 
-                                <!-- ДЕЙСТВИЯ -->
                                 <hr class="my-4">
 
+                                <!-- ДЕЙСТВИЯ -->
                                 <div class="vstack gap-2">
                                     @if (User.Identity?.IsAuthenticated == true && User.IsInRole("job_seeker"))
                                     {
-                                        <!-- Кнопка отклика -->
                                         <form method="post" asp-page-handler="Apply" class="w-100">
                                             <input type="hidden" name="companyName" value="@Model.Vacancy.CompanyName" />
                                             <input type="hidden" name="title" value="@Model.Vacancy.Title" />
@@ -262,7 +232,6 @@
                                             </button>
                                         </form>
 
-                                        <!-- Кнопка избранного -->
                                         <form method="post" asp-page-handler="SaveVacancy" class="w-100">
                                             <input type="hidden" name="companyName" value="@Model.Vacancy.CompanyName" />
                                             <input type="hidden" name="title" value="@Model.Vacancy.Title" />
@@ -272,11 +241,10 @@
                                             </button>
                                         </form>
 
-                                        <!-- Кнопка чата (если уже есть диалог) -->
                                         @if (Model.HasExistingChat)
                                         {
                                             <a href="/Account/Chat?peer=@Model.Vacancy.AuthorEmail&companyName=@Model.Vacancy.CompanyName&title=@Model.Vacancy.Title"
-                                               class="btn btn-outline-primary w-100 py-3 mt-2">
+                                                   class="btn btn-outline-primary w-100 py-3 mt-2">
                                                 <i class="fas fa-comment me-2"></i>Перейти в чат
                                             </a>
                                         }
@@ -289,11 +257,10 @@
                                     }
                                     else if (User.IsInRole("employer") && User.FindFirstValue(ClaimTypes.Email) == Model.Vacancy.AuthorEmail)
                                     {
-                                        <!-- Кнопка редактирования для автора вакансии -->
                                         <a asp-page="/Vacancy/Edit"
-                                           asp-route-companyName="@Model.Vacancy.CompanyName"
-                                           asp-route-title="@Model.Vacancy.Title"
-                                           class="btn btn-outline-primary w-100 py-3">
+                                               asp-route-companyName="@Model.Vacancy.CompanyName"
+                                               asp-route-title="@Model.Vacancy.Title"
+                                               class="btn btn-outline-primary w-100 py-3">
                                             <i class="fas fa-edit me-2"></i>Редактировать вакансию
                                         </a>
                                     }
@@ -303,7 +270,6 @@
                     </div>
                 </div>
 
-                <!-- ИНФОРМАЦИЯ О КОМПАНИИ -->
                 @if (Model.Vacancy.Company != null)
                 {
                     <div class="mt-5">
@@ -331,7 +297,6 @@
 
 @section Scripts {
     <script>
-        // Автоматическое скрытие уведомлений через 5 секунд
         setTimeout(() => {
             const alerts = document.querySelectorAll('.alert-info');
             alerts.forEach(alert => {
@@ -340,7 +305,6 @@
             });
         }, 5000);
 
-        // Альтернативная кнопка назад, если history.back() не сработает
         document.getElementById('backButton')?.addEventListener('click', function (e) {
             if (document.referrer === '') {
                 e.preventDefault();

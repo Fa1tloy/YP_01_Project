@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿// Models/Vacancy.cs
+using System.ComponentModel.DataAnnotations;
 
 namespace WebReckrytingSystem.Models
 {
@@ -23,8 +24,6 @@ namespace WebReckrytingSystem.Models
 
         public int? SalaryFrom { get; set; }
 
-        public int? SalaryTo { get; set; }
-
         [Required]
         public string EmploymentType { get; set; } = string.Empty;
 
@@ -35,12 +34,6 @@ namespace WebReckrytingSystem.Models
 
         [StringLength(50)]
         public string WorkFormat { get; set; } = string.Empty;
-
-        [StringLength(20)]
-        public string SalaryPeriod { get; set; } = string.Empty;
-
-        [StringLength(50)]
-        public string PaymentFrequency { get; set; } = string.Empty;
 
         [StringLength(255)]
         public string Specialty { get; set; } = string.Empty;

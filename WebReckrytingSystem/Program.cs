@@ -1,3 +1,4 @@
+// Program.cs (только EnsureSchemaColumns скорректирован)
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 using WebReckrytingSystem.Models;
@@ -7,30 +8,27 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         new MySqlServerVersion(new Version(8, 0, 21))
     ));
 
-// 2. ВСЕ репозитории
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IVacancyRepository, VacancyRepository>();
 builder.Services.AddScoped<IResumeRepository, ResumeRepository>();
-builder.Services.AddScoped<IResumeService, ResumeService>(); // ✅ ДОБАВЛЕНО!
+builder.Services.AddScoped<IResumeService, ResumeService>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 
-// 3. ВСЕ сервисы
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IVacancyService, VacancyService>();
 builder.Services.AddScoped<AdminService>();
 builder.Services.AddScoped<IAdminService>(sp => sp.GetRequiredService<AdminService>());
 builder.Services.AddScoped<IVacancySearchService, VacancySearchService>();
+builder.Services.AddScoped<ISpecialtyService, SpecialtyService>();
 
-// 4. Авторизация и аутентификация
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options => {
         options.LoginPath = "/Account/Login";
@@ -38,7 +36,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 builder.Services.AddAuthorization();
 
-// 5. Razor Pages и Controllers (для AJAX)
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
 
@@ -46,7 +43,6 @@ var app = builder.Build();
 
 EnsureDatabaseCreated(app);
 
-// 6. Конвейер HTTP
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -59,7 +55,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// 7. Маршруты
 app.MapRazorPages();
 app.MapControllers();
 
@@ -81,10 +76,8 @@ static void EnsureDatabaseCreated(WebApplication app)
         {
             Database = string.Empty
         };
-
         using var serverConnection = new MySqlConnection(serverConnectionBuilder.ConnectionString);
         serverConnection.Open();
-
         using var command = serverConnection.CreateCommand();
         command.CommandText = $"CREATE DATABASE IF NOT EXISTS `{databaseName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
         command.ExecuteNonQuery();
@@ -101,6 +94,7 @@ static void EnsureSchemaColumns(string connectionString)
     using var connection = new MySqlConnection(connectionString);
     connection.Open();
 
+    // таблицы notifications, chat_messages, companies, vacancies (без salary_to, salary_period, payment_frequency)
     EnsureTableExists(connection, "notifications", @"`id` INT NOT NULL AUTO_INCREMENT,
 `recipient_email` VARCHAR(255) NOT NULL,
 `sender_email` VARCHAR(255) NOT NULL,
@@ -109,7 +103,7 @@ static void EnsureSchemaColumns(string connectionString)
 `link` VARCHAR(500) NULL,
 `is_read` TINYINT(1) NOT NULL DEFAULT 0,
 `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-PRIMARY KEY (`id`)" );
+PRIMARY KEY (`id`)");
 
     EnsureTableExists(connection, "chat_messages", @"`id` INT NOT NULL AUTO_INCREMENT,
 `sender_email` VARCHAR(255) NOT NULL,
@@ -119,14 +113,14 @@ PRIMARY KEY (`id`)" );
 `vacancy_title` VARCHAR(255) NULL,
 `sent_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 `is_read` TINYINT(1) NOT NULL DEFAULT 0,
-PRIMARY KEY (`id`)" );
+PRIMARY KEY (`id`)");
 
     EnsureTableExists(connection, "companies", @"`name` VARCHAR(255) NOT NULL,
 `description` TEXT NULL,
 `website` TEXT NULL,
 `logo_url` TEXT NULL,
 `verified` TINYINT(1) NOT NULL DEFAULT 0,
-PRIMARY KEY (`name`)" );
+PRIMARY KEY (`name`)");
 
     EnsureTableExists(connection, "vacancies", @"`company_name` VARCHAR(255) NOT NULL,
 `title` VARCHAR(255) NOT NULL,
@@ -134,17 +128,20 @@ PRIMARY KEY (`name`)" );
 `description` TEXT NOT NULL,
 `requirements` TEXT NOT NULL,
 `salary_from` INT NULL,
-`salary_to` INT NULL,
 `employment_type` VARCHAR(50) NOT NULL,
 `work_schedule` VARCHAR(50) NOT NULL,
 `work_hours_per_day` INT NULL,
 `work_format` VARCHAR(50) NOT NULL DEFAULT '',
-`salary_period` VARCHAR(20) NOT NULL DEFAULT '',
-`payment_frequency` VARCHAR(50) NOT NULL DEFAULT '',
 `specialty` VARCHAR(255) NOT NULL DEFAULT '',
 `author_email` VARCHAR(255) NOT NULL,
-PRIMARY KEY (`company_name`, `title`)" );
+PRIMARY KEY (`company_name`, `title`)");
 
+    EnsureTableExists(connection, "specialties", @"`id` INT NOT NULL AUTO_INCREMENT,
+`name` VARCHAR(255) NOT NULL,
+PRIMARY KEY (`id`),
+UNIQUE INDEX `uq_specialties_name` (`name`)");
+
+    // Добавляем недостающие столбцы для других таблиц (без изменений)
     EnsureColumnExists(connection, "companies", "description", "TEXT NULL");
     EnsureColumnExists(connection, "companies", "website", "TEXT NULL");
     EnsureColumnExists(connection, "companies", "logo_url", "TEXT NULL");
@@ -153,9 +150,7 @@ PRIMARY KEY (`company_name`, `title`)" );
     EnsureColumnExists(connection, "vacancies", "region", "VARCHAR(100) NOT NULL DEFAULT ''");
     EnsureColumnExists(connection, "vacancies", "work_hours_per_day", "INT NULL");
     EnsureColumnExists(connection, "vacancies", "work_format", "VARCHAR(50) NOT NULL DEFAULT ''");
-    EnsureColumnExists(connection, "vacancies", "salary_period", "VARCHAR(20) NOT NULL DEFAULT ''");
-    EnsureColumnExists(connection, "vacancies", "payment_frequency", "VARCHAR(50) NOT NULL DEFAULT ''");
-    EnsureColumnExists(connection, "vacancies", "specialty", "VARCHAR(255) NOT NULL DEFAULT ''");
+    // salary_to, salary_period, payment_frequency больше не добавляем
 
     EnsureColumnExists(connection, "users", "company_name", "VARCHAR(255) NULL");
 
@@ -181,19 +176,11 @@ static void EnsureTableExists(MySqlConnection connection, string tableName, stri
 static void EnsureColumnExists(MySqlConnection connection, string tableName, string columnName, string columnDefinition)
 {
     using var existsCommand = connection.CreateCommand();
-    existsCommand.CommandText = @"SELECT COUNT(*)
-                                 FROM information_schema.columns
-                                 WHERE table_schema = DATABASE()
-                                   AND table_name = @tableName
-                                   AND column_name = @columnName;";
+    existsCommand.CommandText = @"SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = @tableName AND column_name = @columnName;";
     existsCommand.Parameters.AddWithValue("@tableName", tableName);
     existsCommand.Parameters.AddWithValue("@columnName", columnName);
-
     var exists = Convert.ToInt32(existsCommand.ExecuteScalar()) > 0;
-    if (exists)
-    {
-        return;
-    }
+    if (exists) return;
 
     using var alterCommand = connection.CreateCommand();
     alterCommand.CommandText = $"ALTER TABLE `{tableName}` ADD COLUMN `{columnName}` {columnDefinition};";

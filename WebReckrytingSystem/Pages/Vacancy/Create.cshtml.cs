@@ -14,14 +14,14 @@ namespace WebReckrytingSystem.Pages.Vacancy
     {
         private readonly IVacancyService _vacancyService;
         private readonly ApplicationDbContext _context;
+        private readonly ISpecialtyService _specialtyService;
         private readonly ILogger<CreateModel> _logger;
 
         [BindProperty]
         public CreateVacancyViewModel VacancyData { get; set; } = new();
 
         public List<SelectListItem> CompanyOptions { get; set; } = new();
-
-        public IReadOnlyList<string> Specialties => SpecialtyCatalog.All;
+        public IReadOnlyList<string> Specialties { get; set; } = new List<string>();
 
         public string? SuccessMessage { get; set; }
         public string? ErrorMessage { get; set; }
@@ -29,10 +29,12 @@ namespace WebReckrytingSystem.Pages.Vacancy
         public CreateModel(
             IVacancyService vacancyService,
             ApplicationDbContext context,
+            ISpecialtyService specialtyService,
             ILogger<CreateModel> logger)
         {
             _vacancyService = vacancyService;
             _context = context;
+            _specialtyService = specialtyService;
             _logger = logger;
         }
 
@@ -43,17 +45,17 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 return RedirectToPage("/Account/Login");
 
             LoadSuggestions();
+            Specialties = _specialtyService.GetAllNames();
             return Page();
         }
 
         public IActionResult OnPost()
         {
             LoadSuggestions();
+            Specialties = _specialtyService.GetAllNames();
 
             if (!ModelState.IsValid)
-            {
                 return Page();
-            }
 
             var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
             if (string.IsNullOrEmpty(userEmail))

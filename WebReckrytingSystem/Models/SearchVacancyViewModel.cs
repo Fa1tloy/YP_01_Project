@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿// Models/SearchVacancyViewModel.cs
+using System.ComponentModel.DataAnnotations;
 
 namespace WebReckrytingSystem.Models
 {
@@ -20,10 +21,6 @@ namespace WebReckrytingSystem.Models
         [Display(Name = "Зарплата от (руб.)")]
         public int? SalaryFrom { get; set; }
 
-        [Range(0, 9999999, ErrorMessage = "Зарплата должна быть в диапазоне от 0 до 9 999 999")]
-        [Display(Name = "Зарплата до (руб.)")]
-        public int? SalaryTo { get; set; }
-
         [Display(Name = "Тип занятости")]
         public string? EmploymentType { get; set; }
 
@@ -36,12 +33,6 @@ namespace WebReckrytingSystem.Models
 
         [Display(Name = "Формат работы")]
         public string? WorkFormat { get; set; }
-
-        [Display(Name = "Период дохода")]
-        public string? SalaryPeriod { get; set; }
-
-        [Display(Name = "Частота выплат")]
-        public string? PaymentFrequency { get; set; }
 
         [Display(Name = "Специальность")]
         public string? Specialty { get; set; }

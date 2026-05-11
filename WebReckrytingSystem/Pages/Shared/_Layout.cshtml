@@ -89,6 +89,11 @@
                                         <li><a class="dropdown-item" href="/Account/Favorites"><i class="fas fa-star me-2"></i>Избранное</a></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li><a class="dropdown-item" href="/Account/Settings"><i class="fas fa-cog me-2"></i>Настройки</a></li>
+                                        @if (isAdmin)
+                                        {
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" href="/Admin/Index"><i class="fas fa-shield-alt me-2"></i>Админ-панель</a></li>
+                                        }
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
                                             <form method="post" asp-page="/Account/Logout">

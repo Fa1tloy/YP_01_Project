@@ -6,20 +6,108 @@
 }
 
 <div class="card shadow-sm">
-    <div class="card-header"><h5 class="mb-0">Редактирование вакансии</h5></div>
+    <div class="card-header bg-warning text-white">
+        <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Редактирование вакансии</h5>
+    </div>
     <div class="card-body">
-        <form method="post">
+        <form method="post" novalidate>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger @(ViewData.ModelState.ErrorCount > 0 ? "" : "d-none")"></div>
+
             <div class="row g-3">
-                <div class="col-md-6"><label asp-for="VacancyData.CompanyName"></label><input asp-for="VacancyData.CompanyName" class="form-control" /></div>
-                <div class="col-md-6"><label asp-for="VacancyData.Title"></label><input asp-for="VacancyData.Title" class="form-control" /></div>
-                <div class="col-md-4"><label asp-for="VacancyData.Region"></label><input asp-for="VacancyData.Region" class="form-control" /></div>
-                <div class="col-md-4"><label asp-for="VacancyData.EmploymentType"></label><input asp-for="VacancyData.EmploymentType" class="form-control" /></div>
-                <div class="col-md-4"><label asp-for="VacancyData.WorkSchedule"></label><input asp-for="VacancyData.WorkSchedule" class="form-control" /></div>
-                <div class="col-md-6"><label asp-for="VacancyData.Description"></label><textarea asp-for="VacancyData.Description" class="form-control" rows="4"></textarea></div>
-                <div class="col-md-6"><label asp-for="VacancyData.Requirements"></label><textarea asp-for="VacancyData.Requirements" class="form-control" rows="4"></textarea></div>
+                <div class="col-md-6">
+                    <label asp-for="VacancyData.CompanyName" class="form-label fw-bold">Компания *</label>
+                    <select asp-for="VacancyData.CompanyName" asp-items="Model.CompanyOptions" class="form-select" required>
+                        <option value="">Выберите компанию</option>
+                    </select>
+                    <span asp-validation-for="VacancyData.CompanyName" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="VacancyData.Title" class="form-label fw-bold">Должность *</label>
+                    <input asp-for="VacancyData.Title" class="form-control" placeholder="Backend-разработчик" required />
+                    <span asp-validation-for="VacancyData.Title" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="VacancyData.Region" class="form-label fw-bold">Регион</label>
+                    <input asp-for="VacancyData.Region" class="form-control" placeholder="Москва" />
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="VacancyData.EmploymentType" class="form-label fw-bold">Тип занятости *</label>
+                    <select asp-for="VacancyData.EmploymentType" class="form-select" required>
+                        <option value="">Выберите тип</option>
+                        <option value="full">Полная</option>
+                        <option value="part">Частичная</option>
+                        <option value="project">Проектная</option>
+                        <option value="internship">Стажировка</option>
+                    </select>
+                    <span asp-validation-for="VacancyData.EmploymentType" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="VacancyData.WorkSchedule" class="form-label fw-bold">График работы *</label>
+                    <select asp-for="VacancyData.WorkSchedule" class="form-select" required>
+                        <option value="">Выберите график</option>
+                        <option value="full_day">Полный день</option>
+                        <option value="shifts">Сменный</option>
+                        <option value="flexible">Гибкий</option>
+                        <option value="remote">Удалённо</option>
+                        <option value="shift_work">Вахта</option>
+                    </select>
+                    <span asp-validation-for="VacancyData.WorkSchedule" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="VacancyData.SalaryFrom" class="form-label fw-bold">Доход от (₽)</label>
+                    <input asp-for="VacancyData.SalaryFrom" type="number" class="form-control" min="0" max="9999999" placeholder="60000" />
+                    <span asp-validation-for="VacancyData.SalaryFrom" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="VacancyData.WorkHoursPerDay" class="form-label fw-bold">Часов в день</label>
+                    <input asp-for="VacancyData.WorkHoursPerDay" type="number" class="form-control" min="1" max="24" placeholder="8" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="VacancyData.WorkFormat" class="form-label fw-bold">Формат работы</label>
+                    <select asp-for="VacancyData.WorkFormat" class="form-select">
+                        <option value="">Выберите формат</option>
+                        <option value="office">Офис</option>
+                        <option value="remote">Удаленно</option>
+                        <option value="travel">Разъездной</option>
+                        <option value="hybrid">Гибрид</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="VacancyData.Specialty" class="form-label fw-bold">Специальность</label>
+                    <select asp-for="VacancyData.Specialty" class="form-select">
+                        <option value="">Выберите специальность</option>
+                        @foreach (var specialty in Model.Specialties)
+                        {
+                            <option value="@specialty">@specialty</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="VacancyData.Description" class="form-label fw-bold">Описание вакансии *</label>
+                    <textarea asp-for="VacancyData.Description" class="form-control" rows="4" placeholder="Обязанности, задачи, условия..." required></textarea>
+                    <span asp-validation-for="VacancyData.Description" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="VacancyData.Requirements" class="form-label fw-bold">Требования *</label>
+                    <textarea asp-for="VacancyData.Requirements" class="form-control" rows="4" placeholder="Опыт, навыки, образование..." required></textarea>
+                    <span asp-validation-for="VacancyData.Requirements" class="text-danger small"></span>
+                </div>
             </div>
-            <div class="mt-3 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Сохранить</button>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-warning">
+                    <i class="fas fa-save me-1"></i> Сохранить изменения
+                </button>
                 <a asp-page="/Admin/Vacancies/Vacancies" class="btn btn-outline-secondary">Отмена</a>
             </div>
         </form>
