@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model WebReckrytingSystem.Pages.Account.RegisterModel
 @{
     ViewData["Title"] = "Регистрация - Твоя Карьера";
@@ -9,7 +9,7 @@
         <div class="register-card">
             <div class="register-form-section">
                 <div class="brand text-center mb-4">
-                                  <h2 class="brand-name">Регистрация</h2>
+                    <h2 class="brand-name">Регистрация</h2>
                     <p class="brand-tagline">Начните карьеру за 60 секунд</p>
                 </div>
 
@@ -147,6 +147,65 @@
             }
         }
 
+
+        :root[data-theme='dark'] .register-card {
+            background: #1a1f29;
+            color: #e9edf5;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+        }
+
+        :root[data-theme='dark'] .register-form-section {
+            background: #1a1f29;
+        }
+
+        :root[data-theme='dark'] .brand-name {
+            background: linear-gradient(135deg, #9fb2ff, #c7a6ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        :root[data-theme='dark'] .brand-tagline,
+        :root[data-theme='dark'] .register-form-section p,
+        :root[data-theme='dark'] .register-form-section .form-label {
+            color: #dbe3f2;
+        }
+
+        :root[data-theme='dark'] .register-form-section .form-control {
+            background-color: #ffffff;
+            color: #212529;
+            border-color: #cfd6e4;
+        }
+
+        :root[data-theme='dark'] .register-form-section .form-control:focus {
+            background-color: #ffffff;
+            color: #212529;
+            border-color: #9fb2ff;
+            box-shadow: 0 0 0 0.25rem rgba(159, 178, 255, 0.25);
+        }
+
+        :root[data-theme='dark'] .register-form-section .form-control::placeholder {
+            color: #6c757d;
+        }
+
+        :root[data-theme='dark'] .register-form-section .btn-outline-secondary {
+            background-color: #ffffff;
+            color: #212529;
+            border-color: #cfd6e4;
+        }
+
+        :root[data-theme='dark'] .register-form-section .alert-info {
+            background-color: #202b3f;
+            border-color: #3b5277;
+            color: #dbeafe;
+        }
+
+        :root[data-theme='dark'] .register-form-section input:-webkit-autofill,
+        :root[data-theme='dark'] .register-form-section input:-webkit-autofill:hover,
+        :root[data-theme='dark'] .register-form-section input:-webkit-autofill:focus {
+            -webkit-text-fill-color: #212529;
+            box-shadow: 0 0 0 1000px #ffffff inset;
+        }
         .btn-check:checked + .btn-outline-primary {
             background-color: #667eea;
             border-color: #667eea;
