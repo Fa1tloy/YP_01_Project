@@ -594,6 +594,25 @@ img,
     color: #e9edf5;
 }
 
+:root[data-theme='dark'] .users-section {
+    background: #0f1115;
+}
+
+:root[data-theme='dark'] .user-card,
+:root[data-theme='dark'] .step-card {
+    background: #1a1f29;
+    color: #e9edf5;
+    border: 1px solid #2d3442;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+:root[data-theme='dark'] .user-card .card-body,
+:root[data-theme='dark'] .user-card .card-body p,
+:root[data-theme='dark'] .user-card .feature-list li,
+:root[data-theme='dark'] .step-card p {
+    color: #dbe3f2;
+}
+
 :root[data-theme='dark'] .navbar.fixed-top {
     background: rgba(18, 21, 28, 0.95) !important;
 }
