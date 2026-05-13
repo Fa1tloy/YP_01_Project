@@ -35,7 +35,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/AccessDenied";
     });
 builder.Services.AddAuthorization();
-
+// Настройка лицензии QuestPDF (бесплатная для revenue < $1M)
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
 

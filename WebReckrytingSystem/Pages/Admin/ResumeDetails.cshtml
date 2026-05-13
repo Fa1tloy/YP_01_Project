@@ -23,6 +23,10 @@ else
             <p><strong>Образование:</strong><br/>@Model.Resume.EducationDescription</p>
             <div class="d-flex gap-2">
                 <a asp-page="/Admin/ResumeEdit" asp-route-email="@Model.Resume.UserEmail" class="btn btn-warning">Редактировать</a>
+                <a asp-page="/Admin/ResumeDetails" asp-page-handler="DownloadPdf" asp-route-email="@Model.Resume.UserEmail"
+                       class="btn btn-outline-danger">
+                    <i class="fas fa-file-pdf me-1"></i> Скачать PDF
+                </a>
                 <a asp-page="/Admin/Resumes" class="btn btn-outline-secondary">Назад</a>
             </div>
         </div>

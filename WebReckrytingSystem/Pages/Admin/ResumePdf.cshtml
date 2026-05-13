@@ -1,0 +1,87 @@
+﻿@page
+@model WebReckrytingSystem.Pages.Admin.ResumePdfModel
+@{
+    Layout = null; // без макета
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Резюме @Model.Resume?.User?.LastName</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 40px; color: #333; }
+        h1 { font-size: 28px; margin-bottom: 5px; }
+        h2 { font-size: 20px; color: #555; margin-top: 0; }
+        .block { margin-bottom: 30px; }
+        .label { font-weight: bold; display: inline-block; width: 200px; }
+        .skills span { background: #f0f0f0; padding: 3px 10px; border-radius: 12px; margin-right: 5px; white-space: nowrap; }
+    </style>
+</head>
+<body>
+    <h1>@Model.Resume?.User?.LastName @Model.Resume?.User?.FirstName</h1>
+    <h2>@Model.Resume?.DesiredPosition</h2>
+
+    <div class="block">
+        <div><span class="label">Email:</span>@Model.Resume?.UserEmail</div>
+        <div><span class="label">Город:</span>@Model.Resume?.City</div>
+        <div><span class="label">Возраст:</span>@Model.Resume?.Age</div>
+        <div><span class="label">Пол:</span>@Model.Resume?.Gender</div>
+        <div><span class="label">Специальность:</span>@Model.Resume?.Specialty</div>
+        <div><span class="label">Зарплата:</span>@(Model.Resume?.SalaryExpectations.HasValue == true ? $"{Model.Resume.SalaryExpectations.Value:N0} ₽" : "не указана")</div>
+        <div><span class="label">Тип занятости:</span>@Model.Resume?.EmploymentType</div>
+        <div><span class="label">График:</span>@Model.Resume?.WorkSchedule</div>
+        <div><span class="label">Готовность к командировкам:</span>@Model.Resume?.BusinessTripReadiness</div>
+        <div><span class="label">Статус поиска:</span>@Model.Resume?.SearchStatus</div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Resume?.ExperienceDescription))
+    {
+        <div class="block">
+            <h3>Опыт работы</h3>
+            <p style="white-space: pre-line;">@Model.Resume.ExperienceDescription</p>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.Resume?.EducationDescription))
+    {
+        <div class="block">
+            <h3>Образование</h3>
+            <p style="white-space: pre-line;">@Model.Resume.EducationDescription</p>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.Resume?.Skills))
+    {
+        <div class="block skills">
+            <h3>Навыки</h3>
+            @foreach (var skill in Model.Resume.Skills.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            {
+                <span>@skill.Trim()</span>
+            }
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.Resume?.PracticesJson))
+    {
+        <div class="block">
+            <h3>Практики</h3>
+            @{
+                var practices = System.Text.Json.JsonSerializer.Deserialize<List<PracticeViewModel>>(Model.Resume.PracticesJson);
+            }
+            @if (practices != null)
+            {
+                foreach (var p in practices)
+                {
+                    <p><strong>@p.Place</strong> (@p.StartDate.ToString("MM.yyyy") – @p.EndDate.ToString("MM.yyyy"))</p>
+                    @if (!string.IsNullOrWhiteSpace(p.Description))
+                    {
+                        <p>@p.Description</p>
+                    }
+                }
+            }
+        </div>
+    }
+
+    <p style="margin-top: 50px; font-size: 12px; color: #999;">Сгенерировано системой «Твоя Карьера»</p>
+</body>
+</html>

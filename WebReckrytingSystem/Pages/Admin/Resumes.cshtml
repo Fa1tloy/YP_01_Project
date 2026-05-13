@@ -86,6 +86,10 @@
                                     <a asp-page="/Admin/ResumeDetails" asp-route-email="@resume.UserEmail" class="btn btn-outline-info" title="Просмотр">
                                         <i class="fas fa-eye"></i>
                                     </a>
+                                    <a asp-page="/Admin/ResumeDetails" asp-page-handler="DownloadPdf" asp-route-email="@resume.UserEmail"
+                                           class="btn btn-outline-danger" title="Скачать PDF">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </a>
                                     <a asp-page="/Admin/ResumeEdit" asp-route-email="@resume.UserEmail" class="btn btn-outline-warning" title="Редактировать">
                                         <i class="fas fa-edit"></i>
                                     </a>

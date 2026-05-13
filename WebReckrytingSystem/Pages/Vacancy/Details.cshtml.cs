@@ -176,7 +176,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
 
             await _context.SaveChangesAsync();
 
-            return RedirectToPage(new { companyName, title });
+            return RedirectToPage("/Account/Chat", new { peer = Vacancy.AuthorEmail, companyName = Vacancy.CompanyName, title = Vacancy.Title });
         }
     }
 }

@@ -143,15 +143,14 @@
 
                                             <p class="text-muted small flex-grow-1">@Truncate(vacancy.Description, 170)</p>
 
-                                            <div class="d-flex gap-2 mt-auto">
-                                                <a class="btn btn-outline-primary flex-fill"
-                                                   asp-page="/Vacancy/Details"
-                                                   asp-route-companyName="@vacancy.CompanyName"
-                                                   asp-route-title="@vacancy.Title">Открыть</a>
-                                                <a class="btn btn-primary flex-fill"
-                                                   asp-page="/Vacancy/Details"
-                                                   asp-route-companyName="@vacancy.CompanyName"
-                                                   asp-route-title="@vacancy.Title">Откликнуться</a>
+                                            <!-- ОДНА КНОПКА «ПОДРОБНЕЕ» -->
+                                            <div class="mt-auto">
+                                                <a class="btn btn-primary w-100"
+                                                       asp-page="/Vacancy/Details"
+                                                       asp-route-companyName="@vacancy.CompanyName"
+                                                       asp-route-title="@vacancy.Title">
+                                                    <i class="fas fa-info-circle me-1"></i> Подробнее
+                                                </a>
                                             </div>
                                         </div>
                                     </div>

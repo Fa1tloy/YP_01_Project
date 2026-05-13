@@ -20,10 +20,10 @@
                     {
                         var isActive = Model.Peer == convo.PeerEmail && Model.CompanyName == convo.VacancyCompanyName && Model.Title == convo.VacancyTitle;
                         <a class="list-group-item list-group-item-action @(isActive ? "active" : "")"
-                           asp-page="/Account/Chat"
-                           asp-route-peer="@convo.PeerEmail"
-                           asp-route-companyName="@convo.VacancyCompanyName"
-                           asp-route-title="@convo.VacancyTitle">
+                               asp-page="/Account/Chat"
+                               asp-route-peer="@convo.PeerEmail"
+                               asp-route-companyName="@convo.VacancyCompanyName"
+                               asp-route-title="@convo.VacancyTitle">
                             <div class="d-flex align-items-start gap-2">
                                 <img src="@convo.PeerAvatarUrl" alt="Аватар @convo.PeerEmail" class="rounded-circle flex-shrink-0" style="width: 40px; height: 40px; object-fit: cover;" />
                                 <div class="chat-convo-text">
@@ -39,7 +39,7 @@
         </div>
 
         <div class="col-lg-8">
-                <div class="card shadow-sm">
+            <div class="card shadow-sm">
                 <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
                     <div>
                         <div id="chatPeer" class="fw-semibold">@(Model.Peer ?? "Выберите чат")</div>
@@ -200,6 +200,23 @@
 
             refreshChat();
             setInterval(refreshChat, 5000);
+
+            // ===== ОТПРАВКА СООБЩЕНИЯ ПО ENTER =====
+            const textarea = document.querySelector('.chat-message-input');
+            if (textarea) {
+                textarea.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        const form = this.closest('form');
+                        if (form) {
+                            const submitBtn = form.querySelector('#sendButton');
+                            if (submitBtn && !submitBtn.disabled) {
+                                form.submit(); // отправляем форму
+                            }
+                        }
+                    }
+                });
+            }
         })();
     </script>
 
