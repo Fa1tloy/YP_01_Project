@@ -42,5 +42,8 @@ namespace WebReckrytingSystem.Models
 
         [Range(1, 50, ErrorMessage = "Размер страницы должен быть от 1 до 50")]
         public int PageSize { get; set; } = 10;
+
+        [Display(Name = "Тип вакансии")]
+        public bool? IsPracticum { get; set; }  // null = все, true = практика, false = без практики
     }
 }

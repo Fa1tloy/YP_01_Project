@@ -158,6 +158,12 @@ namespace WebReckrytingSystem.Services
                 filtered = filtered.Where(v => v.Specialty == model.Specialty);
             }
 
+            // НОВЫЙ ФИЛЬТР по признаку практики
+            if (model.IsPracticum.HasValue)
+            {
+                filtered = filtered.Where(v => v.IsPracticum == model.IsPracticum.Value);
+            }
+
             return filtered.ToList();
         }
 

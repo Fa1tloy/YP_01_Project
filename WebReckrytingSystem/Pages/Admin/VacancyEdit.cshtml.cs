@@ -44,7 +44,8 @@ public class VacancyEditModel : PageModel
             WorkSchedule = vacancy.WorkSchedule,
             WorkHoursPerDay = vacancy.WorkHoursPerDay,
             WorkFormat = vacancy.WorkFormat,
-            Specialty = vacancy.Specialty
+            Specialty = vacancy.Specialty,
+            IsPracticum = vacancy.IsPracticum   // <-- НОВОЕ
         };
 
         Specialties = _specialtyService.GetAllNames();
@@ -75,6 +76,7 @@ public class VacancyEditModel : PageModel
         vacancy.WorkHoursPerDay = VacancyData.WorkHoursPerDay;
         vacancy.WorkFormat = VacancyData.WorkFormat?.Trim() ?? string.Empty;
         vacancy.Specialty = VacancyData.Specialty?.Trim() ?? string.Empty;
+        vacancy.IsPracticum = VacancyData.IsPracticum;   // <-- НОВОЕ
 
         await _context.SaveChangesAsync();
         TempData["SuccessMessage"] = "Вакансия обновлена администратором.";

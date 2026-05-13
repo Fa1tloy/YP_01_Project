@@ -42,6 +42,8 @@ namespace WebReckrytingSystem.Models
         [EmailAddress]
         public string AuthorEmail { get; set; } = string.Empty;
 
+        public bool IsPracticum { get; set; }  // новое поле
+
         public Company Company { get; set; } = null!;
         public User Author { get; set; } = null!;
     }

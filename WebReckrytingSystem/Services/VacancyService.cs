@@ -81,7 +81,8 @@ namespace WebReckrytingSystem.Services
                     WorkHoursPerDay = model.WorkHoursPerDay,
                     WorkFormat = model.WorkFormat.Trim(),
                     Specialty = model.Specialty.Trim(),
-                    AuthorEmail = authorEmail
+                    AuthorEmail = authorEmail,
+                    IsPracticum = model.IsPracticum   // <-- НОВОЕ
                 };
 
                 _logger.LogInformation("Сохранение вакансии в репозиторий");
@@ -191,6 +192,7 @@ namespace WebReckrytingSystem.Services
                 existingVacancy.WorkHoursPerDay = model.WorkHoursPerDay;
                 existingVacancy.WorkFormat = model.WorkFormat.Trim();
                 existingVacancy.Specialty = model.Specialty.Trim();
+                existingVacancy.IsPracticum = model.IsPracticum;   // <-- НОВОЕ
 
                 _logger.LogInformation("Сохранение обновленной вакансии в репозиторий");
                 var updatedVacancy = _vacancyRepository.Update(existingVacancy);

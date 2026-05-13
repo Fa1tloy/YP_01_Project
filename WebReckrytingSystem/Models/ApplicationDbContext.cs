@@ -109,6 +109,7 @@ namespace WebReckrytingSystem.Models
             });
 
             // Конфигурация Vacancy
+            // Фрагмент метода OnModelCreating (замените существующую конфигурацию Vacancy)
             modelBuilder.Entity<Vacancy>().ToTable("vacancies");
             modelBuilder.Entity<Vacancy>(entity =>
             {
@@ -125,6 +126,9 @@ namespace WebReckrytingSystem.Models
                 entity.Property(e => e.WorkFormat).HasColumnName("work_format").HasMaxLength(50);
                 entity.Property(e => e.Specialty).HasColumnName("specialty").HasMaxLength(255);
                 entity.Property(e => e.AuthorEmail).HasColumnName("author_email").HasMaxLength(255);
+
+                // НОВОЕ: маппинг признака практики
+                entity.Property(e => e.IsPracticum).HasColumnName("is_practicum").HasDefaultValue(false);
 
                 entity.HasOne(v => v.Company).WithMany(c => c.Vacancies).HasForeignKey(v => v.CompanyName).OnDelete(DeleteBehavior.Cascade);
                 entity.HasOne(v => v.Author).WithMany().HasForeignKey(v => v.AuthorEmail).OnDelete(DeleteBehavior.Restrict);

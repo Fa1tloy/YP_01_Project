@@ -52,5 +52,8 @@ namespace WebReckrytingSystem.Models
         [Display(Name = "Специальность")]
         [StringLength(255)]
         public string Specialty { get; set; } = string.Empty;
+
+        [Display(Name = "Это вакансия на практику")]
+        public bool IsPracticum { get; set; }
     }
 }

@@ -84,6 +84,16 @@
                                 </select>
                             </div>
 
+                            <!-- НОВЫЙ ФИЛЬТР: тип вакансии -->
+                            <div class="mb-3">
+                                <label asp-for="SearchData.IsPracticum" class="form-label">Тип вакансии</label>
+                                <select asp-for="SearchData.IsPracticum" class="form-select">
+                                    <option value="">Все</option>
+                                    <option value="false">Обычная вакансия</option>
+                                    <option value="true">Практика</option>
+                                </select>
+                            </div>
+
                             <input type="hidden" asp-for="SearchData.Page" value="1" />
                             <input type="hidden" asp-for="SearchData.PageSize" value="10" />
 
@@ -110,7 +120,13 @@
                                                      style="width:48px;height:48px;object-fit:cover;border-radius:50%;" />
                                                 <div>
                                                     <h3 class="h6 mb-1">@vacancy.Title</h3>
-                                                    <div class="text-muted small">@vacancy.CompanyName</div>
+                                                    <div class="text-muted small">
+                                                        @vacancy.CompanyName
+                                                        @if (vacancy.IsPracticum)
+                                                        {
+                                                            <span class="badge bg-info ms-2">Практика</span>
+                                                        }
+                                                    </div>
                                                 </div>
                                             </div>
 

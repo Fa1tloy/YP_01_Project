@@ -47,6 +47,20 @@ else
                         {
                             <tr><td class="text-muted">Зарплата:</td><td>Не указана</td></tr>
                         }
+                        <!-- НОВОЕ: признак практики -->
+                        <tr>
+                            <td class="text-muted">Практика:</td>
+                            <td>
+                                @if (Model.Vacancy.IsPracticum)
+                                {
+                                    <span class="badge bg-info">Да</span>
+                                }
+                                else
+                                {
+                                    <span>Нет</span>
+                                }
+                            </td>
+                        </tr>
                         @if (Model.Vacancy.WorkHoursPerDay.HasValue)
                         {
                             <tr><td class="text-muted">Рабочие часы в день:</td><td>@Model.Vacancy.WorkHoursPerDay ч</td></tr>

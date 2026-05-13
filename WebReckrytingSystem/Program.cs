@@ -141,7 +141,7 @@ PRIMARY KEY (`company_name`, `title`)");
 PRIMARY KEY (`id`),
 UNIQUE INDEX `uq_specialties_name` (`name`)");
 
-    // Добавляем недостающие столбцы для других таблиц (без изменений)
+    // Добавляем недостающие столбцы для других таблиц
     EnsureColumnExists(connection, "companies", "description", "TEXT NULL");
     EnsureColumnExists(connection, "companies", "website", "TEXT NULL");
     EnsureColumnExists(connection, "companies", "logo_url", "TEXT NULL");
@@ -150,7 +150,8 @@ UNIQUE INDEX `uq_specialties_name` (`name`)");
     EnsureColumnExists(connection, "vacancies", "region", "VARCHAR(100) NOT NULL DEFAULT ''");
     EnsureColumnExists(connection, "vacancies", "work_hours_per_day", "INT NULL");
     EnsureColumnExists(connection, "vacancies", "work_format", "VARCHAR(50) NOT NULL DEFAULT ''");
-    // salary_to, salary_period, payment_frequency больше не добавляем
+    // НОВАЯ КОЛОНКА ДЛЯ ПРАКТИКИ
+    EnsureColumnExists(connection, "vacancies", "is_practicum", "TINYINT(1) NOT NULL DEFAULT 0");
 
     EnsureColumnExists(connection, "users", "company_name", "VARCHAR(255) NULL");
 
