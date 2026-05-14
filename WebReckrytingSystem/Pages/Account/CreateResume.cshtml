@@ -132,7 +132,8 @@
                     <div class="card-body p-4 pt-2">
                         <div class="mb-3">
                             <label asp-for="ResumeData.EducationalInstitution" class="form-label fw-600">Учебное заведение *</label>
-                            <input asp-for="ResumeData.EducationalInstitution" class="form-control rounded-pill" placeholder="МГУ им. Ломоносова" />
+                            <input asp-for="ResumeData.EducationalInstitution" class="form-control rounded-pill bg-light text-muted" readonly />
+                            <small class="form-text text-muted">Учебное заведение установлено автоматически и не может быть изменено.</small>
                             <span asp-validation-for="ResumeData.EducationalInstitution" class="text-danger small"></span>
                         </div>
 
@@ -297,11 +298,11 @@
 
         @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
         {
-            <text>showToast('@Html.Raw(Model.SuccessMessage)', 'success');</text>
+                <text>showToast('@Html.Raw(Model.SuccessMessage)', 'success');</text>
         }
         @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
         {
-            <text>showToast('@Html.Raw(Model.ErrorMessage)', 'error');</text>
+                <text>showToast('@Html.Raw(Model.ErrorMessage)', 'error');</text>
         }
 
         document.addEventListener('DOMContentLoaded', () => {

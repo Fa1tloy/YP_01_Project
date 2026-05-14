@@ -75,7 +75,7 @@ namespace WebReckrytingSystem.Models
         [Required(ErrorMessage = "Укажите учебное заведение")]
         [StringLength(255, ErrorMessage = "Название учебного заведения не должно превышать 255 символов")]
         [Display(Name = "Учебное заведение")]
-        public string EducationalInstitution { get; set; } = string.Empty;
+        public string EducationalInstitution { get; set; } = "ФГБОУ Колледж Росрезерва";
 
         [StringLength(255, ErrorMessage = "Факультет не должен превышать 255 символов")]
         [Display(Name = "Факультет")]

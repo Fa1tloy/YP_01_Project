@@ -22,6 +22,8 @@ namespace WebReckrytingSystem.Services
             if (existingResume != null)
                 return ServiceResult<Resume>.Error("У вас уже есть созданное резюме");
 
+            model.EducationalInstitution = "ФГБОУ Колледж Росрезерва";
+
             var validationResult = ValidateResume(model);
             if (!validationResult.IsSuccess)
                 return ServiceResult<Resume>.Error(validationResult.Message);
@@ -61,6 +63,8 @@ namespace WebReckrytingSystem.Services
 
         public ServiceResult<Resume> UpdateResume(string userEmail, CreateResumeViewModel model)
         {
+            model.EducationalInstitution = "ФГБОУ Колледж Росрезерва";
+
             var validationResult = ValidateResume(model);
             if (!validationResult.IsSuccess)
                 return ServiceResult<Resume>.Error(validationResult.Message);

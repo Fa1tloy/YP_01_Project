@@ -207,7 +207,6 @@
                                     }
                                 </div>
 
-                                <!-- САЙТ КОМПАНИИ (отображается только если сайт указан) -->
                                 @if (!string.IsNullOrWhiteSpace(Model.Vacancy.Company?.Website))
                                 {
                                     <hr class="my-4">
@@ -230,14 +229,27 @@
                                 <div class="vstack gap-2">
                                     @if (User.Identity?.IsAuthenticated == true && User.IsInRole("job_seeker"))
                                     {
-                                        <form method="post" asp-page-handler="Apply" class="w-100">
-                                            <input type="hidden" name="companyName" value="@Model.Vacancy.CompanyName" />
-                                            <input type="hidden" name="title" value="@Model.Vacancy.Title" />
-                                            <button type="submit" class="btn btn-success w-100 py-3 fw-semibold">
-                                                <i class="fas fa-paper-plane me-2"></i>Откликнуться администратору
-                                            </button>
-                                        </form>
+                                        // Если чат уже существует, показываем только кнопку «Перейти в чат»
+                                        if (Model.HasExistingChat)
+                                        {
+                                            <a href="/Account/Chat?peer=@Model.Vacancy.AuthorEmail&companyName=@Model.Vacancy.CompanyName&title=@Model.Vacancy.Title"
+                                                   class="btn btn-outline-primary w-100 py-3">
+                                                <i class="fas fa-comment me-2"></i>Перейти в чат
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            // Чат ещё не создан – отклик
+                                            <form method="post" asp-page-handler="Apply" class="w-100">
+                                                <input type="hidden" name="companyName" value="@Model.Vacancy.CompanyName" />
+                                                <input type="hidden" name="title" value="@Model.Vacancy.Title" />
+                                                <button type="submit" class="btn btn-success w-100 py-3 fw-semibold">
+                                                    <i class="fas fa-paper-plane me-2"></i>Откликнуться администратору
+                                                </button>
+                                            </form>
+                                        }
 
+                                        <!-- Избранное доступно всегда -->
                                         <form method="post" asp-page-handler="SaveVacancy" class="w-100">
                                             <input type="hidden" name="companyName" value="@Model.Vacancy.CompanyName" />
                                             <input type="hidden" name="title" value="@Model.Vacancy.Title" />
@@ -246,14 +258,6 @@
                                                 @(Model.IsSavedByCurrentStudent ? "Удалить из избранного" : "Сохранить в избранное")
                                             </button>
                                         </form>
-
-                                        @if (Model.HasExistingChat)
-                                        {
-                                            <a href="/Account/Chat?peer=@Model.Vacancy.AuthorEmail&companyName=@Model.Vacancy.CompanyName&title=@Model.Vacancy.Title"
-                                                   class="btn btn-outline-primary w-100 py-3 mt-2">
-                                                <i class="fas fa-comment me-2"></i>Перейти в чат
-                                            </a>
-                                        }
                                     }
                                     else if (!User.Identity?.IsAuthenticated == true)
                                     {

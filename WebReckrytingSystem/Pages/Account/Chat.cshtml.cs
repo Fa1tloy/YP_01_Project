@@ -64,7 +64,7 @@ namespace WebReckrytingSystem.Pages.Account
 
             if (!string.IsNullOrWhiteSpace(Peer) && !string.IsNullOrWhiteSpace(MessageText))
             {
-                _context.ChatMessages.Add(new ChatMessage
+                var newMessage = new ChatMessage
                 {
                     SenderEmail = userEmail,
                     RecipientEmail = Peer,
@@ -73,11 +73,33 @@ namespace WebReckrytingSystem.Pages.Account
                     VacancyTitle = Title,
                     SentAt = DateTime.UtcNow,
                     IsRead = false
-                });
-
+                };
+                _context.ChatMessages.Add(newMessage);
                 await _context.SaveChangesAsync();
+
+                // AJAX-ответ
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return new JsonResult(new
+                    {
+                        success = true,
+                        message = new
+                        {
+                            senderEmail = newMessage.SenderEmail,
+                            message = newMessage.Message,
+                            sentAt = newMessage.SentAt
+                        }
+                    });
+                }
+
+                // Обычный редирект (без JS)
+                return RedirectToPage(new { peer = Peer, companyName = CompanyName, title = Title });
             }
 
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return new JsonResult(new { success = false, error = "Сообщение не может быть пустым" });
+            }
             return RedirectToPage(new { peer = Peer, companyName = CompanyName, title = Title });
         }
 
@@ -131,7 +153,7 @@ namespace WebReckrytingSystem.Pages.Account
             {
                 senderEmail = m.SenderEmail,
                 message = m.Message,
-                sentAt = m.SentAt
+                sentAt = DateTime.SpecifyKind(m.SentAt, DateTimeKind.Utc).ToString("o") // всегда UTC c "Z"
             });
 
             return new JsonResult(new

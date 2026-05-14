@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -30,9 +29,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 .FirstOrDefaultAsync(v => v.CompanyName == companyName && v.Title == title);
 
             if (Vacancy == null)
-            {
                 return NotFound();
-            }
 
             if (User.Identity?.IsAuthenticated == true)
             {
@@ -46,18 +43,18 @@ namespace WebReckrytingSystem.Pages.Vacancy
                                        s.VacancyCompanyName == companyName &&
                                        s.VacancyTitle == title);
 
-                    // Проверяем, есть ли уже чат с администратором по этой вакансии
+                    // Проверяем, есть ли уже чат с автором ИМЕННО ПО ЭТОЙ ВАКАНСИИ
                     HasExistingChat = await _context.ChatMessages
-                        .AnyAsync(m => (m.SenderEmail == userEmail && m.RecipientEmail == Vacancy.AuthorEmail) ||
-                                       (m.SenderEmail == Vacancy.AuthorEmail && m.RecipientEmail == userEmail));
-                }
-                else if (User.IsInRole("employer") && userEmail == Vacancy.AuthorEmail)
-                {
-                    // Для автора вакансии - показываем статистику откликов
-                    // Можете добавить статистику позже
+                        .AnyAsync(m =>
+                            ((m.SenderEmail == userEmail && m.RecipientEmail == Vacancy.AuthorEmail) ||
+                             (m.SenderEmail == Vacancy.AuthorEmail && m.RecipientEmail == userEmail)) &&
+                            m.VacancyCompanyName == companyName &&
+                            m.VacancyTitle == title);
                 }
             }
 
+            // Показываем сообщение из TempData, если есть
+            StatusMessage = TempData["StatusMessage"]?.ToString();
             return Page();
         }
 
@@ -67,9 +64,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
             var role = User.FindFirst(ClaimTypes.Role)?.Value;
 
             if (string.IsNullOrWhiteSpace(studentEmail) || role != "job_seeker")
-            {
                 return RedirectToPage("/Account/Login", new { returnUrl = Url.Page("/Vacancy/Details", new { companyName, title }) });
-            }
 
             Vacancy = await _context.Vacancies
                 .AsNoTracking()
@@ -77,35 +72,31 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 .Include(v => v.Author)
                 .FirstOrDefaultAsync(v => v.CompanyName == companyName && v.Title == title);
 
-            if (Vacancy is null)
-            {
+            if (Vacancy == null)
                 return NotFound();
-            }
 
-            // Проверка на повторный отклик
-            var alreadyApplied = await _context.JobApplications.AnyAsync(a =>
-                a.StudentEmail == studentEmail &&
-                a.VacancyCompanyName == companyName &&
-                a.VacancyTitle == title);
-
-            if (alreadyApplied)
+            // Удаляем старый отклик, если он существует (чтобы можно было переоткликнуться после удаления чата)
+            var existingApp = await _context.JobApplications
+                .FirstOrDefaultAsync(a => a.StudentEmail == studentEmail &&
+                                          a.VacancyCompanyName == companyName &&
+                                          a.VacancyTitle == title);
+            if (existingApp != null)
             {
-                StatusMessage = "Вы уже откликались на эту вакансию.";
-                return Page();
+                _context.JobApplications.Remove(existingApp);
             }
 
-            // Создаем отклик
-            var application = new JobApplication
+            // Создаём новый отклик
+            _context.JobApplications.Add(new JobApplication
             {
                 StudentEmail = studentEmail,
                 VacancyCompanyName = companyName,
                 VacancyTitle = title,
                 Status = "pending",
                 AppliedAt = DateTime.UtcNow
-            };
+            });
 
-            // Создаем уведомление для администратора, который ведет вакансию
-            var notification = new Notification
+            // Уведомление автору (администратору)
+            _context.Notifications.Add(new Notification
             {
                 RecipientEmail = Vacancy.AuthorEmail,
                 SenderEmail = studentEmail,
@@ -114,10 +105,10 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 Link = Url.Page("/Account/Chat", null, new { peer = studentEmail, companyName = Vacancy.CompanyName, title = Vacancy.Title }, Request.Scheme),
                 CreatedAt = DateTime.UtcNow,
                 IsRead = false
-            };
+            });
 
-            // Создаем первое сообщение в чате
-            var chatMessage = new ChatMessage
+            // Первое сообщение в чат
+            _context.ChatMessages.Add(new ChatMessage
             {
                 SenderEmail = studentEmail,
                 RecipientEmail = Vacancy.AuthorEmail,
@@ -126,32 +117,25 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 VacancyTitle = Vacancy.Title,
                 SentAt = DateTime.UtcNow,
                 IsRead = false
-            };
+            });
 
-            _context.JobApplications.Add(application);
-            _context.Notifications.Add(notification);
-            _context.ChatMessages.Add(chatMessage);
             await _context.SaveChangesAsync();
 
-            StatusMessage = "Отклик отправлен! Администратор получил уведомление, и чат создан.";
-            return RedirectToPage(new { companyName, title });
+            TempData["StatusMessage"] = "Отклик отправлен! Теперь вы можете общаться в чате.";
+            return RedirectToPage("/Account/Chat", new { peer = Vacancy.AuthorEmail, companyName = Vacancy.CompanyName, title = Vacancy.Title });
         }
 
         public async Task<IActionResult> OnPostSaveVacancyAsync(string companyName, string title)
         {
             var studentEmail = User.FindFirstValue(ClaimTypes.Email);
             if (string.IsNullOrEmpty(studentEmail) || !User.IsInRole("job_seeker"))
-            {
                 return RedirectToPage("/Account/Login");
-            }
 
             var vacancy = await _context.Vacancies
                 .AsNoTracking()
                 .FirstOrDefaultAsync(v => v.CompanyName == companyName && v.Title == title);
             if (vacancy == null)
-            {
                 return NotFound();
-            }
 
             var existing = await _context.SavedVacancies
                 .FirstOrDefaultAsync(s => s.StudentEmail == studentEmail &&
@@ -164,7 +148,8 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 {
                     StudentEmail = studentEmail,
                     VacancyCompanyName = companyName,
-                    VacancyTitle = title
+                    VacancyTitle = title,
+                    SavedAt = DateTime.UtcNow
                 });
                 TempData["StatusMessage"] = "✅ Вакансия добавлена в избранное";
             }
@@ -175,8 +160,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
             }
 
             await _context.SaveChangesAsync();
-
-            return RedirectToPage("/Account/Chat", new { peer = Vacancy.AuthorEmail, companyName = Vacancy.CompanyName, title = Vacancy.Title });
+            return RedirectToPage(new { companyName, title });
         }
     }
 }

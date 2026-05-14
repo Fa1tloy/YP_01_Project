@@ -209,7 +209,8 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label asp-for="ResumeData.EducationalInstitution" class="form-label fw-600">Учебное заведение *</label>
-                                <input asp-for="ResumeData.EducationalInstitution" class="form-control rounded-pill" placeholder="МГУ им. Ломоносова" />
+                                <input asp-for="ResumeData.EducationalInstitution" class="form-control rounded-pill bg-light text-muted" readonly />
+                                <small class="form-text text-muted">Учебное заведение установлено автоматически и не может быть изменено.</small>
                                 <span asp-validation-for="ResumeData.EducationalInstitution" class="text-danger small"></span>
                             </div>
                             <div class="col-md-6">
@@ -315,43 +316,14 @@
 
 @section Styles {
     <style>
-        /* Дополнительные стили для улучшения внешнего вида */
-        .card {
-            border-radius: 1.5rem !important;
-        }
-
-        .form-control-lg, .form-select-lg {
-            font-size: 1rem;
-            padding: 0.75rem 1.25rem;
-        }
-
-        .btn-lg {
-            padding: 0.75rem 2rem;
-        }
-
-        .form-check-input:checked {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        #skillsTags .badge {
-            font-size: 0.9rem;
-            padding: 0.5rem 1rem;
-            background-color: var(--primary-color) !important;
-        }
-
-            #skillsTags .badge a {
-                color: white;
-                text-decoration: none;
-            }
-
-        .practice-item {
-            transition: all 0.2s ease;
-        }
-
-            .practice-item:hover {
-                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            }
+        .card { border-radius: 1.5rem !important; }
+        .form-control-lg, .form-select-lg { font-size: 1rem; padding: 0.75rem 1.25rem; }
+        .btn-lg { padding: 0.75rem 2rem; }
+        .form-check-input:checked { background-color: var(--primary-color); border-color: var(--primary-color); }
+        #skillsTags .badge { font-size: 0.9rem; padding: 0.5rem 1rem; background-color: var(--primary-color) !important; }
+        #skillsTags .badge a { color: white; text-decoration: none; }
+        .practice-item { transition: all 0.2s ease; }
+        .practice-item:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
     </style>
 }
 
@@ -359,22 +331,15 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        // Функции для работы с навыками и практиками (оставлены без изменений, но можно адаптировать)
         document.addEventListener('DOMContentLoaded', () => {
-            // Инициализация навыков
             const hidden = document.getElementById('skillsHidden');
             let skills = [];
-            try {
-                skills = JSON.parse(hidden.value || '[]');
-            } catch (e) {
-                skills = [];
-            }
-            window.skills = skills; // делаем глобальной для доступа из функций
+            try { skills = JSON.parse(hidden.value || '[]'); } catch (e) { skills = []; }
+            window.skills = skills;
 
             renderSkills();
             initLicenseDropdown('editDriverLicenseCategories');
 
-            // Обработчик ввода навыков
             const inp = document.getElementById('skillsInput');
             inp.addEventListener('keydown', (e) => {
                 if (e.key !== 'Enter') return;
@@ -395,8 +360,8 @@
                 const tags = document.getElementById('skillsTags');
                 tags.innerHTML = skills.map(s =>
                     `<span class="badge bg-primary me-2 mb-2">${s}
-                                 <a href="#" class="text-white ms-1" onclick="skills=skills.filter(x=>x!=='${s}');renderSkills();return false;">×</a>
-                             </span>`).join('');
+                         <a href="#" class="text-white ms-1" onclick="skills=skills.filter(x=>x!=='${s}');renderSkills();return false;">×</a>
+                     </span>`).join('');
                 hidden.value = JSON.stringify(skills);
             }
         });
@@ -435,30 +400,30 @@
             const div = document.createElement('div');
             div.className = 'card mb-3 p-3 practice-item border-0 bg-light';
             div.innerHTML = `
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-600">Место практики</label>
-                                <input name="ResumeData.Practices[${index}].Place" class="form-control rounded-pill" placeholder="ООО ТехноПрактик" />
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-600">С</label>
-                                <input name="ResumeData.Practices[${index}].StartDate" type="date" class="form-control rounded-pill" />
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-600">По</label>
-                                <input name="ResumeData.Practices[${index}].EndDate" type="date" class="form-control rounded-pill" />
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label fw-600">Описание</label>
-                                <textarea name="ResumeData.Practices[${index}].Description" class="form-control rounded-3" rows="2" maxlength="500"></textarea>
-                            </div>
-                            <div class="col-12 text-end">
-                                <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="removePractice(this)">
-                                    <i class="fas fa-trash me-1"></i> Удалить практику
-                                </button>
-                            </div>
-                        </div>
-                    `;
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-600">Место практики</label>
+                        <input name="ResumeData.Practices[${index}].Place" class="form-control rounded-pill" placeholder="ООО ТехноПрактик" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-600">С</label>
+                        <input name="ResumeData.Practices[${index}].StartDate" type="date" class="form-control rounded-pill" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-600">По</label>
+                        <input name="ResumeData.Practices[${index}].EndDate" type="date" class="form-control rounded-pill" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-600">Описание</label>
+                        <textarea name="ResumeData.Practices[${index}].Description" class="form-control rounded-3" rows="2" maxlength="500"></textarea>
+                    </div>
+                    <div class="col-12 text-end">
+                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="removePractice(this)">
+                            <i class="fas fa-trash me-1"></i> Удалить практику
+                        </button>
+                    </div>
+                </div>
+            `;
             container.appendChild(div);
         }
 
@@ -496,7 +461,6 @@
             syncUi();
         }
 
-        // toast-уведомления
         @if (!string.IsNullOrEmpty(Model.SuccessMessage))
         {
             <text>showToast('@Html.Raw(Model.SuccessMessage)', 'success');</text>

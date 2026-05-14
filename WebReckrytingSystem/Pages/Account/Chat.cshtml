@@ -20,10 +20,10 @@
                     {
                         var isActive = Model.Peer == convo.PeerEmail && Model.CompanyName == convo.VacancyCompanyName && Model.Title == convo.VacancyTitle;
                         <a class="list-group-item list-group-item-action @(isActive ? "active" : "")"
-                               asp-page="/Account/Chat"
-                               asp-route-peer="@convo.PeerEmail"
-                               asp-route-companyName="@convo.VacancyCompanyName"
-                               asp-route-title="@convo.VacancyTitle">
+                               data-peer="@convo.PeerEmail"
+                               data-company="@convo.VacancyCompanyName"
+                               data-title="@convo.VacancyTitle"
+                               href="javascript:void(0)">
                             <div class="d-flex align-items-start gap-2">
                                 <img src="@convo.PeerAvatarUrl" alt="Аватар @convo.PeerEmail" class="rounded-circle flex-shrink-0" style="width: 40px; height: 40px; object-fit: cover;" />
                                 <div class="chat-convo-text">
@@ -76,19 +76,19 @@
                             <div class="d-flex mb-3 @(isMine ? "justify-content-end" : "justify-content-start")">
                                 <div class="chat-message-bubble p-2 rounded @(isMine ? "bg-primary text-white" : "bg-light")" style="max-width: 75%;">
                                     <div class="chat-message-text">@message.Message</div>
-                                    <div class="chat-message-time small @(isMine ? "text-white-50" : "text-muted")">@message.SentAt.ToLocalTime().ToString("dd.MM HH:mm")</div>
+                                    <div class="chat-message-time small @(isMine ? "text-white-50" : "text-muted")">@FormatMskTime(message.SentAt)</div>
                                 </div>
                             </div>
                         }
                     }
                 </div>
                 <div class="card-footer bg-transparent">
-                    <form method="post" asp-page-handler="Send" class="d-flex gap-2">
-                        <input type="hidden" asp-for="Peer" />
-                        <input type="hidden" asp-for="CompanyName" />
-                        <input type="hidden" asp-for="Title" />
-                        <textarea asp-for="MessageText" class="form-control chat-message-input" rows="1" placeholder="Введите сообщение..."></textarea>
-                        <button id="sendButton" type="submit" class="btn btn-primary" disabled="@(string.IsNullOrWhiteSpace(Model.Peer))">Отправить</button>
+                    <form method="post" asp-page-handler="Send" class="d-flex gap-2" id="sendForm">
+                        <input type="hidden" asp-for="Peer" id="hiddenPeer" />
+                        <input type="hidden" asp-for="CompanyName" id="hiddenCompany" />
+                        <input type="hidden" asp-for="Title" id="hiddenTitle" />
+                        <textarea asp-for="MessageText" class="form-control chat-message-input" rows="1" placeholder="Введите сообщение..." id="messageInput"></textarea>
+                        <button id="sendButton" type="submit" class="btn btn-primary" disabled>Отправить</button>
                     </form>
                 </div>
             </div>
@@ -103,10 +103,24 @@
             const messagesContainer = document.getElementById('messagesContainer');
             const chatPeer = document.getElementById('chatPeer');
             const chatTitle = document.getElementById('chatTitle');
-            const hiddenPeer = document.querySelector('input[name="Peer"]');
-            const hiddenCompany = document.querySelector('input[name="CompanyName"]');
-            const hiddenTitle = document.querySelector('input[name="Title"]');
+            const hiddenPeer = document.getElementById('hiddenPeer');
+            const hiddenCompany = document.getElementById('hiddenCompany');
+            const hiddenTitle = document.getElementById('hiddenTitle');
             const sendButton = document.getElementById('sendButton');
+            const sendForm = document.getElementById('sendForm');
+            const messageInput = document.getElementById('messageInput');
+
+            let currentPeer = hiddenPeer.value || '';
+            let currentCompany = hiddenCompany.value || '';
+            let currentTitle = hiddenTitle.value || '';
+
+            let isUserScrolledUp = false;
+
+            messagesContainer.addEventListener('scroll', () => {
+                const threshold = 50;
+                const distanceToBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop - messagesContainer.clientHeight;
+                isUserScrolledUp = distanceToBottom > threshold;
+            });
 
             const escapeHtml = (text) => {
                 const div = document.createElement('div');
@@ -114,31 +128,34 @@
                 return div.innerHTML;
             };
 
-            const formatDate = (isoDate) => {
-                const date = new Date(isoDate);
-                return date.toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', '');
-            };
+                    const formatDate = (isoDate) => {
+            const date = new Date(isoDate); // isoDate теперь с 'Z' – распознаётся как UTC
+            return date.toLocaleString('ru-RU', {
+                timeZone: 'Europe/Moscow',
+                day: '2-digit',
+                month: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            }).replace(',', '');
+        };
 
-            const buildConversationHref = (convo) => {
-                const url = new URL(window.location.origin + window.location.pathname);
-                url.searchParams.set('peer', convo.peerEmail);
-                if (convo.vacancyCompanyName) url.searchParams.set('companyName', convo.vacancyCompanyName);
-                if (convo.vacancyTitle) url.searchParams.set('title', convo.vacancyTitle);
-                return url.pathname + url.search;
-            };
-
-            const renderConversations = (conversations, selectedPeer, selectedCompanyName, selectedTitle) => {
+            const renderConversations = (conversations) => {
+                if (!conversationList) return;
                 if (!conversations.length) {
                     conversationList.innerHTML = '<div class="list-group-item text-muted">Пока нет активных чатов.</div>';
                     return;
                 }
 
                 conversationList.innerHTML = conversations.map((convo) => {
-                    const isActive = convo.peerEmail === selectedPeer
-                        && (convo.vacancyCompanyName || '') === (selectedCompanyName || '')
-                        && (convo.vacancyTitle || '') === (selectedTitle || '');
+                    const isActive = convo.peerEmail === currentPeer
+                        && (convo.vacancyCompanyName || '') === (currentCompany || '')
+                        && (convo.vacancyTitle || '') === (currentTitle || '');
                     return `
-                        <a class="list-group-item list-group-item-action ${isActive ? 'active' : ''}" href="${buildConversationHref(convo)}">
+                        <a class="list-group-item list-group-item-action ${isActive ? 'active' : ''}"
+                           data-peer="${escapeHtml(convo.peerEmail)}"
+                           data-company="${escapeHtml(convo.vacancyCompanyName || '')}"
+                           data-title="${escapeHtml(convo.vacancyTitle || '')}"
+                           href="javascript:void(0)">
                             <div class="d-flex align-items-start gap-2">
                                 <img src="${escapeHtml(convo.peerAvatarUrl || '/images/student.png')}" alt="Аватар ${escapeHtml(convo.peerEmail)}" class="rounded-circle flex-shrink-0" style="width: 40px; height: 40px; object-fit: cover;" />
                                 <div class="chat-convo-text">
@@ -149,9 +166,20 @@
                             </div>
                         </a>`;
                 }).join('');
+
+                document.querySelectorAll('#conversationList .list-group-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const peer = item.dataset.peer;
+                        const company = item.dataset.company || '';
+                        const title = item.dataset.title || '';
+                        selectConversation(peer, company, title);
+                    });
+                });
             };
 
             const renderMessages = (messages, currentUserEmail) => {
+                if (!messagesContainer) return;
                 if (!messages.length) {
                     messagesContainer.innerHTML = '<p class="text-muted mb-0">Сообщений пока нет.</p>';
                     return;
@@ -168,57 +196,133 @@
                         </div>`;
                 }).join('');
 
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                if (!isUserScrolledUp) {
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+            };
+
+            const selectConversation = (peer, company, title) => {
+                currentPeer = peer;
+                currentCompany = company;
+                currentTitle = title;
+                hiddenPeer.value = peer;
+                hiddenCompany.value = company;
+                hiddenTitle.value = title;
+                sendButton.disabled = false;
+                chatPeer.textContent = peer;
+                chatTitle.textContent = title ? `Вакансия: ${title}` : '';
+
+                const params = new URLSearchParams();
+                params.set('peer', peer);
+                if (company) params.set('companyName', company);
+                if (title) params.set('title', title);
+                const newUrl = `${window.location.pathname}?${params.toString()}`;
+                history.replaceState(null, '', newUrl);
+
+                isUserScrolledUp = false;
+                refreshChat();
             };
 
             const refreshChat = async () => {
+                if (!currentPeer) return;
+
                 const url = new URL(window.location.href);
                 url.searchParams.set('handler', 'Updates');
-                if (hiddenPeer?.value) url.searchParams.set('peer', hiddenPeer.value);
-                if (hiddenCompany?.value) url.searchParams.set('companyName', hiddenCompany.value);
-                if (hiddenTitle?.value) url.searchParams.set('title', hiddenTitle.value);
+                url.searchParams.set('peer', currentPeer);
+                if (currentCompany) url.searchParams.set('companyName', currentCompany);
+                if (currentTitle) url.searchParams.set('title', currentTitle);
 
                 const response = await fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
                 if (!response.ok) return;
 
                 const data = await response.json();
-                if (!hiddenPeer.value && data.selectedPeer) {
-                    hiddenPeer.value = data.selectedPeer;
-                    hiddenCompany.value = data.selectedCompanyName || '';
-                    hiddenTitle.value = data.selectedTitle || '';
-                }
 
-                if (sendButton) {
-                    sendButton.disabled = !data.selectedPeer;
-                }
-
-                chatPeer.textContent = data.selectedPeer || 'Выберите чат';
-                chatTitle.textContent = data.selectedTitle ? `Вакансия: ${data.selectedTitle}` : '';
-                renderConversations(data.conversations || [], data.selectedPeer, data.selectedCompanyName, data.selectedTitle);
+                renderConversations(data.conversations || []);
                 renderMessages(data.messages || [], data.currentUserEmail);
+
+                if (!currentPeer && data.selectedPeer) {
+                    selectConversation(data.selectedPeer, data.selectedCompanyName || '', data.selectedTitle || '');
+                }
+
+                sendButton.disabled = !currentPeer;
             };
 
-            refreshChat();
+            if (currentPeer) {
+                selectConversation(currentPeer, currentCompany, currentTitle);
+            } else {
+                renderConversations([]);
+            }
+
             setInterval(refreshChat, 5000);
 
-            // ===== ОТПРАВКА СООБЩЕНИЯ ПО ENTER =====
-            const textarea = document.querySelector('.chat-message-input');
-            if (textarea) {
-                textarea.addEventListener('keydown', function (e) {
+            // AJAX отправка сообщения
+            sendForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                if (!currentPeer || !messageInput.value.trim()) return;
+
+                const formData = new FormData(sendForm);
+                try {
+                    const response = await fetch(sendForm.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                        },
+                        body: formData
+                    });
+
+                    if (!response.ok) throw new Error('Network response was not ok');
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        const newMsg = result.message;
+                        const msgHtml = `
+                            <div class="d-flex mb-3 justify-content-end">
+                                <div class="chat-message-bubble p-2 rounded bg-primary text-white" style="max-width: 75%;">
+                                    <div class="chat-message-text">${escapeHtml(newMsg.message)}</div>
+                                    <div class="chat-message-time small text-white-50">${formatDate(newMsg.sentAt)}</div>
+                                </div>
+                            </div>`;
+                        messagesContainer.insertAdjacentHTML('beforeend', msgHtml);
+                        messageInput.value = '';
+
+                        if (!isUserScrolledUp) {
+                            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                        }
+                    } else {
+                        alert(result.error || 'Ошибка отправки');
+                    }
+                } catch (error) {
+                    console.error('Ошибка отправки сообщения:', error);
+                    alert('Не удалось отправить сообщение');
+                }
+            });
+
+            // Отправка по Enter
+            if (messageInput) {
+                messageInput.addEventListener('keydown', function (e) {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
-                        const form = this.closest('form');
-                        if (form) {
-                            const submitBtn = form.querySelector('#sendButton');
-                            if (submitBtn && !submitBtn.disabled) {
-                                form.submit(); // отправляем форму
-                            }
+                        if (sendButton && !sendButton.disabled && sendForm) {
+                            sendForm.dispatchEvent(new Event('submit', { cancelable: true }));
                         }
                     }
                 });
             }
         })();
     </script>
+
+@functions {
+    string FormatMskTime(DateTime dateTime)
+    {
+        var mskZone = TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time");
+        var utcTime = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
+        var mskTime = TimeZoneInfo.ConvertTimeFromUtc(utcTime, mskZone);
+        return mskTime.ToString("dd.MM HH:mm");
+    }
+}
 
     <style>
         .chat-message-input {
