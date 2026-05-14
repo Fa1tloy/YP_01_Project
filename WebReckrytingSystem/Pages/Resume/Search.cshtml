@@ -13,186 +13,209 @@
     </section>
 
     <div class="container my-4">
-        <form method="get" class="row g-3 align-items-end mb-4">
-            <div class="col-lg-9">
-                <label asp-for="SearchQuery" class="form-label fw-semibold">Строка поиска</label>
-                <input asp-for="SearchQuery" class="form-control" placeholder="ФИО, специальность, навыки" />
-            </div>
-            <div class="col-lg-3 d-grid">
-                <button type="submit" class="btn btn-info text-white fw-semibold">Найти</button>
-            </div>
-
-            <div class="col-lg-3 col-md-6">
-                <label asp-for="City" class="form-label">Город</label>
-                <input asp-for="City" class="form-control" placeholder="Москва" />
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <label asp-for="BusinessTripReadiness" class="form-label">Готовность к командировкам</label>
-                <select asp-for="BusinessTripReadiness" class="form-select">
-                    <option value="">Любая</option>
-                    <option value="yes">Да</option>
-                    <option value="no">Нет</option>
-                    <option value="sometimes">Иногда</option>
-                </select>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <label asp-for="SearchStatus" class="form-label">Статус поиска</label>
-                <select asp-for="SearchStatus" class="form-select">
-                    <option value="">Любой</option>
-                    <option>активно ищет</option>
-                    <option>рассматривает</option>
-                    <option>не ищет</option>
-                    <option>получил предложение</option>
-                    <option>вышел на работу</option>
-                </select>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <label asp-for="Specialty" class="form-label">Специальность</label>
-                <select asp-for="Specialty" class="form-select">
-                    <option value="">Любая</option>
-                    @foreach (var specialty in Model.Specialties)
-                    {
-                        <option value="@specialty">@specialty</option>
-                    }
-                </select>
-            </div>
-
-            <div class="col-lg-2 col-md-4">
-                <label asp-for="AgeFrom" class="form-label">Возраст от</label>
-                <input asp-for="AgeFrom" type="number" class="form-control" min="14" max="100" />
-            </div>
-            <div class="col-lg-2 col-md-4">
-                <label asp-for="AgeTo" class="form-label">Возраст до</label>
-                <input asp-for="AgeTo" type="number" class="form-control" min="14" max="100" />
-            </div>
-            <div class="col-lg-4 col-md-4">
-                <label asp-for="EmploymentType" class="form-label">Тип занятости</label>
-                <select asp-for="EmploymentType" class="form-select">
-                    <option value="">Любой</option>
-                    <option>полная занятость</option>
-                    <option>частичная занятость</option>
-                    <option>проектная</option>
-                    <option>волонтерство</option>
-                    <option>стажировка</option>
-                </select>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <label asp-for="WorkSchedule" class="form-label">График работы</label>
-                <select asp-for="WorkSchedule" class="form-select">
-                    <option value="">Любой</option>
-                    <option>полный день</option>
-                    <option>сменный график</option>
-                    <option>гибкий график</option>
-                    <option>удаленная работа</option>
-                    <option>вахтовый метод</option>
-                </select>
-            </div>
-
-            <div class="col-lg-3 col-md-6">
-                <label asp-for="Gender" class="form-label">Пол</label>
-                <select asp-for="Gender" class="form-select">
-                    <option value="">Любой</option>
-                    <option>мужской</option>
-                    <option>женский</option>
-                </select>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <label asp-for="SalaryExpectationsFrom" class="form-label">Зарплатные ожидания от</label>
-                <input asp-for="SalaryExpectationsFrom" type="number" class="form-control" min="0" />
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <label asp-for="SalaryExpectationsTo" class="form-label">Зарплатные ожидания до</label>
-                <input asp-for="SalaryExpectationsTo" type="number" class="form-control" min="0" />
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <label asp-for="DriverLicenseCategories" class="form-label">Категория(и) прав</label>
-                <div class="dropdown" data-bs-auto-close="outside" data-target-select="searchDriverLicenseCategories">
-                    <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Выберите категории прав
-                    </button>
-                    <ul class="dropdown-menu w-100 shadow-sm p-2">
-                        @foreach (var category in Model.AvailableDriverLicenseCategories)
-                        {
-                            <li>
-                                <button type="button" class="dropdown-item d-flex justify-content-between align-items-center rounded-3" data-license-value="@category">
-                                    <span>@category</span>
-                                    <i class="fas fa-check text-success d-none"></i>
-                                </button>
-                            </li>
-                        }
-                    </ul>
+        <form method="get" id="searchForm" class="mb-4">
+            <div class="row g-2 align-items-end">
+                <div class="col-lg-10">
+                    <label asp-for="SearchQuery" class="form-label fw-semibold">Строка поиска</label>
+                    <input asp-for="SearchQuery" class="form-control" placeholder="ФИО, специальность, навыки" />
                 </div>
-                <select asp-for="DriverLicenseCategories" id="searchDriverLicenseCategories" class="d-none" multiple>
-                    @foreach (var category in Model.AvailableDriverLicenseCategories)
-                    {
-                        <option value="@category">@category</option>
-                    }
-                </select>
+                <div class="col-lg-2 d-grid">
+                    <button type="submit" class="btn btn-info text-white fw-semibold">Найти</button>
+                </div>
             </div>
 
-            <div class="col-lg-4 col-md-6">
-                <label asp-for="Skills" class="form-label">Навыки</label>
-                <input asp-for="Skills" class="form-control" placeholder="SQL, C#, Photoshop" />
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <label asp-for="HasCar" class="form-label">Наличие автомобиля</label>
-                <select asp-for="HasCar" class="form-select">
-                    <option value="">Любое</option>
-                    <option value="yes">Есть</option>
-                    <option value="no">Нет</option>
-                </select>
-            </div>
-            <div class="col-lg-4 d-grid">
-                <a asp-page="/Resume/Search" class="btn btn-outline-secondary">Сбросить фильтры</a>
-            </div>
-        </form>
-
-        <h2 class="h5 mb-3">Список резюме (@Model.Resumes.Count)</h2>
-
-        @if (Model.Resumes.Any())
-        {
-            <div class="row g-3">
-                @foreach (var resume in Model.Resumes)
-                {
-                    <div class="col-xl-4 col-md-6">
-                        <div class="card h-100 shadow-sm border-0">
-                            <div class="card-body d-flex flex-column">
-                                <div class="d-flex align-items-start gap-3 mb-2">
-                                    <img src="@(string.IsNullOrWhiteSpace(resume.User?.AvatarUrl) ? "/images/student.png" : resume.User.AvatarUrl)"
-                                         alt="Аватар @resume.User?.LastName @resume.User?.FirstName"
-                                         style="width:48px;height:48px;object-fit:cover;border-radius:50%;" />
-                                    <div>
-                                        <h5 class="card-title mb-1">@resume.User?.LastName @resume.User?.FirstName</h5>
-                                        <div class="text-muted small mb-2">@resume.UserEmail</div>
-                                    </div>
-                                </div>
-                                <div class="fw-semibold mb-1">@resume.DesiredPosition</div>
-                                <div class="small text-muted mb-2">@resume.Specialty · @resume.City</div>
-                                <p class="small text-muted mb-2">@resume.EmploymentType, @resume.WorkSchedule</p>
-                                <p class="small text-muted flex-grow-1">@(string.IsNullOrWhiteSpace(resume.Skills) ? "Навыки не указаны" : $"Навыки: {resume.Skills}")</p>
-
-                                <div class="mb-3">
-                                    @if (resume.SalaryExpectations.HasValue)
-                                    {
-                                        <span class="badge bg-success">@resume.SalaryExpectations.Value.ToString("N0") ₽</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-secondary">З/п не указана</span>
-                                    }
-                                </div>
-
-                                <a asp-page="/Resume/Details" asp-route-userEmail="@resume.UserEmail" class="btn btn-outline-info mt-auto">Просмотреть</a>
+            <div class="row g-4 mt-1">
+                <div class="col-lg-4 col-xl-3">
+                    <div class="card shadow-sm border-0 sticky-top" style="top: 96px;">
+                        <div class="card-header bg-transparent fw-bold">Фильтры</div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label asp-for="City" class="form-label">Город</label>
+                                <input asp-for="City" class="form-control" placeholder="Москва" />
                             </div>
+
+                            <div class="mb-3">
+                                <label asp-for="BusinessTripReadiness" class="form-label">Готовность к командировкам</label>
+                                <select asp-for="BusinessTripReadiness" class="form-select">
+                                    <option value="">Любая</option>
+                                    <option value="yes">Да</option>
+                                    <option value="no">Нет</option>
+                                    <option value="sometimes">Иногда</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="SearchStatus" class="form-label">Статус поиска</label>
+                                <select asp-for="SearchStatus" class="form-select">
+                                    <option value="">Любой</option>
+                                    <option>активно ищет</option>
+                                    <option>рассматривает</option>
+                                    <option>не ищет</option>
+                                    <option>получил предложение</option>
+                                    <option>вышел на работу</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Specialty" class="form-label">Специальность</label>
+                                <select asp-for="Specialty" class="form-select">
+                                    <option value="">Любая</option>
+                                    @foreach (var specialty in Model.Specialties)
+                                    {
+                                        <option value="@specialty">@specialty</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="AgeFrom" class="form-label">Возраст от</label>
+                                <input asp-for="AgeFrom" type="number" class="form-control" min="14" max="100" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="AgeTo" class="form-label">Возраст до</label>
+                                <input asp-for="AgeTo" type="number" class="form-control" min="14" max="100" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="EmploymentType" class="form-label">Тип занятости</label>
+                                <select asp-for="EmploymentType" class="form-select">
+                                    <option value="">Любой</option>
+                                    <option>полная занятость</option>
+                                    <option>частичная занятость</option>
+                                    <option>проектная</option>
+                                    <option>волонтерство</option>
+                                    <option>стажировка</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="WorkSchedule" class="form-label">График работы</label>
+                                <select asp-for="WorkSchedule" class="form-select">
+                                    <option value="">Любой</option>
+                                    <option>полный день</option>
+                                    <option>сменный график</option>
+                                    <option>гибкий график</option>
+                                    <option>удаленная работа</option>
+                                    <option>вахтовый метод</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Gender" class="form-label">Пол</label>
+                                <select asp-for="Gender" class="form-select">
+                                    <option value="">Любой</option>
+                                    <option>мужской</option>
+                                    <option>женский</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="SalaryExpectationsFrom" class="form-label">Зарплата от</label>
+                                <input asp-for="SalaryExpectationsFrom" type="number" class="form-control" min="0" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="SalaryExpectationsTo" class="form-label">Зарплата до</label>
+                                <input asp-for="SalaryExpectationsTo" type="number" class="form-control" min="0" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Skills" class="form-label">Навыки</label>
+                                <input asp-for="Skills" class="form-control" placeholder="SQL, C#, Photoshop" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="HasCar" class="form-label">Наличие автомобиля</label>
+                                <select asp-for="HasCar" class="form-select">
+                                    <option value="">Любое</option>
+                                    <option value="yes">Есть</option>
+                                    <option value="no">Нет</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="DriverLicenseCategories" class="form-label">Категории прав</label>
+                                <div class="dropdown" data-bs-auto-close="outside" data-target-select="searchDriverLicenseCategories">
+                                    <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Выберите категории прав
+                                    </button>
+                                    <ul class="dropdown-menu w-100 shadow-sm p-2">
+                                        @foreach (var category in Model.AvailableDriverLicenseCategories)
+                                        {
+                                            <li>
+                                                <button type="button" class="dropdown-item d-flex justify-content-between align-items-center rounded-3" data-license-value="@category">
+                                                    <span>@category</span>
+                                                    <i class="fas fa-check text-success d-none"></i>
+                                                </button>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                                <select asp-for="DriverLicenseCategories" id="searchDriverLicenseCategories" class="d-none" multiple>
+                                    @foreach (var category in Model.AvailableDriverLicenseCategories)
+                                    {
+                                        <option value="@category">@category</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-info text-white w-100">Применить фильтры</button>
+                            <a asp-page="/Resume/Search" class="btn btn-outline-secondary w-100 mt-2">Сбросить</a>
                         </div>
                     </div>
-                }
+                </div>
+
+                <div class="col-lg-8 col-xl-9">
+                    <h2 class="h5 mb-3">Список резюме (@Model.Resumes.Count)</h2>
+
+                    @if (Model.Resumes.Any())
+                    {
+                        <div class="row g-3">
+                            @foreach (var resume in Model.Resumes)
+                            {
+                                <div class="col-xl-6">
+                                    <div class="card h-100 shadow-sm border-0">
+                                        <div class="card-body d-flex flex-column">
+                                            <div class="d-flex align-items-start gap-3 mb-2">
+                                                <img src="@(string.IsNullOrWhiteSpace(resume.User?.AvatarUrl) ? "/images/student.png" : resume.User.AvatarUrl)"
+                                                     alt="Аватар @resume.User?.LastName @resume.User?.FirstName"
+                                                     style="width:48px;height:48px;object-fit:cover;border-radius:50%;" />
+                                                <div>
+                                                    <h5 class="card-title mb-1">@resume.User?.LastName @resume.User?.FirstName</h5>
+                                                    <div class="text-muted small mb-2">@resume.UserEmail</div>
+                                                </div>
+                                            </div>
+                                            <div class="fw-semibold mb-1">@resume.DesiredPosition</div>
+                                            <div class="small text-muted mb-2">@resume.Specialty · @resume.City</div>
+                                            <p class="small text-muted mb-2">@resume.EmploymentType, @resume.WorkSchedule</p>
+                                            <p class="small text-muted flex-grow-1">@(string.IsNullOrWhiteSpace(resume.Skills) ? "Навыки не указаны" : $"Навыки: {resume.Skills}")</p>
+
+                                            <div class="mb-3">
+                                                @if (resume.SalaryExpectations.HasValue)
+                                                {
+                                                    <span class="badge bg-success">@resume.SalaryExpectations.Value.ToString("N0") ₽</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">З/п не указана</span>
+                                                }
+                                            </div>
+
+                                            <a asp-page="/Resume/Details" asp-route-userEmail="@resume.UserEmail" class="btn btn-outline-info mt-auto">Просмотреть</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-light border">Опубликованные резюме не найдены.</div>
+                    }
+                </div>
             </div>
-        }
-        else
-        {
-            <div class="alert alert-light border">Опубликованные резюме не найдены.</div>
-        }
+        </form>
     </div>
 </div>
 

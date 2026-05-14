@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 using WebReckrytingSystem.Models;
 using WebReckrytingSystem.Services;
 
@@ -11,14 +13,17 @@ namespace WebReckrytingSystem.Pages.Vacancy
     {
         private readonly IVacancySearchService _vacancySearchService;
         private readonly ISpecialtyService _specialtyService;
+        private readonly ApplicationDbContext _context; // добавлен контекст для запросов меток
         private readonly ILogger<SearchModel> _logger;
 
         public SearchModel(IVacancySearchService vacancySearchService,
                            ISpecialtyService specialtyService,
+                           ApplicationDbContext context,
                            ILogger<SearchModel> logger)
         {
             _vacancySearchService = vacancySearchService ?? throw new ArgumentNullException(nameof(vacancySearchService));
             _specialtyService = specialtyService ?? throw new ArgumentNullException(nameof(specialtyService));
+            _context = context ?? throw new ArgumentNullException(nameof(context));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -29,6 +34,10 @@ namespace WebReckrytingSystem.Pages.Vacancy
         public IReadOnlyList<string> Specialties { get; set; } = new List<string>();
         public string SuccessMessage { get; set; } = string.Empty;
         public string ErrorMessage { get; set; } = string.Empty;
+
+        // Метки для авторизованного соискателя
+        public HashSet<string> SavedVacancyKeys { get; set; } = new();
+        public HashSet<string> ViewedVacancyKeys { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -53,6 +62,9 @@ namespace WebReckrytingSystem.Pages.Vacancy
                     _logger.LogWarning("⚠️ Поиск не дал результатов: {Message}", ErrorMessage);
                     SearchResult = CreateEmptyResult();
                 }
+
+                // Загрузка меток для авторизованного соискателя
+                await LoadVacancyLabelsAsync();
 
                 return Page();
             }
@@ -90,6 +102,12 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 AddIfNotNull(query, "WorkHoursPerDay", SearchData.WorkHoursPerDay);
                 AddIfNotEmpty(query, "WorkFormat", SearchData.WorkFormat);
                 AddIfNotEmpty(query, "Specialty", SearchData.Specialty);
+
+                if (SearchData.IsPracticum.HasValue)
+                {
+                    query.Add("IsPracticum", SearchData.IsPracticum.Value.ToString());
+                }
+
                 query.Add("Page", SearchData.Page.ToString());
                 query.Add("PageSize", SearchData.PageSize.ToString());
 
@@ -103,6 +121,31 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 _logger.LogError(ex, "❌ Ошибка обработки формы поиска");
                 ErrorMessage = "Не удалось выполнить поиск";
                 return Page();
+            }
+        }
+
+        private async Task LoadVacancyLabelsAsync()
+        {
+            if (User.Identity?.IsAuthenticated == true && User.IsInRole("job_seeker"))
+            {
+                var userEmail = User.FindFirstValue(ClaimTypes.Email);
+                if (!string.IsNullOrEmpty(userEmail))
+                {
+                    // Сохранённые вакансии
+                    var savedKeys = await _context.SavedVacancies
+                        .Where(s => s.StudentEmail == userEmail)
+                        .Select(s => new { s.VacancyCompanyName, s.VacancyTitle })
+                        .ToListAsync();
+                    SavedVacancyKeys = savedKeys.Select(k => $"{k.VacancyCompanyName}||{k.VacancyTitle}").ToHashSet();
+
+                    // Просмотренные вакансии (из новой таблицы vacancy_views)
+                    var viewedKeys = await _context.Set<VacancyView>()
+                        .Where(v => v.UserEmail == userEmail)
+                        .Select(v => new { v.VacancyCompanyName, v.VacancyTitle })
+                        .Distinct()
+                        .ToListAsync();
+                    ViewedVacancyKeys = viewedKeys.Select(k => $"{k.VacancyCompanyName}||{k.VacancyTitle}").ToHashSet();
+                }
             }
         }
 

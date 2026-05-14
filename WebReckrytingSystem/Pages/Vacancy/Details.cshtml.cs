@@ -6,6 +6,7 @@ using WebReckrytingSystem.Models;
 
 namespace WebReckrytingSystem.Pages.Vacancy
 {
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]  // запрет кэширования
     public class DetailsModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -31,22 +32,26 @@ namespace WebReckrytingSystem.Pages.Vacancy
             if (Vacancy == null)
                 return NotFound();
 
-            // Запись просмотра вакансии соискателем
-            if (User.Identity?.IsAuthenticated == true && User.IsInRole("job_seeker"))
+            if (User.Identity?.IsAuthenticated == true)
             {
                 var userEmail = User.FindFirstValue(ClaimTypes.Email);
-                _context.Set<VacancyView>().Add(new VacancyView
-                {
-                    UserEmail = userEmail,
-                    VacancyCompanyName = companyName,
-                    VacancyTitle = title,
-                    ViewedAt = DateTime.UtcNow
-                });
-                await _context.SaveChangesAsync();
-            }
-        
 
-            // Показываем сообщение из TempData, если есть
+                if (User.IsInRole("job_seeker"))
+                {
+                    IsSavedByCurrentStudent = await _context.SavedVacancies
+                        .AnyAsync(s => s.StudentEmail == userEmail &&
+                                       s.VacancyCompanyName == companyName &&
+                                       s.VacancyTitle == title);
+
+                    HasExistingChat = await _context.ChatMessages
+                        .AnyAsync(m =>
+                            ((m.SenderEmail == userEmail && m.RecipientEmail == Vacancy.AuthorEmail) ||
+                             (m.SenderEmail == Vacancy.AuthorEmail && m.RecipientEmail == userEmail)) &&
+                            m.VacancyCompanyName == companyName &&
+                            m.VacancyTitle == title);
+                }
+            }
+
             StatusMessage = TempData["StatusMessage"]?.ToString();
             return Page();
         }
@@ -68,17 +73,14 @@ namespace WebReckrytingSystem.Pages.Vacancy
             if (Vacancy == null)
                 return NotFound();
 
-            // Удаляем старый отклик, если он существует (чтобы можно было переоткликнуться после удаления чата)
+            // Удаляем старый отклик, если он существует
             var existingApp = await _context.JobApplications
                 .FirstOrDefaultAsync(a => a.StudentEmail == studentEmail &&
                                           a.VacancyCompanyName == companyName &&
                                           a.VacancyTitle == title);
             if (existingApp != null)
-            {
                 _context.JobApplications.Remove(existingApp);
-            }
 
-            // Создаём новый отклик
             _context.JobApplications.Add(new JobApplication
             {
                 StudentEmail = studentEmail,
@@ -88,7 +90,6 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 AppliedAt = DateTime.UtcNow
             });
 
-            // Уведомление автору (администратору)
             _context.Notifications.Add(new Notification
             {
                 RecipientEmail = Vacancy.AuthorEmail,
@@ -100,7 +101,6 @@ namespace WebReckrytingSystem.Pages.Vacancy
                 IsRead = false
             });
 
-            // Первое сообщение в чат
             _context.ChatMessages.Add(new ChatMessage
             {
                 SenderEmail = studentEmail,

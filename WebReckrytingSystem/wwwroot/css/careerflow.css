@@ -708,3 +708,8 @@ img,
     --bs-table-color: #e9edf5;
     color: #e9edf5;
 }
+:root[data-theme='dark'] .form-control::placeholder,
+:root[data-theme='dark'] .form-select::placeholder {
+    color: #ffffff !important;
+    opacity: 1;
+}

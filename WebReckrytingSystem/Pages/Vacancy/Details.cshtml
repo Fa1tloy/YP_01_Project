@@ -229,7 +229,6 @@
                                 <div class="vstack gap-2">
                                     @if (User.Identity?.IsAuthenticated == true && User.IsInRole("job_seeker"))
                                     {
-                                        // Если чат уже существует, показываем только кнопку «Перейти в чат»
                                         if (Model.HasExistingChat)
                                         {
                                             <a href="/Account/Chat?peer=@Model.Vacancy.AuthorEmail&companyName=@Model.Vacancy.CompanyName&title=@Model.Vacancy.Title"
@@ -239,7 +238,6 @@
                                         }
                                         else
                                         {
-                                            // Чат ещё не создан – отклик
                                             <form method="post" asp-page-handler="Apply" class="w-100">
                                                 <input type="hidden" name="companyName" value="@Model.Vacancy.CompanyName" />
                                                 <input type="hidden" name="title" value="@Model.Vacancy.Title" />
@@ -249,11 +247,13 @@
                                             </form>
                                         }
 
-                                        <!-- Избранное доступно всегда -->
-                                        <form method="post" asp-page-handler="SaveVacancy" class="w-100">
+                                        <!-- Сохранить в избранное (кнопка блокируется после клика) -->
+                                        <form method="post" asp-page-handler="SaveVacancy" class="w-100"
+                                              onsubmit="this.querySelector('button').disabled = true; return true;">
                                             <input type="hidden" name="companyName" value="@Model.Vacancy.CompanyName" />
                                             <input type="hidden" name="title" value="@Model.Vacancy.Title" />
-                                            <button type="submit" class="btn @(Model.IsSavedByCurrentStudent ? "btn-warning" : "btn-outline-warning") w-100 py-3">
+                                            <button type="submit" class="btn @(Model.IsSavedByCurrentStudent ? "btn-warning" : "btn-outline-warning") w-100 py-3"
+                                                @(Model.IsSavedByCurrentStudent ? "title=\"Удалить из избранного\"" : "title=\"Сохранить в избранное\"")>
                                                 <i class="fas fa-star me-2"></i>
                                                 @(Model.IsSavedByCurrentStudent ? "Удалить из избранного" : "Сохранить в избранное")
                                             </button>
