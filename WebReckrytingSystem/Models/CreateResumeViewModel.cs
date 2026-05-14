@@ -71,26 +71,18 @@ namespace WebReckrytingSystem.Models
         [Display(Name = "Описание опыта работы")]
         public string? ExperienceDescription { get; set; }
 
-        // Образование
+        // Образование – только учебное заведение и год окончания
         [Required(ErrorMessage = "Укажите учебное заведение")]
         [StringLength(255, ErrorMessage = "Название учебного заведения не должно превышать 255 символов")]
         [Display(Name = "Учебное заведение")]
         public string EducationalInstitution { get; set; } = "ФГБОУ Колледж Росрезерва";
-
-        [StringLength(255, ErrorMessage = "Факультет не должен превышать 255 символов")]
-        [Display(Name = "Факультет")]
-        public string? Faculty { get; set; }
-
-        [StringLength(255, ErrorMessage = "Специализация не должна превышать 255 символов")]
-        [Display(Name = "Специализация")]
-        public string? Specialization { get; set; }
 
         [Range(1900, 2025, ErrorMessage = "Год окончания должен быть между 1900 и текущим годом")]
         [Display(Name = "Год окончания")]
         public int? GraduationYear { get; set; }
 
         // Навыки
-        public List<string> Skills { get; set; } = new(); // оставлено для совместимости
+        public List<string> Skills { get; set; } = new();
 
         [Display(Name = "Опубликовать резюме")]
         public bool IsPublished { get; set; } = true;

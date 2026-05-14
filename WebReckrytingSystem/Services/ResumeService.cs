@@ -155,6 +155,7 @@ namespace WebReckrytingSystem.Services
             return parts.Any() ? string.Join("\n", parts) : null;
         }
 
+
         private string? FormatEducationDescription(CreateResumeViewModel model)
         {
             var parts = new List<string>();
@@ -162,12 +163,6 @@ namespace WebReckrytingSystem.Services
             if (!string.IsNullOrWhiteSpace(model.EducationalInstitution))
             {
                 var education = model.EducationalInstitution.Trim();
-
-                if (!string.IsNullOrWhiteSpace(model.Faculty))
-                    education += $", {model.Faculty.Trim()}";
-
-                if (!string.IsNullOrWhiteSpace(model.Specialization))
-                    education += $", {model.Specialization.Trim()}";
 
                 if (model.GraduationYear.HasValue)
                     education += $", {model.GraduationYear} г.";

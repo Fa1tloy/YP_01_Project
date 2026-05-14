@@ -25,18 +25,19 @@
                         <h5 class="fw-bold mb-0"><i class="fas fa-id-card text-primary me-2"></i>Основная информация</h5>
                     </div>
                     <div class="card-body p-4 pt-2">
+                        <!-- Желаемая должность -->
                         <div class="mb-3">
                             <label asp-for="ResumeData.DesiredPosition" class="form-label fw-600">Желаемая должность *</label>
                             <input asp-for="ResumeData.DesiredPosition" class="form-control form-control-lg rounded-pill" placeholder=".NET Developer" />
                             <span asp-validation-for="ResumeData.DesiredPosition" class="text-danger small"></span>
                         </div>
-
+                        <!-- Зарплата -->
                         <div class="mb-3">
                             <label asp-for="ResumeData.SalaryExpectations" class="form-label fw-600">Зарплатные ожидания (руб.)</label>
                             <input asp-for="ResumeData.SalaryExpectations" type="number" class="form-control form-control-lg rounded-pill" min="0" max="9999999" placeholder="100000" />
                             <span asp-validation-for="ResumeData.SalaryExpectations" class="text-danger small"></span>
                         </div>
-
+                        <!-- Специальность -->
                         <div class="mb-3">
                             <label asp-for="ResumeData.Specialty" class="form-label fw-600">Специальность *</label>
                             <select asp-for="ResumeData.Specialty" class="form-select form-select-lg rounded-pill" required>
@@ -48,19 +49,19 @@
                             </select>
                             <span asp-validation-for="ResumeData.Specialty" class="text-danger small"></span>
                         </div>
-
+                        <!-- Город -->
                         <div class="mb-3">
                             <label asp-for="ResumeData.City" class="form-label fw-600">Город *</label>
                             <input asp-for="ResumeData.City" class="form-control form-control-lg rounded-pill" placeholder="Москва" required />
                             <span asp-validation-for="ResumeData.City" class="text-danger small"></span>
                         </div>
-
+                        <!-- Возраст -->
                         <div class="mb-3">
                             <label asp-for="ResumeData.Age" class="form-label fw-600">Возраст *</label>
                             <input asp-for="ResumeData.Age" type="number" class="form-control form-control-lg rounded-pill" min="14" max="100" placeholder="22" required />
                             <span asp-validation-for="ResumeData.Age" class="text-danger small"></span>
                         </div>
-
+                        <!-- Пол -->
                         <div class="mb-3">
                             <label asp-for="ResumeData.Gender" class="form-label fw-600">Пол *</label>
                             <select asp-for="ResumeData.Gender" class="form-select form-select-lg rounded-pill" required>
@@ -70,7 +71,7 @@
                             </select>
                             <span asp-validation-for="ResumeData.Gender" class="text-danger small"></span>
                         </div>
-
+                        <!-- Командировки -->
                         <div class="mb-3">
                             <label asp-for="ResumeData.BusinessTripReadiness" class="form-label fw-600">Готовность к командировкам *</label>
                             <select asp-for="ResumeData.BusinessTripReadiness" class="form-select form-select-lg rounded-pill" required>
@@ -81,7 +82,7 @@
                             </select>
                             <span asp-validation-for="ResumeData.BusinessTripReadiness" class="text-danger small"></span>
                         </div>
-
+                        <!-- Статус поиска -->
                         <div class="mb-3">
                             <label asp-for="ResumeData.SearchStatus" class="form-label fw-600">Статус поиска *</label>
                             <select asp-for="ResumeData.SearchStatus" class="form-select form-select-lg rounded-pill" required>
@@ -94,7 +95,7 @@
                             </select>
                             <span asp-validation-for="ResumeData.SearchStatus" class="text-danger small"></span>
                         </div>
-
+                        <!-- Тип занятости -->
                         <div class="mb-3">
                             <label asp-for="ResumeData.EmploymentType" class="form-label fw-600">Тип занятости *</label>
                             <select asp-for="ResumeData.EmploymentType" class="form-select form-select-lg rounded-pill" required>
@@ -107,7 +108,7 @@
                             </select>
                             <span asp-validation-for="ResumeData.EmploymentType" class="text-danger small"></span>
                         </div>
-
+                        <!-- График -->
                         <div>
                             <label asp-for="ResumeData.WorkSchedule" class="form-label fw-600">График работы *</label>
                             <select asp-for="ResumeData.WorkSchedule" class="form-select form-select-lg rounded-pill" required>
@@ -130,43 +131,32 @@
                         <h5 class="fw-bold mb-0"><i class="fas fa-graduation-cap text-primary me-2"></i>Образование и опыт</h5>
                     </div>
                     <div class="card-body p-4 pt-2">
+                        <!-- Учебное заведение (только чтение) -->
                         <div class="mb-3">
                             <label asp-for="ResumeData.EducationalInstitution" class="form-label fw-600">Учебное заведение *</label>
                             <input asp-for="ResumeData.EducationalInstitution" class="form-control rounded-pill bg-light text-muted" readonly />
                             <small class="form-text text-muted">Учебное заведение установлено автоматически и не может быть изменено.</small>
                             <span asp-validation-for="ResumeData.EducationalInstitution" class="text-danger small"></span>
                         </div>
-
-                        <div class="mb-3">
-                            <label asp-for="ResumeData.Faculty" class="form-label fw-600">Факультет</label>
-                            <input asp-for="ResumeData.Faculty" class="form-control rounded-pill" placeholder="Факультет ВМК" />
-                            <span asp-validation-for="ResumeData.Faculty" class="text-danger small"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="ResumeData.Specialization" class="form-label fw-600">Специализация</label>
-                            <input asp-for="ResumeData.Specialization" class="form-control rounded-pill" placeholder="Прикладная математика" />
-                            <span asp-validation-for="ResumeData.Specialization" class="text-danger small"></span>
-                        </div>
-
+                        <!-- Год окончания -->
                         <div class="mb-3">
                             <label asp-for="ResumeData.GraduationYear" class="form-label fw-600">Год окончания</label>
                             <input asp-for="ResumeData.GraduationYear" type="number" class="form-control rounded-pill" min="1900" max="2025" placeholder="2023" />
                             <span asp-validation-for="ResumeData.GraduationYear" class="text-danger small"></span>
                         </div>
-
+                        <!-- Опыт работы (лет) -->
                         <div class="mb-3">
                             <label asp-for="ResumeData.ExperienceYears" class="form-label fw-600">Опыт работы (лет)</label>
                             <input asp-for="ResumeData.ExperienceYears" type="number" class="form-control rounded-pill" min="0" max="60" placeholder="3" />
                             <span asp-validation-for="ResumeData.ExperienceYears" class="text-danger small"></span>
                         </div>
-
+                        <!-- Описание опыта -->
                         <div class="mb-3">
                             <label asp-for="ResumeData.ExperienceDescription" class="form-label fw-600">Описание опыта</label>
                             <textarea asp-for="ResumeData.ExperienceDescription" class="form-control rounded-3" rows="3" maxlength="1000" placeholder="Ключевые проекты и достижения"></textarea>
                             <span asp-validation-for="ResumeData.ExperienceDescription" class="text-danger small"></span>
                         </div>
-
+                        <!-- Автомобиль -->
                         <div class="mb-3">
                             <label asp-for="ResumeData.HasCar" class="form-label fw-600">Наличие автомобиля</label>
                             <select asp-for="ResumeData.HasCar" class="form-select rounded-pill">
@@ -175,7 +165,7 @@
                             </select>
                             <span asp-validation-for="ResumeData.HasCar" class="text-danger small"></span>
                         </div>
-
+                        <!-- Категории прав -->
                         <div>
                             <label asp-for="ResumeData.DriverLicenseCategories" class="form-label fw-600">Категория(и) прав</label>
                             <div class="dropdown" data-bs-auto-close="outside" data-target-select="createDriverLicenseCategories">
@@ -207,6 +197,7 @@
             </div>
         </div>
 
+        <!-- Практики -->
         <div class="card border-0 shadow-sm rounded-4 mt-4">
             <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
                 <h5 class="fw-bold mb-0"><i class="fas fa-briefcase text-primary me-2"></i>Практики во время учёбы</h5>
@@ -245,6 +236,7 @@
             </div>
         </div>
 
+        <!-- Навыки -->
         <div class="card border-0 shadow-sm rounded-4 mt-4">
             <div class="card-header bg-transparent border-0 pt-4 px-4">
                 <h5 class="fw-bold mb-0"><i class="fas fa-code text-primary me-2"></i>Ключевые навыки</h5>

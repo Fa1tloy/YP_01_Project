@@ -138,34 +138,11 @@ namespace WebReckrytingSystem.Pages.Account
                 viewModel.EducationalInstitution = parts[0];
             }
 
-            if (parts.Count > 1)
+            // Ищем год в строке (простое регулярное выражение)
+            var yearMatch = System.Text.RegularExpressions.Regex.Match(educationDescription, @"\b\d{4}\b");
+            if (yearMatch.Success && int.TryParse(yearMatch.Value, out var year))
             {
-                viewModel.Faculty = parts[1];
-            }
-
-            if (parts.Count > 2)
-            {
-                var yearPart = parts.FirstOrDefault(p => Regex.IsMatch(p, @"\b\d{4}\b"));
-                if (yearPart != null)
-                {
-                    var yearMatch = Regex.Match(yearPart, @"\b\d{4}\b");
-                    if (yearMatch.Success && int.TryParse(yearMatch.Value, out var year))
-                    {
-                        viewModel.GraduationYear = year;
-                    }
-
-                    var specializationParts = parts.Where(p => p != yearPart).Skip(2);
-                    viewModel.Specialization = specializationParts.Any() ? string.Join(", ", specializationParts) : null;
-                }
-                else
-                {
-                    viewModel.Specialization = string.Join(", ", parts.Skip(2));
-                }
-            }
-
-            if (string.IsNullOrWhiteSpace(viewModel.EducationalInstitution))
-            {
-                viewModel.EducationalInstitution = educationDescription;
+                viewModel.GraduationYear = year;
             }
         }
 

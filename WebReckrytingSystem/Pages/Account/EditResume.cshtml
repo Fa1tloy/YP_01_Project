@@ -199,38 +199,29 @@
                 </div>
 
                 <!-- Образование -->
-                <div class="card border-0 shadow-sm rounded-4 mt-4">
-                    <div class="card-header bg-transparent border-0 pt-4 px-4">
-                        <h5 class="fw-bold mb-0">
-                            <i class="fas fa-graduation-cap text-primary me-2"></i>Образование
-                        </h5>
-                    </div>
-                    <div class="card-body p-4 pt-2">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label asp-for="ResumeData.EducationalInstitution" class="form-label fw-600">Учебное заведение *</label>
-                                <input asp-for="ResumeData.EducationalInstitution" class="form-control rounded-pill bg-light text-muted" readonly />
-                                <small class="form-text text-muted">Учебное заведение установлено автоматически и не может быть изменено.</small>
-                                <span asp-validation-for="ResumeData.EducationalInstitution" class="text-danger small"></span>
-                            </div>
-                            <div class="col-md-6">
-                                <label asp-for="ResumeData.Faculty" class="form-label fw-600">Факультет</label>
-                                <input asp-for="ResumeData.Faculty" class="form-control rounded-pill" placeholder="Факультет ВМК" />
-                                <span asp-validation-for="ResumeData.Faculty" class="text-danger small"></span>
-                            </div>
-                            <div class="col-md-6">
-                                <label asp-for="ResumeData.Specialization" class="form-label fw-600">Специализация</label>
-                                <input asp-for="ResumeData.Specialization" class="form-control rounded-pill" placeholder="Прикладная математика" />
-                                <span asp-validation-for="ResumeData.Specialization" class="text-danger small"></span>
-                            </div>
-                            <div class="col-md-6">
-                                <label asp-for="ResumeData.GraduationYear" class="form-label fw-600">Год окончания</label>
-                                <input asp-for="ResumeData.GraduationYear" type="number" class="form-control rounded-pill" min="1900" max="2025" placeholder="2023" />
-                                <span asp-validation-for="ResumeData.GraduationYear" class="text-danger small"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Внутри карточки "Образование" -->
+<div class="card border-0 shadow-sm rounded-4 mt-4">
+    <div class="card-header bg-transparent border-0 pt-4 px-4">
+        <h5 class="fw-bold mb-0">
+            <i class="fas fa-graduation-cap text-primary me-2"></i>Образование
+        </h5>
+    </div>
+    <div class="card-body p-4 pt-2">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="ResumeData.EducationalInstitution" class="form-label fw-600">Учебное заведение *</label>
+                <input asp-for="ResumeData.EducationalInstitution" class="form-control rounded-pill bg-light text-muted" readonly />
+                <small class="form-text text-muted">Учебное заведение установлено автоматически и не может быть изменено.</small>
+                <span asp-validation-for="ResumeData.EducationalInstitution" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="ResumeData.GraduationYear" class="form-label fw-600">Год окончания</label>
+                <input asp-for="ResumeData.GraduationYear" type="number" class="form-control rounded-pill" min="1900" max="2025" placeholder="2023" />
+                <span asp-validation-for="ResumeData.GraduationYear" class="text-danger small"></span>
+            </div>
+        </div>
+    </div>
+</div>
 
                 <!-- Навыки -->
                 <div class="card border-0 shadow-sm rounded-4 mt-4">
