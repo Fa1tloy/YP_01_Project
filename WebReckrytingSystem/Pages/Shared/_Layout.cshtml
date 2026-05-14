@@ -30,24 +30,26 @@
 
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-            <div class="container d-flex justify-content-between align-items-center flex-nowrap">
-                <!-- Логотип – всегда слева, ведёт на главную -->
+            <div class="container">
+                <!-- Логотип -->
                 <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
                     <img src="~/images/logotip.png" alt="Твоя Карьера" height="60" class="me-2" />
                     <span class="logo-text">Твоя Карьера</span>
                 </a>
 
-                <!-- Правая группа (прижата к правому краю) -->
-                <div class="d-flex align-items-center ms-auto">
-                    <!-- Кнопки поиска видны ТОЛЬКО на больших экранах -->
-                    <div class="d-none d-lg-flex align-items-center gap-2 me-3">
-                        <a href="@searchVacanciesUrl" class="btn search-mode-btn @(ViewContext.RouteData.Values["page"]?.ToString() == "/Vacancy/Search" ? "active" : "")">
-                            <i class="fas fa-briefcase me-1"></i>Поиск вакансий
-                        </a>
-                        <a href="@searchResumesUrl" class="btn search-mode-btn @(ViewContext.RouteData.Values["page"]?.ToString() == "/Resume/Search" ? "active" : "")">
-                            <i class="fas fa-address-card me-1"></i>Поиск резюме
-                        </a>
-                    </div>
+                <!-- Гамбургер (мобильные) -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Десктопная панель (скрыта на мобильных) -->
+                <div class="d-none d-lg-flex align-items-center ms-auto gap-2">
+                    <a href="@searchVacanciesUrl" class="btn search-mode-btn @(ViewContext.RouteData.Values["page"]?.ToString() == "/Vacancy/Search" ? "active" : "")">
+                        <i class="fas fa-briefcase me-1"></i>Поиск вакансий
+                    </a>
+                    <a href="@searchResumesUrl" class="btn search-mode-btn @(ViewContext.RouteData.Values["page"]?.ToString() == "/Resume/Search" ? "active" : "")">
+                        <i class="fas fa-address-card me-1"></i>Поиск резюме
+                    </a>
 
                     @if (!isAuthenticated)
                     {
@@ -55,34 +57,77 @@
                     }
                     else
                     {
-                        <ul class="navbar-nav">
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-user-circle me-1"></i> @User.FindFirst(ClaimTypes.GivenName)?.Value
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userMenu">
-                                    <li><a class="dropdown-item" href="@(isEmployer ? "/Account/EmployerDashboard" : isAdmin ? "/Admin/Index" : "/Account/JobSeekerDashboard")"><i class="fas fa-tachometer-alt me-2"></i>Личный кабинет</a></li>
-                                    <li><a class="dropdown-item" href="@(isEmployer ? "/Resume/Search" : "/Vacancy/Search")"><i class="fas fa-search me-2"></i>Поиск</a></li>
-                                    <li><a class="dropdown-item" href="/Account/Notifications"><i class="fas fa-bell me-2"></i>Уведомления</a></li>
-                                    <li><a class="dropdown-item" href="/Account/Chat"><i class="fas fa-comment me-2"></i>Чаты</a></li>
-                                    <li><a class="dropdown-item" href="/Account/Favorites"><i class="fas fa-star me-2"></i>Избранное</a></li>
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1"></i> @User.FindFirst(ClaimTypes.GivenName)?.Value
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                <li><a class="dropdown-item" href="@(isEmployer ? "/Account/EmployerDashboard" : isAdmin ? "/Admin/Index" : "/Account/JobSeekerDashboard")"><i class="fas fa-tachometer-alt me-2"></i>Личный кабинет</a></li>
+                                <li><a class="dropdown-item" href="@(isEmployer ? "/Resume/Search" : "/Vacancy/Search")"><i class="fas fa-search me-2"></i>Поиск</a></li>
+                                <li><a class="dropdown-item" href="/Account/Notifications"><i class="fas fa-bell me-2"></i>Уведомления</a></li>
+                                <li><a class="dropdown-item" href="/Account/Chat"><i class="fas fa-comment me-2"></i>Чаты</a></li>
+                                <li><a class="dropdown-item" href="/Account/Favorites"><i class="fas fa-star me-2"></i>Избранное</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/Account/Settings"><i class="fas fa-cog me-2"></i>Настройки</a></li>
+                                @if (isAdmin)
+                                {
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="/Account/Settings"><i class="fas fa-cog me-2"></i>Настройки</a></li>
-                                    @if (isAdmin)
-                                    {
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" href="/Admin/Index"><i class="fas fa-shield-alt me-2"></i>Админ-панель</a></li>
-                                    }
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <form method="post" asp-page="/Account/Logout">
-                                            <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i>Выход</button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
+                                    <li><a class="dropdown-item" href="/Admin/Index"><i class="fas fa-shield-alt me-2"></i>Админ-панель</a></li>
+                                }
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="post" asp-page="/Account/Logout">
+                                        <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i>Выход</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
                     }
+                </div>
+
+                <!-- Мобильное меню (видно только на мобильных, скрыто на десктопе) -->
+                <div class="collapse navbar-collapse d-lg-none" id="navbarNav">
+                    <div class="py-3">
+                        <a href="@searchVacanciesUrl" class="btn search-mode-btn w-100 mb-2 @(ViewContext.RouteData.Values["page"]?.ToString() == "/Vacancy/Search" ? "active" : "")">
+                            <i class="fas fa-briefcase me-1"></i>Поиск вакансий
+                        </a>
+                        <a href="@searchResumesUrl" class="btn search-mode-btn w-100 mb-2 @(ViewContext.RouteData.Values["page"]?.ToString() == "/Resume/Search" ? "active" : "")">
+                            <i class="fas fa-address-card me-1"></i>Поиск резюме
+                        </a>
+                        @if (!isAuthenticated)
+                        {
+                            <a href="/Account/Login" class="btn btn-login w-100 mb-2">Войти</a>
+                        }
+                        else
+                        {
+                            <a href="@(isEmployer ? "/Account/EmployerDashboard" : isAdmin ? "/Admin/Index" : "/Account/JobSeekerDashboard")" class="btn btn-outline-light w-100 mb-2">
+                                <i class="fas fa-tachometer-alt me-1"></i>Личный кабинет
+                            </a>
+                            <a href="/Account/Notifications" class="btn btn-outline-light w-100 mb-2">
+                                <i class="fas fa-bell me-1"></i>Уведомления
+                            </a>
+                            <a href="/Account/Chat" class="btn btn-outline-light w-100 mb-2">
+                                <i class="fas fa-comment me-1"></i>Чаты
+                            </a>
+                            <a href="/Account/Favorites" class="btn btn-outline-light w-100 mb-2">
+                                <i class="fas fa-star me-1"></i>Избранное
+                            </a>
+                            <a href="/Account/Settings" class="btn btn-outline-light w-100 mb-2">
+                                <i class="fas fa-cog me-1"></i>Настройки
+                            </a>
+                            @if (isAdmin)
+                            {
+                                <a href="/Admin/Index" class="btn btn-outline-warning w-100 mb-2">
+                                    <i class="fas fa-shield-alt me-1"></i>Админ-панель
+                                </a>
+                            }
+                            <form method="post" asp-page="/Account/Logout">
+                                <button type="submit" class="btn btn-outline-danger w-100">
+                                    <i class="fas fa-sign-out-alt me-1"></i>Выход
+                                </button>
+                            </form>
+                        }
+                    </div>
                 </div>
             </div>
         </nav>
@@ -92,6 +137,7 @@
         @RenderBody()
     </main>
 
+    <!-- Футер и остальное без изменений -->
     <footer class="footer py-5">
         <div class="container">
             <div class="row">
@@ -104,13 +150,11 @@
                 </div>
                 <div class="col-md-2 mb-4">
                     <h6 class="fw-bold">Для студентов</h6>
-                    <ul class="list-unstyled">
-                    </ul>
+                    <ul class="list-unstyled"></ul>
                 </div>
                 <div class="col-md-2 mb-4">
                     <h6 class="fw-bold">Для работодателей</h6>
-                    <ul class="list-unstyled">
-                    </ul>
+                    <ul class="list-unstyled"></ul>
                 </div>
                 <div class="col-md-2 mb-4">
                     <h6 class="fw-bold">О нас</h6>

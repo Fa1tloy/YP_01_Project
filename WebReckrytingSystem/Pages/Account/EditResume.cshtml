@@ -200,6 +200,7 @@
 
                 <!-- Образование -->
                 <!-- Внутри карточки "Образование" -->
+<!-- Образование -->
 <div class="card border-0 shadow-sm rounded-4 mt-4">
     <div class="card-header bg-transparent border-0 pt-4 px-4">
         <h5 class="fw-bold mb-0">
@@ -208,6 +209,17 @@
     </div>
     <div class="card-body p-4 pt-2">
         <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="ResumeData.Specialty" class="form-label fw-600">Специальность *</label>
+                <select asp-for="ResumeData.Specialty" class="form-select form-select-lg rounded-pill" required>
+                    <option value="">Выберите специальность</option>
+                    @foreach (var specialty in Model.Specialties)
+                    {
+                        <option value="@specialty">@specialty</option>
+                    }
+                </select>
+                <span asp-validation-for="ResumeData.Specialty" class="text-danger small"></span>
+            </div>
             <div class="col-md-6">
                 <label asp-for="ResumeData.EducationalInstitution" class="form-label fw-600">Учебное заведение *</label>
                 <input asp-for="ResumeData.EducationalInstitution" class="form-control rounded-pill bg-light text-muted" readonly />
