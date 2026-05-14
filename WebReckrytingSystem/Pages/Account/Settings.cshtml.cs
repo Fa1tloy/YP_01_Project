@@ -94,6 +94,18 @@ namespace WebReckrytingSystem.Pages.Account
 
             try
             {
+                // Удаляем старый пользовательский аватар, если он существует
+                if (!string.IsNullOrEmpty(user.AvatarUrl) &&
+                    user.AvatarUrl.StartsWith("/uploads/avatars/"))
+                {
+                    var oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath,
+                                                    user.AvatarUrl.TrimStart('/'));
+                    if (System.IO.File.Exists(oldFilePath))
+                    {
+                        System.IO.File.Delete(oldFilePath);
+                    }
+                }
+
                 var uploadsDir = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "avatars");
                 Directory.CreateDirectory(uploadsDir);
 

@@ -32,10 +32,9 @@ namespace WebReckrytingSystem.Pages.Account
 
         // Статистика
         public int TotalApplications { get; set; }
-        public int TotalViews { get; set; }
+        public int TotalVacancyViews { get; set; }
         public int SavedVacanciesCount { get; set; }
-        public int WeekViews { get; set; }
-        public int MonthViews { get; set; }
+    
 
         // Данные для отображения
         public List<DailyAnalytic> WeekData { get; set; } = new();
@@ -113,15 +112,11 @@ namespace WebReckrytingSystem.Pages.Account
             try
             {
                 TotalApplications = _context.Set<JobApplication>().Count(a => a.StudentEmail == userEmail);
-                TotalViews = _context.ResumeViews.Count(v => v.ResumeEmail == userEmail);
+                TotalVacancyViews = _context.Set<VacancyView>().Count(v => v.UserEmail == userEmail);
                 SavedVacanciesCount = _context.SavedVacancies.Count(s => s.StudentEmail == userEmail);
 
+                // WeekData можно оставить для графика, но WeekViews больше не нужен
                 var weekAgo = DateTime.Now.AddDays(-7);
-                WeekViews = _context.ResumeViews.Count(v => v.ResumeEmail == userEmail && v.ViewedAt >= weekAgo);
-
-                var monthAgo = DateTime.Now.AddDays(-30);
-                MonthViews = _context.ResumeViews.Count(v => v.ResumeEmail == userEmail && v.ViewedAt >= monthAgo);
-
                 WeekData = _context.DailyAnalytics
                     .Where(d => d.UserEmail == userEmail && d.Date >= weekAgo)
                     .OrderBy(d => d.Date)

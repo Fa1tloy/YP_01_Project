@@ -28,20 +28,24 @@
                         </div>
                     }
 
+                    <!-- Блок загрузки аватара – теперь одна кнопка -->
                     <div class="border rounded-3 p-3 mb-4">
                         <div class="d-flex align-items-center gap-3">
                             <img src="@Model.CurrentAvatarUrl" alt="Аватар" class="rounded-circle" style="width:72px;height:72px;object-fit:cover;" />
                             <div class="flex-grow-1">
                                 <div class="fw-semibold mb-1">Аватар профиля</div>
                                 <small class="text-muted d-block mb-2">Если фото не загружено, используется стандартный аватар.</small>
-                                <form method="post" enctype="multipart/form-data" asp-page-handler="Avatar" class="d-flex gap-2 align-items-center">
-                                    <input asp-for="AvatarFile" type="file" accept="image/*" class="form-control form-control-sm" />
-                                    <button type="submit" class="btn btn-outline-primary btn-sm">Загрузить</button>
+                                <form method="post" enctype="multipart/form-data" asp-page-handler="Avatar" id="avatarUploadForm">
+                                    <input asp-for="AvatarFile" type="file" accept="image/*" style="display:none;" id="avatarFileInput" />
+                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('avatarFileInput').click();">
+                                        <i class="fas fa-camera me-1"></i> Загрузить фото
+                                    </button>
                                 </form>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Тёмная тема -->
                     <div class="border rounded-3 p-3 mb-4">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
@@ -54,6 +58,7 @@
                         </div>
                     </div>
 
+                    <!-- Смена пароля -->
                     <form method="post" asp-page-handler="Password">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -86,15 +91,20 @@
     </div>
 </div>
 
-
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        // Автоматическая отправка формы после выбора файла
+        document.getElementById('avatarFileInput').addEventListener('change', function() {
+            if (this.files.length > 0) {
+                document.getElementById('avatarUploadForm').submit();
+            }
+        });
+
+        // Переключение тёмной темы
         document.addEventListener('DOMContentLoaded', () => {
             const themeToggle = document.getElementById('themeToggle');
-            if (!themeToggle) {
-                return;
-            }
+            if (!themeToggle) return;
 
             const currentTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', currentTheme);

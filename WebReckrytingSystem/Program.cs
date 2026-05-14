@@ -141,6 +141,12 @@ PRIMARY KEY (`company_name`, `title`)");
 `name` VARCHAR(255) NOT NULL,
 PRIMARY KEY (`id`),
 UNIQUE INDEX `uq_specialties_name` (`name`)");
+    EnsureTableExists(connection, "vacancy_views", @"`id` INT NOT NULL AUTO_INCREMENT,
+`user_email` VARCHAR(255) NOT NULL,
+`vacancy_company_name` VARCHAR(255) NOT NULL,
+`vacancy_title` VARCHAR(255) NOT NULL,
+`viewed_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+PRIMARY KEY (`id`)");
 
     // Добавляем недостающие столбцы для других таблиц
     EnsureColumnExists(connection, "companies", "description", "TEXT NULL");

@@ -31,27 +31,20 @@ namespace WebReckrytingSystem.Pages.Vacancy
             if (Vacancy == null)
                 return NotFound();
 
-            if (User.Identity?.IsAuthenticated == true)
+            // Запись просмотра вакансии соискателем
+            if (User.Identity?.IsAuthenticated == true && User.IsInRole("job_seeker"))
             {
                 var userEmail = User.FindFirstValue(ClaimTypes.Email);
-
-                if (User.IsInRole("job_seeker"))
+                _context.Set<VacancyView>().Add(new VacancyView
                 {
-                    // Проверяем, сохранена ли вакансия
-                    IsSavedByCurrentStudent = await _context.SavedVacancies
-                        .AnyAsync(s => s.StudentEmail == userEmail &&
-                                       s.VacancyCompanyName == companyName &&
-                                       s.VacancyTitle == title);
-
-                    // Проверяем, есть ли уже чат с автором ИМЕННО ПО ЭТОЙ ВАКАНСИИ
-                    HasExistingChat = await _context.ChatMessages
-                        .AnyAsync(m =>
-                            ((m.SenderEmail == userEmail && m.RecipientEmail == Vacancy.AuthorEmail) ||
-                             (m.SenderEmail == Vacancy.AuthorEmail && m.RecipientEmail == userEmail)) &&
-                            m.VacancyCompanyName == companyName &&
-                            m.VacancyTitle == title);
-                }
+                    UserEmail = userEmail,
+                    VacancyCompanyName = companyName,
+                    VacancyTitle = title,
+                    ViewedAt = DateTime.UtcNow
+                });
+                await _context.SaveChangesAsync();
             }
+        
 
             // Показываем сообщение из TempData, если есть
             StatusMessage = TempData["StatusMessage"]?.ToString();

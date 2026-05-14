@@ -14,9 +14,12 @@
         <h1 class="hero-title">Вакансии для студентов</h1>
         <p class="hero-subtitle">Компании и вакансии размещает администратор, а соискатели общаются по откликам с администратором платформы</p>
         <div class="hero-buttons">
-            <a href="/Account/Register?role=job_seeker" class="btn btn-student me-3">
-                <i class="fas fa-user-graduate me-2"></i>Найти работу
-            </a>
+            @if (!User.Identity?.IsAuthenticated ?? false)
+            {
+                <a href="/Account/Register?role=job_seeker" class="btn btn-student me-3">
+                    <i class="fas fa-user-graduate me-2"></i>Найти работу
+                </a>
+            }
             <a href="/Vacancy/Search" class="btn btn-employer">
                 <i class="fas fa-search me-2"></i>Смотреть вакансии
             </a>

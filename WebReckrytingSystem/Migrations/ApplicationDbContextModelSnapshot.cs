@@ -611,6 +611,43 @@ namespace WebReckrytingSystem.Migrations
                     b.ToTable("vacancies", (string)null);
                 });
 
+            modelBuilder.Entity("WebReckrytingSystem.Models.VacancyView", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("UserEmail")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("user_email");
+
+                    b.Property<string>("VacancyCompanyName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("vacancy_company_name");
+
+                    b.Property<string>("VacancyTitle")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("vacancy_title");
+
+                    b.Property<DateTime>("ViewedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp")
+                        .HasColumnName("viewed_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("vacancy_views", (string)null);
+                });
+
             modelBuilder.Entity("WebReckrytingSystem.Models.Resume", b =>
                 {
                     b.HasOne("WebReckrytingSystem.Models.User", "User")

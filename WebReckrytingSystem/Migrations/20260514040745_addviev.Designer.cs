@@ -12,8 +12,8 @@ using WebReckrytingSystem.Models;
 namespace WebReckrytingSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260512120046_addpraktik")]
-    partial class addpraktik
+    [Migration("20260514040745_addviev")]
+    partial class addviev
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -612,6 +612,43 @@ namespace WebReckrytingSystem.Migrations
                     b.HasIndex("AuthorEmail");
 
                     b.ToTable("vacancies", (string)null);
+                });
+
+            modelBuilder.Entity("WebReckrytingSystem.Models.VacancyView", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("UserEmail")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("user_email");
+
+                    b.Property<string>("VacancyCompanyName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("vacancy_company_name");
+
+                    b.Property<string>("VacancyTitle")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("vacancy_title");
+
+                    b.Property<DateTime>("ViewedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp")
+                        .HasColumnName("viewed_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("vacancy_views", (string)null);
                 });
 
             modelBuilder.Entity("WebReckrytingSystem.Models.Resume", b =>

@@ -28,6 +28,7 @@ namespace WebReckrytingSystem.Models
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<SavedResume> SavedResumes { get; set; }
         public DbSet<Specialty> Specialties { get; set; }
+        public DbSet<VacancyView> VacancyViews { get; set; }
 
         // Для миграций — строка подключения, если опции не переданы
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -235,6 +236,15 @@ namespace WebReckrytingSystem.Models
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).HasColumnName("name").HasMaxLength(255).IsRequired();
                 entity.HasIndex(e => e.Name).IsUnique();
+            });
+            modelBuilder.Entity<VacancyView>().ToTable("vacancy_views");
+            modelBuilder.Entity<VacancyView>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.UserEmail).HasColumnName("user_email").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.VacancyCompanyName).HasColumnName("vacancy_company_name").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.VacancyTitle).HasColumnName("vacancy_title").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.ViewedAt).HasColumnName("viewed_at").HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
         }
     }

@@ -6,18 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Твоя Карьера</title>
 
-    <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="~/images/favicon.ico" />
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
 
-    <!-- ТОЛЬКО НУЖНЫЕ СТИЛИ -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- НОВЫЙ ДИЗАЙН -->
     <link rel="stylesheet" href="~/css/careerflow.css" asp-append-version="true" />
 
     @await RenderSectionAsync("Styles", required: false)
@@ -26,84 +21,67 @@
     @{
         var isAuthenticated = User.Identity?.IsAuthenticated == true;
         var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-
         var isEmployer = userRole == "employer";
         var isAdmin = userRole == "admin";
 
-        var currentPage = ViewContext.RouteData.Values["page"]?.ToString();
-        var logoUrl = isEmployer ? "/Resume/Search" : "/Vacancy/Search";
-        var profileUrl = isEmployer ? "/Account/EmployerDashboard" : isAdmin ? "/Admin/Index" : "/Account/JobSeekerDashboard";
-        var defaultSearchMode = currentPage == "/Resume/Search"
-            ? "resumes"
-            : currentPage == "/Vacancy/Search"
-                ? "vacancies"
-                : isEmployer
-                    ? "resumes"
-                    : "vacancies";
-        var searchUrl = isEmployer ? "/Resume/Search" : "/Vacancy/Search";
-        var showNavbarSearch = currentPage == "/Vacancy/Search" || currentPage == "/Resume/Search";
+        string searchVacanciesUrl = "/Vacancy/Search";
+        string searchResumesUrl = "/Resume/Search";
     }
 
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-            <div class="container">
-                <a class="navbar-brand fw-bold d-flex align-items-center" href="@logoUrl">
+            <div class="container d-flex justify-content-between align-items-center flex-nowrap">
+                <!-- Логотип – всегда слева, ведёт на главную -->
+                <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
                     <img src="~/images/logotip.png" alt="Твоя Карьера" height="60" class="me-2" />
                     <span class="logo-text">Твоя Карьера</span>
                 </a>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+                <!-- Правая группа (прижата к правому краю) -->
+                <div class="d-flex align-items-center ms-auto">
+                    <!-- Кнопки поиска видны ТОЛЬКО на больших экранах -->
+                    <div class="d-none d-lg-flex align-items-center gap-2 me-3">
+                        <a href="@searchVacanciesUrl" class="btn search-mode-btn @(ViewContext.RouteData.Values["page"]?.ToString() == "/Vacancy/Search" ? "active" : "")">
+                            <i class="fas fa-briefcase me-1"></i>Поиск вакансий
+                        </a>
+                        <a href="@searchResumesUrl" class="btn search-mode-btn @(ViewContext.RouteData.Values["page"]?.ToString() == "/Resume/Search" ? "active" : "")">
+                            <i class="fas fa-address-card me-1"></i>Поиск резюме
+                        </a>
+                    </div>
 
-                <div class="collapse navbar-collapse" id="navbarNav">
                     @if (!isAuthenticated)
                     {
-                        <div class="ms-auto">
-                            <a href="/Account/Login" class="btn btn-login">Войти</a>
-                        </div>
+                        <a href="/Account/Login" class="btn btn-login">Войти</a>
                     }
                     else
                     {
-                        <div class="navbar-auth-content w-100 d-lg-flex align-items-center justify-content-between gap-3">
-                            @if (showNavbarSearch)
-                            {
-                                <div class="navbar-search-block">
-                                    <div class="search-mode-switcher">
-                                        <button type="button" class="search-mode-btn @(defaultSearchMode == "vacancies" ? "active" : "")" data-search-mode="vacancies">Вакансии</button>
-                                        <button type="button" class="search-mode-btn @(defaultSearchMode == "resumes" ? "active" : "")" data-search-mode="resumes">Резюме</button>
-                                    </div>
-                                </div>
-                            }
-
-                            <ul class="navbar-nav align-items-lg-center ms-auto ">
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fas fa-user-circle me-1"></i> @User.FindFirst(ClaimTypes.GivenName)?.Value
-                                    </a>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userMenu">
-                                        <li><a class="dropdown-item" href="@profileUrl"><i class="fas fa-tachometer-alt me-2"></i>Личный кабинет</a></li>
-                                        <li><a class="dropdown-item" href="@searchUrl"><i class="fas fa-search me-2"></i>Поиск</a></li>
-                                        <li><a class="dropdown-item" href="/Account/Notifications"><i class="fas fa-bell me-2"></i>Уведомления</a></li>
-                                        <li><a class="dropdown-item" href="/Account/Chat"><i class="fas fa-comment me-2"></i>Чаты</a></li>
-                                        <li><a class="dropdown-item" href="/Account/Favorites"><i class="fas fa-star me-2"></i>Избранное</a></li>
+                        <ul class="navbar-nav">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user-circle me-1"></i> @User.FindFirst(ClaimTypes.GivenName)?.Value
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userMenu">
+                                    <li><a class="dropdown-item" href="@(isEmployer ? "/Account/EmployerDashboard" : isAdmin ? "/Admin/Index" : "/Account/JobSeekerDashboard")"><i class="fas fa-tachometer-alt me-2"></i>Личный кабинет</a></li>
+                                    <li><a class="dropdown-item" href="@(isEmployer ? "/Resume/Search" : "/Vacancy/Search")"><i class="fas fa-search me-2"></i>Поиск</a></li>
+                                    <li><a class="dropdown-item" href="/Account/Notifications"><i class="fas fa-bell me-2"></i>Уведомления</a></li>
+                                    <li><a class="dropdown-item" href="/Account/Chat"><i class="fas fa-comment me-2"></i>Чаты</a></li>
+                                    <li><a class="dropdown-item" href="/Account/Favorites"><i class="fas fa-star me-2"></i>Избранное</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="/Account/Settings"><i class="fas fa-cog me-2"></i>Настройки</a></li>
+                                    @if (isAdmin)
+                                    {
                                         <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" href="/Account/Settings"><i class="fas fa-cog me-2"></i>Настройки</a></li>
-                                        @if (isAdmin)
-                                        {
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item" href="/Admin/Index"><i class="fas fa-shield-alt me-2"></i>Админ-панель</a></li>
-                                        }
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <form method="post" asp-page="/Account/Logout">
-                                                <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i>Выход</button>
-                                            </form>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div>
+                                        <li><a class="dropdown-item" href="/Admin/Index"><i class="fas fa-shield-alt me-2"></i>Админ-панель</a></li>
+                                    }
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form method="post" asp-page="/Account/Logout">
+                                            <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i>Выход</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
                     }
                 </div>
             </div>
@@ -117,7 +95,6 @@
     <footer class="footer py-5">
         <div class="container">
             <div class="row">
-                <!-- ЛОГОТИП В ФУТЕРЕ -->
                 <div class="col-md-4 mb-4">
                     <a class="footer-brand d-flex align-items-center mb-3" href="/">
                         <img src="~/images/logotip.png" alt="Твоя Карьера" class="footer-logo me-2" />
@@ -125,18 +102,14 @@
                     </a>
                     <p class="text-white">Лучшая платформа для поиска работы и талантов</p>
                 </div>
-
-                <!-- Остальные колонки -->
                 <div class="col-md-2 mb-4">
                     <h6 class="fw-bold">Для студентов</h6>
                     <ul class="list-unstyled">
-                        
                     </ul>
                 </div>
                 <div class="col-md-2 mb-4">
                     <h6 class="fw-bold">Для работодателей</h6>
                     <ul class="list-unstyled">
-                       
                     </ul>
                 </div>
                 <div class="col-md-2 mb-4">
@@ -162,11 +135,9 @@
         </div>
     </footer>
 
-    <!-- ТОЛЬКО НУЖНЫЕ СКРИПТЫ -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/modern.js" asp-append-version="true"></script>
 
-    <!-- TOAST CONTAINER -->
     <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100">
         <div id="liveToast" class="toast" role="alert">
             <div class="toast-header">
@@ -180,40 +151,11 @@
     @await RenderSectionAsync("Scripts", required: false)
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const switchButtons = document.querySelectorAll('.search-mode-btn');
-            if (!switchButtons.length) {
-                return;
-            }
-
-            const applySearchMode = (mode) => {
-                switchButtons.forEach((button) => {
-                    button.classList.toggle('active', button.dataset.searchMode === mode);
-                });
-            };
-
-            switchButtons.forEach((button) => {
-                button.addEventListener('click', () => {
-                    const mode = button.dataset.searchMode;
-                    applySearchMode(mode);
-
-                    const targetPage = mode === 'resumes' ? '/Resume/Search' : '/Vacancy/Search';
-                    if (window.location.pathname !== targetPage) {
-                        window.location.href = targetPage;
-                    }
-                });
-            });
-
-            const activeButton = document.querySelector('.search-mode-btn.active');
-            applySearchMode(activeButton?.dataset.searchMode ?? 'vacancies');
-        });
-
-        // Активация toasts
         function showToast(message, type = 'success') {
-            const toast = new bootstrap.Toast(document.getElementById('liveToast'));
-            const toastBody = document.getElementById('toastMessage');
-            toastBody.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle text-success' : 'exclamation-circle text-danger'} me-2"></i>${message}`;
-            toast.show();
+        const toast = new bootstrap.Toast(document.getElementById('liveToast'));
+        const toastBody = document.getElementById('toastMessage');
+        toastBody.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle text-success' : 'exclamation-circle text-danger'} me-2"></i>${message}`;
+        toast.show();
         }
     </script>
 </body>
