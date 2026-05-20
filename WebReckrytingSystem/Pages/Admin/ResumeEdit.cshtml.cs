@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using WebReckrytingSystem.Data;
 using WebReckrytingSystem.Models;
-using WebReckrytingSystem.Models.Admin; // Добавьте это
+using WebReckrytingSystem.Models.Admin;
 using Microsoft.Extensions.Logging;
 
 namespace WebReckrytingSystem.Pages.Admin
@@ -23,29 +23,38 @@ namespace WebReckrytingSystem.Pages.Admin
         }
 
         [BindProperty]
-        public AdminResumeViewModel ResumeData { get; set; } = new(); // Используем новую модель
+        public AdminResumeViewModel ResumeData { get; set; } = new();
 
         public string? ErrorMessage { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string email)
         {
-            _logger.LogInformation($"=== OnGetAsync для {email} ===");
+            _logger.LogInformation("=== OnGetAsync РґР»СЏ {Email} ===", email);
 
             var resume = await _context.Resumes.Include(r => r.User).FirstOrDefaultAsync(r => r.UserEmail == email);
             if (resume == null)
             {
-                _logger.LogWarning("Резюме не найдено!");
+                _logger.LogWarning("Р РµР·СЋРјРµ РЅРµ РЅР°Р№РґРµРЅРѕ");
                 return NotFound();
             }
 
-            // Простое присвоение без промежуточных полей
             ResumeData = new AdminResumeViewModel
             {
                 DesiredPosition = resume.DesiredPosition,
                 SalaryExpectations = resume.SalaryExpectations,
+                City = resume.City,
+                BusinessTripReadiness = resume.BusinessTripReadiness,
+                SearchStatus = resume.SearchStatus,
+                Age = resume.Age,
+                EmploymentType = resume.EmploymentType,
+                WorkSchedule = resume.WorkSchedule,
+                Specialty = resume.Specialty,
+                Gender = resume.Gender,
+                HasCar = resume.HasCar,
+                DriverLicenseCategory = resume.DriverLicenseCategory,
                 ExperienceDescription = resume.ExperienceDescription,
-                EducationDescription = resume.EducationDescription, // Прямая строка
-                Skills = resume.Skills, // Прямая строка
+                EducationDescription = resume.EducationDescription,
+                Skills = resume.Skills,
                 IsPublished = resume.IsPublished
             };
 
@@ -59,33 +68,35 @@ namespace WebReckrytingSystem.Pages.Admin
 
         public async Task<IActionResult> OnPostAsync(string email)
         {
-            _logger.LogInformation($"=== OnPostAsync для {email} ===");
+            _logger.LogInformation("=== OnPostAsync РґР»СЏ {Email} ===", email);
 
             var resume = await _context.Resumes.FindAsync(email);
             if (resume == null)
             {
-                _logger.LogError("Резюме не найдено в POST!");
+                _logger.LogError("Р РµР·СЋРјРµ РЅРµ РЅР°Р№РґРµРЅРѕ РІ POST");
                 return NotFound();
             }
 
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning("ModelState не валиден:");
-                foreach (var error in ModelState)
-                {
-                    foreach (var err in error.Value.Errors)
-                    {
-                        _logger.LogWarning($"Ошибка в {error.Key}: {err.ErrorMessage}");
-                    }
-                }
+                _logger.LogWarning("ModelState РЅРµ РІР°Р»РёРґРµРЅ");
                 return Page();
             }
 
             try
             {
-                // Обновляем прямо из ResumeData
                 resume.DesiredPosition = ResumeData.DesiredPosition.Trim();
                 resume.SalaryExpectations = ResumeData.SalaryExpectations;
+                resume.City = ResumeData.City.Trim();
+                resume.BusinessTripReadiness = ResumeData.BusinessTripReadiness.Trim();
+                resume.SearchStatus = ResumeData.SearchStatus.Trim();
+                resume.Age = ResumeData.Age;
+                resume.EmploymentType = ResumeData.EmploymentType.Trim();
+                resume.WorkSchedule = ResumeData.WorkSchedule.Trim();
+                resume.Specialty = ResumeData.Specialty.Trim();
+                resume.Gender = ResumeData.Gender.Trim();
+                resume.HasCar = ResumeData.HasCar;
+                resume.DriverLicenseCategory = ResumeData.DriverLicenseCategory?.Trim();
                 resume.ExperienceDescription = ResumeData.ExperienceDescription?.Trim();
                 resume.EducationDescription = ResumeData.EducationDescription?.Trim();
                 resume.Skills = ResumeData.Skills?.Trim();
@@ -94,13 +105,13 @@ namespace WebReckrytingSystem.Pages.Admin
 
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Резюме успешно обновлено!";
+                TempData["SuccessMessage"] = "Р РµР·СЋРјРµ СѓСЃРїРµС€РЅРѕ РѕР±РЅРѕРІР»РµРЅРѕ!";
                 return RedirectToPage("/Admin/Resumes");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка при сохранении!");
-                ErrorMessage = $"Ошибка при сохранении: {ex.Message}";
+                _logger.LogError(ex, "РћС€РёР±РєР° РїСЂРё РѕР±РЅРѕРІР»РµРЅРёРё СЂРµР·СЋРјРµ");
+                ErrorMessage = $"РћС€РёР±РєР° РїСЂРё СЃРѕС…СЂР°РЅРµРЅРёРё: {ex.Message}";
                 return Page();
             }
         }
