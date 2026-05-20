@@ -32,6 +32,46 @@
                             <label asp-for="ResumeData.SalaryExpectations" class="form-label">Зарплатные ожидания</label>
                             <input asp-for="ResumeData.SalaryExpectations" type="number" class="form-control" />
                         </div>
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.City" class="form-label">Город *</label>
+                            <input asp-for="ResumeData.City" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.Age" class="form-label">Возраст</label>
+                            <input asp-for="ResumeData.Age" type="number" class="form-control" min="14" max="100" />
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.Gender" class="form-label">Пол *</label>
+                            <input asp-for="ResumeData.Gender" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.Specialty" class="form-label">Специальность *</label>
+                            <input asp-for="ResumeData.Specialty" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.BusinessTripReadiness" class="form-label">Командировки *</label>
+                            <input asp-for="ResumeData.BusinessTripReadiness" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.SearchStatus" class="form-label">Статус поиска *</label>
+                            <input asp-for="ResumeData.SearchStatus" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.EmploymentType" class="form-label">Тип занятости *</label>
+                            <input asp-for="ResumeData.EmploymentType" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.WorkSchedule" class="form-label">График работы *</label>
+                            <input asp-for="ResumeData.WorkSchedule" class="form-control" required />
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input asp-for="ResumeData.HasCar" class="form-check-input" />
+                            <label asp-for="ResumeData.HasCar" class="form-check-label">Наличие автомобиля</label>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ResumeData.DriverLicenseCategory" class="form-label">Категории прав</label>
+                            <input asp-for="ResumeData.DriverLicenseCategory" class="form-control" />
+                        </div>
                         <div class="mb-3 form-check">
                             <input asp-for="ResumeData.IsPublished" class="form-check-input" />
                             <label asp-for="ResumeData.IsPublished" class="form-check-label">
@@ -125,7 +165,7 @@
     </form>
 </div>
 
-@@section Scripts {
+@section Scripts {
 <script>
     function removePractice(btn) {
         const card = btn.closest('.practice-item');
