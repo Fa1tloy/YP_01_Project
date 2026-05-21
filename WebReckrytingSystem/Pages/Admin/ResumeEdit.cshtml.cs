@@ -25,9 +25,13 @@ namespace WebReckrytingSystem.Pages.Admin
 
         public IReadOnlyList<string> Specialties { get; set; } = new List<string>();
         public IReadOnlyList<string> DriverLicenseCategories => DriverLicenseCategoryCatalog.All;
+        public string? SuccessMessage { get; set; }
+        public string? ErrorMessage { get; set; }
 
         public IActionResult OnGet(string email)
         {
+            SuccessMessage = TempData["SuccessMessage"]?.ToString();
+            ErrorMessage = TempData["ErrorMessage"]?.ToString();
             Specialties = _specialtyService.GetAllNames();
 
             var existingResume = _context.Resumes.FirstOrDefault(r => r.UserEmail == email);
