@@ -63,7 +63,8 @@ public class CompanyDetailsModel : PageModel
 
         try
         {
-            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "company-logos");
+            var webRootPath = ResolveWebRootPath();
+            var uploadsFolder = Path.Combine(webRootPath, "uploads", "company-logos");
             Directory.CreateDirectory(uploadsFolder);
 
             var extension = Path.GetExtension(LogoFile.FileName);
@@ -90,5 +91,17 @@ public class CompanyDetailsModel : PageModel
         }
 
         return RedirectToPage(new { name });
+    }
+
+    private string ResolveWebRootPath()
+    {
+        if (!string.IsNullOrWhiteSpace(_webHostEnvironment.WebRootPath))
+        {
+            return _webHostEnvironment.WebRootPath;
+        }
+
+        var fallback = Path.Combine(_webHostEnvironment.ContentRootPath, "wwwroot");
+        Directory.CreateDirectory(fallback);
+        return fallback;
     }
 }

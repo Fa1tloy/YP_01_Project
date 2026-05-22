@@ -11,11 +11,13 @@ public class EditModel : PageModel
 {
     private readonly ApplicationDbContext _context;
     private readonly IWebHostEnvironment _webHostEnvironment;
+    private readonly ILogger<EditModel> _logger;
 
-    public EditModel(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
+    public EditModel(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, ILogger<EditModel> logger)
     {
         _context = context;
         _webHostEnvironment = webHostEnvironment;
+        _logger = logger;
     }
 
     [BindProperty]
@@ -60,35 +62,56 @@ public class EditModel : PageModel
 
         if (LogoFile is { Length: > 0 })
         {
-
-            if (string.IsNullOrWhiteSpace(LogoFile.ContentType) || !LogoFile.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
-            if (!LogoFile.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
-
+            if (string.IsNullOrWhiteSpace(LogoFile.ContentType) ||
+                !LogoFile.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
             {
                 ModelState.AddModelError(nameof(LogoFile), "Допускаются только изображения.");
                 return Page();
             }
 
-            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "company-logos");
-            Directory.CreateDirectory(uploadsFolder);
-
-            var extension = Path.GetExtension(LogoFile.FileName);
-            if (string.IsNullOrWhiteSpace(extension))
+            try
             {
-                extension = ".png";
+                var webRootPath = ResolveWebRootPath();
+                var uploadsFolder = Path.Combine(webRootPath, "uploads", "company-logos");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var extension = Path.GetExtension(LogoFile.FileName);
+                if (string.IsNullOrWhiteSpace(extension))
+                {
+                    extension = ".png";
+                }
+                var uniqueFileName = $"{Guid.NewGuid():N}{extension}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                await using var stream = System.IO.File.Create(filePath);
+                await LogoFile.CopyToAsync(stream);
+
+                companyFromDb.LogoUrl = $"/uploads/company-logos/{uniqueFileName}";
             }
-            var uniqueFileName = $"{Guid.NewGuid():N}{extension}";
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            await using var stream = System.IO.File.Create(filePath);
-            await LogoFile.CopyToAsync(stream);
-
-            companyFromDb.LogoUrl = $"/uploads/company-logos/{uniqueFileName}";
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка загрузки логотипа компании {CompanyName}", companyFromDb.Name);
+                ModelState.AddModelError(nameof(LogoFile), "Не удалось загрузить логотип. Попробуйте ещё раз.");
+                Company = companyFromDb;
+                return Page();
+            }
         }
 
         await _context.SaveChangesAsync();
 
         TempData["SuccessMessage"] = "Компания успешно обновлена.";
         return RedirectToPage("/Admin/Companies/Companies");
+    }
+
+    private string ResolveWebRootPath()
+    {
+        if (!string.IsNullOrWhiteSpace(_webHostEnvironment.WebRootPath))
+        {
+            return _webHostEnvironment.WebRootPath;
+        }
+
+        var fallback = Path.Combine(_webHostEnvironment.ContentRootPath, "wwwroot");
+        Directory.CreateDirectory(fallback);
+        return fallback;
     }
 }
