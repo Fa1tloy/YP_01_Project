@@ -94,7 +94,7 @@ namespace WebReckrytingSystem.Pages.Admin
             return RedirectToPage("/Admin/Resumes");
         }
 
-        private static CreateResumeViewModel MapResumeToViewModel(Resume resume)
+        private static CreateResumeViewModel MapResumeToViewModel(Models.Resume resume)
         {
             var viewModel = new CreateResumeViewModel
             {
