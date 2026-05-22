@@ -36,14 +36,22 @@ public class EditModel : PageModel
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync(string name)
+    public async Task<IActionResult> OnPostAsync(string? name)
     {
-        if (!ModelState.IsValid)
-            return Page();
+        var companyName = string.IsNullOrWhiteSpace(name) ? Company.Name : name;
+        if (string.IsNullOrWhiteSpace(companyName))
+            return NotFound();
 
-        var companyFromDb = await _context.Companies.FindAsync(name);
+        var companyFromDb = await _context.Companies.FindAsync(companyName);
         if (companyFromDb == null)
             return NotFound();
+
+        ModelState.Remove("Company.Name");
+        if (!ModelState.IsValid)
+        {
+            Company = companyFromDb;
+            return Page();
+        }
 
         // Название компании не меняем (Primary Key)
         companyFromDb.Description = Company.Description?.Trim();
@@ -52,7 +60,10 @@ public class EditModel : PageModel
 
         if (LogoFile is { Length: > 0 })
         {
+
+            if (string.IsNullOrWhiteSpace(LogoFile.ContentType) || !LogoFile.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
             if (!LogoFile.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+
             {
                 ModelState.AddModelError(nameof(LogoFile), "Допускаются только изображения.");
                 return Page();
@@ -62,6 +73,10 @@ public class EditModel : PageModel
             Directory.CreateDirectory(uploadsFolder);
 
             var extension = Path.GetExtension(LogoFile.FileName);
+            if (string.IsNullOrWhiteSpace(extension))
+            {
+                extension = ".png";
+            }
             var uniqueFileName = $"{Guid.NewGuid():N}{extension}";
             var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 

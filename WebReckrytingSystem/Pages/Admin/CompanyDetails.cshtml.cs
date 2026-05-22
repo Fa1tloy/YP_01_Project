@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -55,7 +55,7 @@ public class CompanyDetailsModel : PageModel
             return RedirectToPage(new { name });
         }
 
-        if (!LogoFile.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+        if (string.IsNullOrWhiteSpace(LogoFile.ContentType) || !LogoFile.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
         {
             TempData["ErrorMessage"] = "Допускаются только изображения.";
             return RedirectToPage(new { name });
@@ -67,6 +67,10 @@ public class CompanyDetailsModel : PageModel
             Directory.CreateDirectory(uploadsFolder);
 
             var extension = Path.GetExtension(LogoFile.FileName);
+            if (string.IsNullOrWhiteSpace(extension))
+            {
+                extension = ".png";
+            }
             var uniqueFileName = $"{Guid.NewGuid():N}{extension}";
             var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
