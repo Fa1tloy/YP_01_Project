@@ -64,7 +64,12 @@
                                     <li><a class="dropdown-item" href="@(isEmployer ? "/Account/EmployerDashboard" : isAdmin ? "/Admin/Index" : "/Account/JobSeekerDashboard")"><i class="fas fa-tachometer-alt me-2"></i>Личный кабинет</a></li>
                                     <li><a class="dropdown-item" href="@(isEmployer ? "/Resume/Search" : "/Vacancy/Search")"><i class="fas fa-search me-2"></i>Поиск</a></li>
                                     <li><a class="dropdown-item" href="/Account/Notifications"><i class="fas fa-bell me-2"></i>Уведомления</a></li>
-                                    <li><a class="dropdown-item" href="/Account/Chat"><i class="fas fa-comment me-2"></i>Чаты</a></li>
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center justify-content-between" href="/Account/Chat">
+                                            <span><i class="fas fa-comment me-2"></i>Чаты</span>
+                                            <span id="chatUnreadBadge" class="badge rounded-pill bg-danger ms-2 d-none">0</span>
+                                        </a>
+                                    </li>
                                     <li><a class="dropdown-item" href="/Account/Favorites"><i class="fas fa-star me-2"></i>Избранное</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="/Account/Settings"><i class="fas fa-cog me-2"></i>Настройки</a></li>
@@ -149,6 +154,38 @@
     </div>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        (() => {
+            const badge = document.getElementById('chatUnreadBadge');
+            if (!badge) return;
+
+            const applyUnreadCount = (count) => {
+                if (count > 0) {
+                    badge.textContent = count > 99 ? '99+' : String(count);
+                    badge.classList.remove('d-none');
+                } else {
+                    badge.textContent = '0';
+                    badge.classList.add('d-none');
+                }
+            };
+
+            const refreshUnreadCount = async () => {
+                try {
+                    const response = await fetch('/Account/Chat?handler=UnreadCount', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                    if (!response.ok) return;
+
+                    const data = await response.json();
+                    applyUnreadCount(Number(data.unreadCount) || 0);
+                } catch (error) {
+                    console.error('Ошибка при получении количества непрочитанных сообщений:', error);
+                }
+            };
+
+            refreshUnreadCount();
+            setInterval(refreshUnreadCount, 10000);
+        })();
+    </script>
 
     <script>
         function showToast(message, type = 'success') {

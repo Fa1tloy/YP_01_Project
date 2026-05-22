@@ -167,6 +167,20 @@ namespace WebReckrytingSystem.Pages.Account
             });
         }
 
+
+        public async Task<IActionResult> OnGetUnreadCountAsync()
+        {
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrWhiteSpace(userEmail))
+                return new JsonResult(new { unreadCount = 0 });
+
+            var unreadCount = await _context.ChatMessages
+                .Where(m => m.RecipientEmail == userEmail && !m.IsRead)
+                .CountAsync();
+
+            return new JsonResult(new { unreadCount });
+        }
+
         private async Task LoadDataAsync()
         {
             var allRelated = await _context.ChatMessages
@@ -227,6 +241,20 @@ namespace WebReckrytingSystem.Pages.Account
                 }
 
                 Messages = await query.OrderBy(m => m.SentAt).ToListAsync();
+
+                var unreadIncoming = Messages
+                    .Where(m => m.RecipientEmail == CurrentUserEmail && m.SenderEmail == Peer && !m.IsRead)
+                    .ToList();
+
+                if (unreadIncoming.Any())
+                {
+                    foreach (var message in unreadIncoming)
+                    {
+                        message.IsRead = true;
+                    }
+
+                    await _context.SaveChangesAsync();
+                }
             }
         }
 
