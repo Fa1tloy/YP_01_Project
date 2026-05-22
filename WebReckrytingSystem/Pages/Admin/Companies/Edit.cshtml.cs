@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -10,14 +10,19 @@ namespace WebReckrytingSystem.Pages.Admin.Companies;
 public class EditModel : PageModel
 {
     private readonly ApplicationDbContext _context;
+    private readonly IWebHostEnvironment _webHostEnvironment;
 
-    public EditModel(ApplicationDbContext context)
+    public EditModel(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
     {
         _context = context;
+        _webHostEnvironment = webHostEnvironment;
     }
 
     [BindProperty]
     public Company Company { get; set; } = new();
+
+    [BindProperty]
+    public IFormFile? LogoFile { get; set; }
 
     public async Task<IActionResult> OnGetAsync(string name)
     {
@@ -31,19 +36,52 @@ public class EditModel : PageModel
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync(string name)
+    public async Task<IActionResult> OnPostAsync(string? name)
     {
-        if (!ModelState.IsValid)
-            return Page();
+        var companyName = string.IsNullOrWhiteSpace(name) ? Company.Name : name;
+        if (string.IsNullOrWhiteSpace(companyName))
+            return NotFound();
 
-        var companyFromDb = await _context.Companies.FindAsync(name);
+        var companyFromDb = await _context.Companies.FindAsync(companyName);
         if (companyFromDb == null)
             return NotFound();
+
+        ModelState.Remove("Company.Name");
+        if (!ModelState.IsValid)
+        {
+            Company = companyFromDb;
+            return Page();
+        }
 
         // Название компании не меняем (Primary Key)
         companyFromDb.Description = Company.Description?.Trim();
         companyFromDb.Website = Company.Website?.Trim();
         companyFromDb.Verified = Company.Verified;
+
+        if (LogoFile is { Length: > 0 })
+        {
+            if (string.IsNullOrWhiteSpace(LogoFile.ContentType) || !LogoFile.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+            {
+                ModelState.AddModelError(nameof(LogoFile), "Допускаются только изображения.");
+                return Page();
+            }
+
+            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "company-logos");
+            Directory.CreateDirectory(uploadsFolder);
+
+            var extension = Path.GetExtension(LogoFile.FileName);
+            if (string.IsNullOrWhiteSpace(extension))
+            {
+                extension = ".png";
+            }
+            var uniqueFileName = $"{Guid.NewGuid():N}{extension}";
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            await using var stream = System.IO.File.Create(filePath);
+            await LogoFile.CopyToAsync(stream);
+
+            companyFromDb.LogoUrl = $"/uploads/company-logos/{uniqueFileName}";
+        }
 
         await _context.SaveChangesAsync();
 
