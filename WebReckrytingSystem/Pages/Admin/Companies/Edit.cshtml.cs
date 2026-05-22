@@ -60,7 +60,10 @@ public class EditModel : PageModel
 
         if (LogoFile is { Length: > 0 })
         {
+
             if (string.IsNullOrWhiteSpace(LogoFile.ContentType) || !LogoFile.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+            if (!LogoFile.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+
             {
                 ModelState.AddModelError(nameof(LogoFile), "Допускаются только изображения.");
                 return Page();
