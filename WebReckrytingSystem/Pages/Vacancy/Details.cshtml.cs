@@ -36,7 +36,7 @@ namespace WebReckrytingSystem.Pages.Vacancy
             {
                 var userEmail = User.FindFirstValue(ClaimTypes.Email);
 
-                if (User.IsInRole("job_seeker"))
+                if (User.IsInRole("job_seeker") && !string.IsNullOrWhiteSpace(userEmail))
                 {
                     IsSavedByCurrentStudent = await _context.SavedVacancies
                         .AnyAsync(s => s.StudentEmail == userEmail &&
@@ -49,6 +49,24 @@ namespace WebReckrytingSystem.Pages.Vacancy
                              (m.SenderEmail == Vacancy.AuthorEmail && m.RecipientEmail == userEmail)) &&
                             m.VacancyCompanyName == companyName &&
                             m.VacancyTitle == title);
+
+                    var alreadyViewed = await _context.VacancyViews
+                        .AnyAsync(v => v.UserEmail == userEmail &&
+                                       v.VacancyCompanyName == companyName &&
+                                       v.VacancyTitle == title);
+
+                    if (!alreadyViewed)
+                    {
+                        _context.VacancyViews.Add(new Models.VacancyView
+                        {
+                            UserEmail = userEmail,
+                            VacancyCompanyName = companyName,
+                            VacancyTitle = title,
+                            ViewedAt = DateTime.UtcNow
+                        });
+
+                        await _context.SaveChangesAsync();
+                    }
                 }
             }
 

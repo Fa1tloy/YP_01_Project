@@ -172,6 +172,7 @@ PRIMARY KEY (`id`)");
     EnsureColumnExists(connection, "resumes", "gender", "VARCHAR(20) NOT NULL DEFAULT ''");
     EnsureColumnExists(connection, "resumes", "has_car", "TINYINT(1) NOT NULL DEFAULT 0");
     EnsureColumnExists(connection, "resumes", "driver_license_category", "VARCHAR(20) NULL");
+    EnsureIndexExists(connection, "vacancy_views", "ux_vacancy_views_user_vacancy", "UNIQUE (`user_email`, `vacancy_company_name`, `vacancy_title`)");
 }
 
 static void EnsureTableExists(MySqlConnection connection, string tableName, string tableDefinition)
@@ -179,6 +180,22 @@ static void EnsureTableExists(MySqlConnection connection, string tableName, stri
     using var command = connection.CreateCommand();
     command.CommandText = $"CREATE TABLE IF NOT EXISTS `{tableName}` ({tableDefinition}) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
     command.ExecuteNonQuery();
+}
+
+static void EnsureIndexExists(MySqlConnection connection, string tableName, string indexName, string indexDefinition)
+{
+    using var existsCommand = connection.CreateCommand();
+    existsCommand.CommandText = @"SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = @tableName AND index_name = @indexName;";
+    existsCommand.Parameters.AddWithValue("@tableName", tableName);
+    existsCommand.Parameters.AddWithValue("@indexName", indexName);
+    var exists = Convert.ToInt32(existsCommand.ExecuteScalar()) > 0;
+
+    if (!exists)
+    {
+        using var addCommand = connection.CreateCommand();
+        addCommand.CommandText = $"ALTER TABLE `{tableName}` ADD CONSTRAINT `{indexName}` {indexDefinition};";
+        addCommand.ExecuteNonQuery();
+    }
 }
 
 static void EnsureColumnExists(MySqlConnection connection, string tableName, string columnName, string columnDefinition)

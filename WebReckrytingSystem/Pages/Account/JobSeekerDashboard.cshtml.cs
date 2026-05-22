@@ -112,26 +112,42 @@ namespace WebReckrytingSystem.Pages.Account
             try
             {
                 TotalApplications = _context.Set<JobApplication>().Count(a => a.StudentEmail == userEmail);
-                TotalVacancyViews = _context.Set<VacancyView>().Count(v => v.UserEmail == userEmail);
+                TotalVacancyViews = _context.Set<VacancyView>()
+                    .Where(v => v.UserEmail == userEmail)
+                    .Select(v => new { v.VacancyCompanyName, v.VacancyTitle })
+                    .Distinct()
+                    .Count();
                 SavedVacanciesCount = _context.SavedVacancies.Count(s => s.StudentEmail == userEmail);
 
-                // WeekData можно оставить для графика, но WeekViews больше не нужен
-                var weekAgo = DateTime.Now.AddDays(-7);
-                WeekData = _context.DailyAnalytics
-                    .Where(d => d.UserEmail == userEmail && d.Date >= weekAgo)
-                    .OrderBy(d => d.Date)
-                    .ToList();
+                var weekStart = DateTime.UtcNow.Date.AddDays(-6);
+                var applicationsByDay = _context.Set<JobApplication>()
+                    .Where(a => a.StudentEmail == userEmail && a.AppliedAt.Date >= weekStart)
+                    .AsEnumerable()
+                    .GroupBy(a => a.AppliedAt.Date)
+                    .ToDictionary(g => g.Key, g => g.Count());
 
-                if (!WeekData.Any())
-                {
-                    WeekData = Enumerable.Range(0, 7).Select(i => new DailyAnalytic
+                var savedByDay = _context.SavedVacancies
+                    .Where(s => s.StudentEmail == userEmail && s.SavedAt.Date >= weekStart)
+                    .AsEnumerable()
+                    .GroupBy(s => s.SavedAt.Date)
+                    .ToDictionary(g => g.Key, g => g.Count());
+
+                var viewsByDay = _context.Set<VacancyView>()
+                    .Where(v => v.UserEmail == userEmail && v.ViewedAt.Date >= weekStart)
+                    .AsEnumerable()
+                    .GroupBy(v => v.ViewedAt.Date)
+                    .ToDictionary(g => g.Key, g => g.Count());
+
+                WeekData = Enumerable.Range(0, 7)
+                    .Select(i => weekStart.AddDays(i))
+                    .Select(date => new DailyAnalytic
                     {
-                        Date = DateTime.Now.AddDays(-i).Date,
-                        ProfileViews = 0,
-                        ApplicationsSent = 0,
-                        SavedVacancies = 0
-                    }).Reverse().ToList();
-                }
+                        Date = date,
+                        ProfileViews = viewsByDay.TryGetValue(date, out var views) ? views : 0,
+                        ApplicationsSent = applicationsByDay.TryGetValue(date, out var applications) ? applications : 0,
+                        SavedVacancies = savedByDay.TryGetValue(date, out var saved) ? saved : 0
+                    })
+                    .ToList();
             }
             catch (Exception ex)
             {
@@ -219,15 +235,34 @@ namespace WebReckrytingSystem.Pages.Account
                 if (string.IsNullOrEmpty(userEmail))
                     return Unauthorized();
 
-                var weekAgo = DateTime.Now.AddDays(-7);
-                var data = _context.DailyAnalytics
-                    .Where(d => d.UserEmail == userEmail && d.Date >= weekAgo)
-                    .Select(d => new
+                var weekStart = DateTime.UtcNow.Date.AddDays(-6);
+
+                var applicationsByDay = _context.Set<JobApplication>()
+                    .Where(a => a.StudentEmail == userEmail && a.AppliedAt.Date >= weekStart)
+                    .AsEnumerable()
+                    .GroupBy(a => a.AppliedAt.Date)
+                    .ToDictionary(g => g.Key, g => g.Count());
+
+                var savedByDay = _context.SavedVacancies
+                    .Where(s => s.StudentEmail == userEmail && s.SavedAt.Date >= weekStart)
+                    .AsEnumerable()
+                    .GroupBy(s => s.SavedAt.Date)
+                    .ToDictionary(g => g.Key, g => g.Count());
+
+                var viewsByDay = _context.Set<VacancyView>()
+                    .Where(v => v.UserEmail == userEmail && v.ViewedAt.Date >= weekStart)
+                    .AsEnumerable()
+                    .GroupBy(v => v.ViewedAt.Date)
+                    .ToDictionary(g => g.Key, g => g.Count());
+
+                var data = Enumerable.Range(0, 7)
+                    .Select(i => weekStart.AddDays(i))
+                    .Select(date => new
                     {
-                        date = d.Date.ToString("dd.MM"),
-                        views = d.ProfileViews,
-                        applications = d.ApplicationsSent,
-                        saved = d.SavedVacancies
+                        date = date.ToString("dd.MM"),
+                        views = viewsByDay.TryGetValue(date, out var views) ? views : 0,
+                        applications = applicationsByDay.TryGetValue(date, out var applications) ? applications : 0,
+                        saved = savedByDay.TryGetValue(date, out var saved) ? saved : 0
                     })
                     .ToList();
 
