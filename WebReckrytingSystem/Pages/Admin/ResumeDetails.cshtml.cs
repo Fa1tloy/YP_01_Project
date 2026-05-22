@@ -154,12 +154,16 @@ public class ResumeDetailsModel : PageModel
                 AddRow("Возраст:", resume.Age?.ToString() ?? "");
                 AddRow("Пол:", resume.Gender);
                 AddRow("Специальность:", resume.Specialty);
+                AddRow("Желаемая должность:", resume.DesiredPosition);
                 AddRow("Желаемая зарплата:", resume.SalaryExpectations.HasValue
                     ? $"{resume.SalaryExpectations.Value:N0} ₽"
                     : "не указана");
                 AddRow("Тип занятости:", resume.EmploymentType);
                 AddRow("График:", resume.WorkSchedule);
                 AddRow("Готовность к командировкам:", tripReadiness);
+                AddRow("Наличие автомобиля:", resume.HasCar ? "Да" : "Нет");
+                AddRow("Категория прав:", string.IsNullOrWhiteSpace(resume.DriverLicenseCategory) ? "не указана" : resume.DriverLicenseCategory);
+                AddRow("Статус публикации:", resume.IsPublished ? "Опубликовано" : "Не опубликовано");
                 AddRow("Статус поиска работы:", resume.SearchStatus);
             });
 
